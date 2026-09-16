@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.env
+.env.local
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Runtime data (never commit these)
+facts/
+vector_db/
+exports/
+logs/
+conversations/
+projects/
+blueprints/*.md
+integrations/*.md
+
+# Editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker volumes
+neo4j_data/
+neo4j_logs/

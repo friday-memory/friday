@@ -1,0 +1,56 @@
+services:
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: friday-neo4j
+    restart: unless-stopped
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-change_this_strong_password}
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    networks:
+      - friday-net
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD:-change_this_strong_password}", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  friday:
+    build: .
+    container_name: friday-brain
+    restart: unless-stopped
+    ports:
+      - "80:8000"
+      - "8001:8001"
+    env_file: .env
+    volumes:
+      - ./gateway:/app/gateway
+      - ./layers:/app/layers
+      - ./pipelines:/app/pipelines
+      - ./orchestrator:/app/orchestrator
+      - ./mcp:/app/mcp
+      - ./studio:/app/studio
+      - ./seed:/app/seed
+      - friday_facts:/app/facts
+      - friday_vectors:/app/vector_db
+      - friday_logs:/app/logs
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    networks:
+      - friday-net
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  friday_facts:
+  friday_vectors:
+  friday_logs:
+
+networks:
+  friday-net:
+    driver: bridge

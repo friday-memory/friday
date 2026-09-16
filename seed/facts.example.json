@@ -1,0 +1,14 @@
+{
+  "facts": [
+    {"id": "f001", "content": "User prefers dark mode in all interfaces.", "superseded": false},
+    {"id": "f002", "content": "Default stack is FastAPI + PostgreSQL for backend services.", "superseded": false},
+    {"id": "f003", "content": "All API endpoints must return consistent JSON with status field.", "superseded": false},
+    {"id": "f004", "content": "Docker Compose is the preferred local development environment.", "superseded": false},
+    {"id": "f005", "content": "Production deploys on Ubuntu 22.04 EC2 instances.", "superseded": false},
+    {"id": "f006", "content": "All environment variables must be documented in .env.example.", "superseded": false},
+    {"id": "f007", "content": "Test coverage must remain above 80% before any merge.", "superseded": false},
+    {"id": "f008", "content": "Neo4j is the primary knowledge graph store.", "superseded": false},
+    {"id": "f009", "content": "DeepSeek Flash is preferred for cost-effective LLM calls.", "superseded": false},
+    {"id": "f010", "content": "MIT License applies to all open-source contributions.", "superseded": false}
+  ]
+}

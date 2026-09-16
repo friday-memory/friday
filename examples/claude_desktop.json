@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "friday": {
+      "command": "python",
+      "args": ["-m", "mcp.server"],
+      "cwd": "/path/to/your/friday",
+      "env": {
+        "FRIDAY_URL": "http://localhost:8000",
+        "BRAIN_API_KEY": "your_brain_api_key_here"
+      }
+    }
+  }
+}
