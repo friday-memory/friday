@@ -11,12 +11,9 @@
   &nbsp;Friday
 </h1>
 
-<h3>Every developer deserves a <strong>F.R.I.D.A.Y.</strong></h3>
-
 <p>
-  The open-source, self-hosted <strong>persistent cognitive memory layer</strong> for AI coding agents.<br>
-  Cursor forgets. Claude forgets. Copilot forgets.<br>
-  <strong>Friday doesn't.</strong>
+  An open-source, self-hosted <strong>persistent cognitive memory layer</strong> for AI coding agents (Cursor, Claude, VS Code).<br>
+  Persists architecture decisions, schemas, and preferences across sessions via the Model Context Protocol (MCP).
 </p>
 
 <br>
@@ -57,33 +54,22 @@
 
 ---
 
-## 🧠 The Problem — AI Amnesia
+## Problem: Session Amnesia & Token Overhead
 
-You're deep in a session with Cursor. You've explained your entire auth architecture.  
-Your JWT strategy. Your database schema. Your preferred patterns.
+Modern coding assistants (Cursor, Claude Code, Copilot, Antigravity) initialize each chat thread without cross-session memory. While developers frequently mitigate this using project documentation (`AGENTS.md`, prompt templates, or manual file references), this workflow presents two major bottlenecks:
 
-You open a new chat.
-
-```
-You:     "Add a refresh token endpoint using our JWT pattern."
-Cursor:  "Sure! What JWT library are you using? And how is your auth structured?"
-You:     😤  (again. for the 47th time this week.)
-```
-
-**Every AI coding assistant suffers from the same critical design flaw: no persistent memory.**
-
-Each session starts at zero. Your AI gives you generic advice instead of deeply personalized,  
-project-specific insight. You're repeating yourself constantly.
-
-The result? **You're spending up to 40% of your time just rebuilding context** — instead of building product.
-
+1. **Context Window & Token Inefficiency**: Injecting massive architecture documents or having agents repeatedly read entire repository directories consumes thousands of context tokens on every single query.
+2. **Loss of Incremental Decisions**: Ephemeral decisions—such as chosen dependency versions, schema adjustments, or bug fix rationale made in prior sessions—are lost when a session resets, forcing developers to repeatedly re-explain core constraints.
 ---
 
-## 💡 The Solution
+## Architecture & Solution
 
-Friday is a **persistent cognitive memory backbone** that plugs into your existing AI tools via the  
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io). It runs fully self-hosted on your  
-own infrastructure — your data never leaves your machine or your server.
+Friday runs as an open-source, self-hosted Model Context Protocol (MCP) server. Instead of dumping entire documentation files into prompt context, Friday exposes 4 targeted tools (`add_memory`, `add_fact`, `memory_search`, `get_context`) backed by a multi-tier storage engine:
+
+- **Semantic Memory (Mem0)**: Preserves past decisions, preferences, and workflows across sessions.
+- **Targeted Vector Search (ChromaDB)**: Retrieves only the exact memory snippets relevant to the immediate query.
+- **Relational Knowledge Graph (Neo4j)**: Automatically extracts entities and relationships in the background, mapping connections between components, schemas, and dependencies.
+- **Neural Studio**: Embedded web visualizer to inspect and query the knowledge graph in real time.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -126,73 +112,21 @@ own infrastructure — your data never leaves your machine or your server.
 
 ---
 
-## 📊 Why Friday?
+## Comparison: Static Prompts vs. Persistent Graph Memory
 
-<table>
-<thead>
-  <tr>
-    <th align="left">Capability</th>
-    <th align="center">Without Friday</th>
-    <th align="center">With Friday</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td>Remembers architecture decisions across sessions</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td>Recalls your exact coding preferences & style</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td>Knows your full project stack & dependencies</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td>Persists knowledge across chat resets</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td>Visual knowledge graph of your codebase</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td>Versioned facts ledger with full audit trail</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td>Self-hosted — data never leaves your infra</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td>Works with Cursor, Claude, VS Code, Antigravity</td>
-    <td align="center">❌</td>
-    <td align="center">✅</td>
-  </tr>
-  <tr>
-    <td><strong>Token cost per task</strong></td>
-    <td align="center">~8,000 tokens</td>
-    <td align="center"><strong>~800 tokens</strong></td>
-  </tr>
-  <tr>
-    <td><strong>Context recall accuracy</strong></td>
-    <td align="center">~30%</td>
-    <td align="center"><strong>~94%</strong></td>
-  </tr>
-</tbody>
-</table>
+| Capability | Static Prompts / AGENTS.md | Friday (MCP + Neo4j + Vector) |
+| :--- | :---: | :---: |
+| **Cross-Session Memory** | ❌ Lost on thread reset | ✅ Persisted in database |
+| **Context Retrieval** | ⚠️ Brute-force re-reading entire files | ✅ Targeted semantic & graph queries |
+| **Entity Relationships** | ❌ Unstructured flat text | ✅ Neo4j Knowledge Graph |
+| **Graph Generation** | ❌ Manual maintenance | ✅ Autonomous background extraction |
+| **Visual Inspection** | ❌ None | ✅ Live browser UI (Neural Studio) |
+| **Audit Trail** | ❌ None | ✅ Immutable versioned facts ledger |
+| **Infrastructure** | Local files | 100% Self-hosted (Docker Compose) |
 
 ---
 
-## 🚀 60-Second Quickstart
+## Quickstart
 
 > **Requirements:** [Docker](https://docker.com) + [Docker Compose](https://docs.docker.com/compose/) installed.  
 > That's literally it. No Python setup. No database config. No services to manage manually.
@@ -433,9 +367,9 @@ Edit your Claude Desktop configuration:
 
 ---
 
-## ✨ Features
+## Features
 
-### ⚡ Auto-Graph Engine — Zero Manual Linking
+### Auto-Graph Engine — Automated Relationship Extraction
 
 Every memory you store is automatically analyzed by an LLM (DeepSeek Flash).  
 Entities and relationships are extracted and wired into your Neo4j knowledge graph  
@@ -459,7 +393,7 @@ No YAML. No manual tagging. Just store memories, and your knowledge graph builds
 
 ---
 
-### 🎨 Neural Studio — Live Knowledge Graph UI
+### Neural Studio — Graph Visualization UI
 
 <br>
 
@@ -482,7 +416,7 @@ that powers [Obsidian](https://obsidian.md)'s graph view.
 
 ---
 
-### 📌 S3-Style Versioned Facts Ledger
+### Versioned Facts Ledger
 
 Discrete facts (rules, preferences, constants) are stored with **immutable version history**.  
 Old versions are superseded, never deleted. You always have a full audit trail.
@@ -503,7 +437,7 @@ GET /facts?include_superseded=true
 
 ---
 
-### 🔍 Semantic Search — 90% Fewer Tokens
+### Semantic Search via Vector Embeddings
 
 Instead of dumping your entire memory into every prompt, Friday uses ChromaDB vector search  
 to retrieve only the **most relevant context** for each query.
@@ -520,7 +454,7 @@ context = memory_search("JWT refresh token implementation")
 
 ---
 
-### 🔌 4 Native MCP Tools — Your AI Learns to Use Them
+### Native MCP Toolset
 
 Once connected, your AI agent automatically calls Friday's tools. No prompting required.
 
@@ -551,7 +485,7 @@ After implementing features or making decisions, call add_memory to persist the 
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 friday/
@@ -602,7 +536,7 @@ friday/
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 All authenticated endpoints require the `X-Brain-Key` header.  
 🌐 = public endpoint (no auth required).
@@ -629,7 +563,7 @@ All authenticated endpoints require the `X-Brain-Key` header.
 
 ---
 
-## 🔑 Environment Variables
+## Environment Variables
 
 | Variable | Required | Default | Description |
 |:---|:---:|:---|:---|
@@ -655,7 +589,7 @@ All authenticated endpoints require the `X-Brain-Key` header.
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 **v1.0 — Foundation** ✅ *shipped*
 - [x] FastAPI memory gateway with full REST API
@@ -688,7 +622,7 @@ All authenticated endpoints require the `X-Brain-Key` header.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Friday is built in public and we'd love your contributions.
 
@@ -720,7 +654,7 @@ Browse [`good first issue`](https://github.com/itskie/friday/issues?q=label%3A%2
 
 ---
 
-## 🔒 Security
+## Security
 
 Friday is designed for self-hosted deployment. A few notes:
 
@@ -733,7 +667,7 @@ Found a vulnerability? Please open a **private** security advisory on GitHub rat
 
 ---
 
-## 📄 License
+## License
 
 MIT © 2026 Friday Contributors — see [LICENSE](LICENSE) for details.
 
