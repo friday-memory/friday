@@ -27,6 +27,7 @@
 <a href="https://neo4j.com"><img src="https://img.shields.io/badge/Neo4j-5.15-4581C3?style=flat-square&logo=neo4j&logoColor=white" alt="Neo4j"/></a>
 <a href="docker-compose.yml"><img src="https://img.shields.io/badge/docker-compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/></a>
 <a href="mcp/server.py"><img src="https://img.shields.io/badge/MCP-protocol-7c3aed?style=flat-square" alt="MCP"/></a>
+<a href="https://glama.ai/mcp/servers/itskie/friday"><img src="https://glama.ai/mcp/servers/itskie/friday/badges/score.svg" alt="Glama MCP Server"/></a>
 <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square" alt="PRs Welcome"/></a>
 <a href="https://github.com/itskie/friday/stargazers"><img src="https://img.shields.io/github/stars/itskie/friday?style=flat-square&color=f59e0b" alt="Stars"/></a>
 
