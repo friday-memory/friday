@@ -26,7 +26,7 @@
 <a href="mcp/server.py"><img src="https://img.shields.io/badge/MCP-protocol-7c3aed?style=flat-square" alt="MCP"/></a>
 <a href="https://glama.ai/mcp/servers/itskie/friday"><img src="https://glama.ai/mcp/servers/itskie/friday/badges/score.svg" alt="Glama MCP Server"/></a>
 <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square" alt="PRs Welcome"/></a>
-<a href="https://github.com/itskie/friday/stargazers"><img src="https://img.shields.io/github/stars/itskie/friday?style=flat-square&color=f59e0b" alt="Stars"/></a>
+<a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat-square&color=f59e0b" alt="Stars"/></a>
 
 <br><br>
 
@@ -135,7 +135,7 @@ Friday runs as an open-source, self-hosted Model Context Protocol (MCP) server. 
 
 **Clone and configure**
 ```bash
-git clone https://github.com/itskie/friday.git
+git clone https://github.com/friday-memory/friday.git
 cd friday
 cp .env.example .env
 ```
@@ -650,7 +650,7 @@ git push origin feat/your-amazing-feature
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full guidelines.  
-Browse [`good first issue`](https://github.com/itskie/friday/issues?q=label%3A%22good+first+issue%22) labels to find where to start.
+Browse [`good first issue`](https://github.com/friday-memory/friday/issues?q=label%3A%22good+first+issue%22) labels to find where to start.
 
 ---
 
@@ -686,10 +686,10 @@ It helps more developers discover the project and keeps us motivated.
 
 <br>
 
-[⭐ Star on GitHub](https://github.com/itskie/friday) &nbsp;·&nbsp;
-[🐛 Report Bug](https://github.com/itskie/friday/issues/new?template=bug_report.md) &nbsp;·&nbsp;
-[💡 Request Feature](https://github.com/itskie/friday/issues/new?template=feature_request.md) &nbsp;·&nbsp;
-[💬 Discussions](https://github.com/itskie/friday/discussions)
+[⭐ Star on GitHub](https://github.com/friday-memory/friday) &nbsp;·&nbsp;
+[🐛 Report Bug](https://github.com/friday-memory/friday/issues/new?template=bug_report.md) &nbsp;·&nbsp;
+[💡 Request Feature](https://github.com/friday-memory/friday/issues/new?template=feature_request.md) &nbsp;·&nbsp;
+[💬 Discussions](https://github.com/friday-memory/friday/discussions)
 
 <br>
 
