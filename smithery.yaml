@@ -1,0 +1,25 @@
+build:
+  dockerfile: Dockerfile
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      fridayUrl:
+        type: string
+        default: "http://localhost:8000"
+        description: "Friday Memory Gateway URL"
+      fridayApiKey:
+        type: string
+        default: "friday_brain_secret_key_2026"
+        description: "Friday Brain API Key"
+  commandFunction: |-
+    (config) => ({
+      command: "python",
+      args: ["-m", "mcp.server"],
+      env: {
+        FRIDAY_URL: config?.fridayUrl || "http://localhost:8000",
+        FRIDAY_API_KEY: config?.fridayApiKey || "friday_brain_secret_key_2026",
+        BRAIN_API_KEY: config?.fridayApiKey || "friday_brain_secret_key_2026"
+      }
+    })
