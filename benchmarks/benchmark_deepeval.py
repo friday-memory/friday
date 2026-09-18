@@ -65,7 +65,7 @@ TEST_CASES = [
         id="TC-05",
         scenario="Multi-Agent Toolchain Consistency",
         query="Does Claude Code CLI in terminal respect the same security rules as Cursor IDE?",
-        ground_truth_nodes=["Protocol:SingleSourceOfTruth", "API:export_persona", "MCP:CentralBrain_18.61.244.46"]
+        ground_truth_nodes=["Protocol:SingleSourceOfTruth", "API:export_persona", "MCP:CentralBrain_Cluster"]
     )
 ]
 

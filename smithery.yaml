@@ -11,7 +11,7 @@ startCommand:
         description: "Friday Memory Gateway URL"
       fridayApiKey:
         type: string
-        default: "friday_brain_secret_key_2026"
+        default: "change_this_to_your_secret_key"
         description: "Friday Brain API Key"
   commandFunction: |-
     (config) => ({
@@ -19,7 +19,7 @@ startCommand:
       args: ["-m", "mcp.server"],
       env: {
         FRIDAY_URL: config?.fridayUrl || "http://localhost:8000",
-        FRIDAY_API_KEY: config?.fridayApiKey || "friday_brain_secret_key_2026",
-        BRAIN_API_KEY: config?.fridayApiKey || "friday_brain_secret_key_2026"
+        FRIDAY_API_KEY: config?.fridayApiKey || "change_this_to_your_secret_key",
+        BRAIN_API_KEY: config?.fridayApiKey || "change_this_to_your_secret_key"
       }
     })
