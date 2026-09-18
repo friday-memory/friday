@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
@@ -382,3 +382,56 @@ async def search_quick(q: str = ""):
         return {"results": results}
     finally:
         driver.close()
+
+@app.get("/export/persona")
+async def export_persona(target: str = "agents", _key=Depends(verify_key)):
+    """
+    Export synchronized agent persona & architectural directives.
+    Targets: 'agents' (AGENTS.md / GEMINI.md), 'cursor' (.cursorrules), 'soul' (SOUL.md for chat agents).
+    """
+    facts_data = _load_facts()
+    active_facts = [
+        f["content"] for f in facts_data.get("facts", [])
+        if f.get("status", "active") == "active"
+    ]
+    
+    if target == "soul":
+        lines = [
+            "# Persona & Directives (SOUL.md)",
+            "",
+            "You are connected to Friday Central Cognitive Memory as your persistent brain.",
+            "",
+            "## Active System Facts",
+        ]
+    elif target == "cursor":
+        lines = [
+            "# Cursor AI Project Rules",
+            "",
+            "## Architecture Truths (Synced from Friday Central Brain)",
+        ]
+    else:
+        lines = [
+            "# Agent Directives & Architectural Rules",
+            "",
+            "> Auto-synced from Friday Central Cognitive Memory. Single Source of Truth across all agents.",
+            "",
+            "## Verified Architectural Facts",
+        ]
+    
+    if active_facts:
+        for fact in active_facts:
+            lines.append(f"- {fact}")
+    else:
+        lines.append("- (No active facts stored in memory ledger yet)")
+    
+    lines.extend([
+        "",
+        "## Persistent Memory Protocol (MCP)",
+        "- Before refactoring major subsystems, query Friday Brain via `memory_search`.",
+        "- When confirming architectural decisions, schema changes, or bug fixes, record them via `add_memory` or `add_fact`.",
+        "- Zero duplicate prompt bloat: keep prompt context lean and rely on Friday for deep retrieval.",
+        ""
+    ])
+    
+    return Response(content="\n".join(lines), media_type="text/markdown")
+

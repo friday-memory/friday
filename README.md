@@ -54,79 +54,116 @@
 
 ---
 
-## Problem: Session Amnesia & Token Overhead
+## Why an External Cognitive Memory Layer? (The Second Brain Architecture)
 
-Modern coding assistants (Cursor, Claude Code, Copilot, Antigravity) initialize each chat thread without cross-session memory. While developers frequently mitigate this using project documentation (`AGENTS.md`, prompt templates, or manual file references), this workflow presents two major bottlenecks:
+Modern AI coding agents (Cursor, Claude Code, Antigravity, Copilot) are exceptionally capable at isolated code generation. However, in production engineering environments, developers repeatedly hit the same structural wall: **Session Amnesia**.
 
-1. **Context Window & Token Inefficiency**: Injecting massive architecture documents or having agents repeatedly read entire repository directories consumes thousands of context tokens on every single query.
-2. **Loss of Incremental Decisions**: Ephemeral decisions—such as chosen dependency versions, schema adjustments, or bug fix rationale made in prior sessions—are lost when a session resets, forcing developers to repeatedly re-explain core constraints.
----
-
-## Architecture & Solution
-
-Friday runs as an open-source, self-hosted Model Context Protocol (MCP) server. Instead of dumping entire documentation files into prompt context, Friday exposes 4 targeted tools (`add_memory`, `add_fact`, `memory_search`, `get_context`) backed by a multi-tier storage engine:
-
-- **Semantic Memory (Mem0)**: Preserves past decisions, preferences, and workflows across sessions.
-- **Targeted Vector Search (ChromaDB)**: Retrieves only the exact memory snippets relevant to the immediate query.
-- **Relational Knowledge Graph (Neo4j)**: Automatically extracts entities and relationships in the background, mapping connections between components, schemas, and dependencies.
-- **Neural Studio**: Embedded web visualizer to inspect and query the knowledge graph in real time.
+Most teams attempt to solve this with either massive prompt files (`.cursorrules`, `AGENTS.md`) or generic vector search (RAG). Both approaches break down under real-world engineering constraints:
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│         YOUR AI AGENT   (Cursor / Claude / Antigravity / VS Code)    │
-└──────────────────────────────┬───────────────────────────────────────┘
-                               │
-                    4 MCP Tools (stdio transport)
-                    ├── add_memory
-                    ├── add_fact
-                    ├── memory_search
-                    └── get_context
-                               │
-                               ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│                        FRIDAY BRAIN (FastAPI)                        │
-│                                                                      │
-│    Layer 2: Mem0           Layer 3: ChromaDB      Layer 4: Neo4j     │
-│  ┌──────────────────┐    ┌─────────────────┐    ┌───────────────┐   │
-│  │ Semantic Memory  │    │  Vector Search  │    │  Knowledge    │   │
-│  │                  │    │                 │    │  Graph        │   │
-│  │ • Cross-session  │    │ • 90% fewer     │    │  ──────────   │   │
-│  │   persistence    │    │   tokens via    │    │  ● WebApp     │   │
-│  │ • Contextual     │    │   targeted      │    │  ● Auth       │   │
-│  │   similarity     │    │   retrieval     │    │  ● Payments   │   │
-│  └──────────────────┘    └─────────────────┘    └───────────────┘   │
-│                                                                      │
-│    ⚡ Auto-Graph Engine                                              │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  Every memory → LLM extraction → Neo4j nodes + edges        │    │
-│  │  Zero manual linking. Your knowledge base wires itself.      │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│                                                                      │
-│    🎨 Neural Studio                                                  │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  Obsidian-grade live knowledge graph browser                 │    │
-│  │  Spread slider • Filters • Inspector drawer • Full CRUD      │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-└──────────────────────────────────────────────────────────────────────┘
+                  ┌─────────────────────────────────────────────────────────┐
+                  │          WHY STANDARD APPROACHES BREAK DOWN             │
+                  └─────────────────────────────────────────────────────────┘
+
+   1. Context Windows (RAM)           2. Static Rules Files             3. Vector Search (RAG)
+  ┌─────────────────────────┐       ┌─────────────────────────┐       ┌─────────────────────────┐
+  │ • Ephemeral volatile    │       │ • Linear token tax      │       │ • Matches text phrasing,│
+  │   memory (clears on     │       │   (2,500 tokens burned  │       │   NOT system topology   │
+  │   every new thread)     │       │   on every typo fix)    │       │ • Blind to directed     │
+  │ • Lost-in-the-middle    │       │ • Stale rules accumu-   │       │   call graphs & schema  │
+  │   degradation on 50k+   │       │   late & conflict       │       │   dependencies          │
+  │   token prompts         │       │ • Zero cross-tool sync  │       │ • Hallucinates blast    │
+  │ • High latency & cost   │       │   (Cursor ≠ Claude CLI) │       │   radii of refactors    │
+  └─────────────────────────┘       └─────────────────────────┘       └─────────────────────────┘
 ```
 
 ---
 
-## Comparison: Static Prompts vs. Persistent Graph Memory
+### The Three Fallacies of Agent Memory
 
-| Capability | Static Prompts / AGENTS.md | Friday (MCP + Neo4j + Vector) |
-| :--- | :---: | :---: |
-| **Cross-Session Memory** | ❌ Lost on thread reset | ✅ Persisted in database |
-| **Context Retrieval** | ⚠️ Brute-force re-reading entire files | ✅ Targeted semantic & graph queries |
-| **Entity Relationships** | ❌ Unstructured flat text | ✅ Neo4j Knowledge Graph |
-| **Graph Generation** | ❌ Manual maintenance | ✅ Autonomous background extraction |
-| **Visual Inspection** | ❌ None | ✅ Live browser UI (Neural Studio) |
-| **Audit Trail** | ❌ None | ✅ Immutable versioned facts ledger |
-| **Infrastructure** | Local files | 100% Self-hosted (Docker Compose) |
+#### 1. The Context Window Fallacy (Volatile RAM vs. Storage)
+Context windows are **working memory (volatile RAM)**, not storage. When you close a chat tab, trigger context compaction, or restart an agent, memory resets to zero. Furthermore, stuffing 50,000+ tokens of documentation into the prompt induces the well-documented *"lost-in-the-middle"* phenomenon: model attention degrades, subtle constraints are overlooked, and per-query latency and token bills skyrocket.
+
+#### 2. The Linear Prompt Tax of Static Rule Files
+Maintaining 600-line Markdown files (`.cursorrules`, `AGENTS.md`) introduces severe operational drag:
+- **The Token Tax**: You burn 2,000–3,000 prompt tokens on *every interaction*—even when merely asking the model to fix CSS padding.
+- **Knowledge Decay & Conflict**: Over months, rules rot. One section says *"use Axios"*, another says *"use fetch"*. The model receives contradictory constraints and behaves erratically.
+- **Toolchain Fragmentation**: Your Cursor rules are inaccessible to your Claude Code terminal CLI, your CI pipeline bots, or your teammates. There is no Single Source of Truth.
+
+#### 3. The Vector Search (RAG) Blindspot on Software Architecture
+Vector embeddings calculate **lexical and semantic cosine similarity**, not **system topology or state**:
+- *The Failure Mode*: Ask an agent: *"What breaks if I rename the `user_id` column in the `accounts` table?"*
+- Standard vector search retrieves files containing the string `"user_id"`. It cannot traverse directed dependency graphs:
+  $$\text{Table: accounts} \longrightarrow \text{FK: subscriptions} \longrightarrow \text{Service: BillingService} \longrightarrow \text{Worker: InvoicePoller}$$
+- Software architectures are **directed graphs**, not flat text documents. Without a relational graph database, agents cannot predict the blast radius of structural changes.
 
 ---
 
-## Quickstart
+## The Friday Cognitive Substrate
+
+Friday runs as an independent, 24/7 self-hosted service providing a **multi-tiered cognitive architecture** accessible by all your tools via the [Model Context Protocol (MCP)](https://modelcontextprotocol.io):
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│               YOUR CODING AGENTS (Cursor / Claude Code / Antigravity / VS Code)        │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │
+                                4 MCP Tools (stdio / HTTP)
+                                ├── add_memory       (persist decisions & rationale)
+                                ├── add_fact         (versioned immutable truths)
+                                ├── memory_search    (targeted semantic recall)
+                                └── get_context      (compiled multi-layer prompt)
+                                            │
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              FRIDAY CENTRAL COGNITIVE BRAIN                            │
+│                                                                                        │
+│   Layer 1: Facts Ledger         Layer 2: Episodic Memory       Layer 3: Graph Topology │
+│  ┌─────────────────────────┐   ┌───────────────────────────┐  ┌──────────────────────┐ │
+│  │ Versioned Facts         │   │ Mem0 + ChromaDB           │  │ Neo4j Property Graph │ │
+│  │                         │   │                           │  │                      │ │
+│  │ • Absolute ground truth │   │ • Chronological decisions │  │ • (:Endpoint)-[:CALLS│ │
+│  │ • 0 token prompt tax    │   │ • Cross-session context   │  │ • (:Service)-[:WRITES│ │
+│  │ • Conflict resolution   │   │ • 90% fewer tokens        │  │ • Entity call trees  │ │
+│  └─────────────────────────┘   └───────────────────────────┘  └──────────────────────┘ │
+│                                                                                        │
+│   ⚡ Autonomous Graph Engine: Every memory → background extraction → Neo4j graph       │
+│   🎨 Neural Studio: Live interactive visualizer for human & agent cognitive auditing  │
+│   🔄 Dynamic Persona Export: /export/persona endpoint feeds synchronized rules to IDEs │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Architectural Comparison Matrix
+
+| Capability | Static Prompts (`.cursorrules` / `AGENTS.md`) | Traditional RAG (Vector Only) | Friday Cognitive Substrate |
+| :--- | :---: | :---: | :---: |
+| **Cross-Session Persistence** | ❌ None (resets with thread) | ⚠️ Text chunks only | ✅ Full cognitive state & decisions |
+| **Dependency Graph Traversal** | ❌ Zero relationship awareness | ❌ Lexical similarity only | ✅ Neo4j Directed Property Graph |
+| **Token Efficiency** | ❌ Burns 2k-5k tokens per turn | ⚠️ Inefficient chunk dumps | ✅ Targeted queries (90% token savings) |
+| **Multi-Agent / Multi-Tool Sync** | ❌ Isolated per editor config | ❌ Disconnected silos | ✅ Universal MCP across Cursor, Claude, CLI |
+| **Knowledge Conflict Resolution**| ❌ Manual editing required | ❌ Ingests contradictory chunks | ✅ Versioned Fact Ledger with status flags |
+| **Visual Architecture Audit** | ❌ None | ❌ None | ✅ Neural Studio live visualizer |
+| **Deployment Model** | Local flat files | Cloud SaaS (vendor lock-in) | 100% Self-Hosted Docker Compose |
+
+---
+
+## 🚀 Quickstart
+
+### Option A: One-Command Zero-Friction Setup (Recommended)
+
+Run the automated installer in your terminal. It verifies Docker, provisions containers, generates cryptographically secure keys, and prints ready-to-use Cursor and Claude Desktop MCP configurations:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/friday-memory/friday/main/install.sh | bash
+```
+
+---
+
+### Option B: Manual Setup via Docker Compose
+
+
 
 > **Requirements:** [Docker](https://docker.com) + [Docker Compose](https://docs.docker.com/compose/) installed.  
 > That's literally it. No Python setup. No database config. No services to manage manually.
@@ -188,6 +225,24 @@ curl -X POST http://localhost/add \
 **Your AI now remembers. Forever.** ✅
 
 ---
+
+
+
+---
+
+## 🔄 Dynamic Persona & Directives Sync (`/export/persona`)
+
+Instead of manually keeping `.cursorrules` or `AGENTS.md` in sync across teammates and workstations, Friday can dynamically compile your active verified facts and architectural constraints into a single markdown file:
+
+```bash
+# Pull canonical rules directly from Friday Central Brain
+curl -s "http://localhost/export/persona?target=agents"   -H "X-Brain-Key: your_key" > AGENTS.md
+
+# For Cursor .cursorrules format
+curl -s "http://localhost/export/persona?target=cursor"   -H "X-Brain-Key: your_key" > .cursorrules
+```
+
+This guarantees all developers and AI agents in your organization adhere to the exact same architectural ground truths.
 
 ## 🔌 Connecting Your Agents (MCP Setup)
 

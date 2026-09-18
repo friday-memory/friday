@@ -93,6 +93,21 @@ def test_quick_search_public():
     assert r.status_code == 200
 
 
+
+def test_export_persona_requires_auth():
+    """Persona export requires auth."""
+    r = client.get("/export/persona")
+    assert r.status_code == 401
+
+
+def test_export_persona_with_auth():
+    """Persona export returns valid markdown directives with auth."""
+    r = client.get("/export/persona?target=agents", headers=HEADERS)
+    assert r.status_code == 200
+    assert "Directives" in r.text
+    assert "Persistent Memory Protocol" in r.text
+
+
 def teardown_module(module):
     """Cleanup temp facts file after tests."""
     if os.path.exists(_TMP_FACTS):
