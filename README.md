@@ -18,26 +18,32 @@
 
 <br>
 
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ec4899?style=flat-square" alt="MIT License"/></a>
-<a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.11+"/></a>
-<a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"/></a>
-<a href="https://neo4j.com"><img src="https://img.shields.io/badge/Neo4j-5.15-4581C3?style=flat-square&logo=neo4j&logoColor=white" alt="Neo4j"/></a>
-<a href="docker-compose.yml"><img src="https://img.shields.io/badge/docker-compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker"/></a>
-<a href="mcp/server.py"><img src="https://img.shields.io/badge/MCP-protocol-7c3aed?style=flat-square" alt="MCP"/></a>
-<a href="https://glama.ai/mcp/servers/itskie/friday"><img src="https://glama.ai/mcp/servers/itskie/friday/badges/score.svg" alt="Glama MCP Server"/></a>
-<a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square" alt="PRs Welcome"/></a>
-<a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat-square&color=f59e0b" alt="Stars"/></a>
+<p align="center">
+  <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat-square&logo=github&color=f59e0b" alt="GitHub Stars"/></a>
+  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/github/v/release/friday-memory/friday?style=flat-square&logo=github&color=6366f1" alt="Latest Release"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-ec4899?style=flat-square" alt="MIT License"/></a>
+  <a href="#-deepeval-comparative-benchmarks"><img src="https://img.shields.io/badge/deepeval-95%25%20precision-06b6d4?style=flat-square" alt="DeepEval Benchmarked"/></a>
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-10b981?style=flat-square" alt="PRs Welcome"/></a>
+</p>
 
-<br><br>
+<p align="center">
+  <a href="mcp/server.py"><img src="https://img.shields.io/badge/mcp-native%20protocol-7c3aed?style=flat-square" alt="MCP Protocol"/></a>
+  <a href="docker-compose.yml"><img src="https://img.shields.io/badge/docker-100%25%20self--hosted-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker Self-Hosted"/></a>
+  <a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"/></a>
+  <a href="https://neo4j.com"><img src="https://img.shields.io/badge/Neo4j-5.15-4581C3?style=flat-square&logo=neo4j&logoColor=white" alt="Neo4j"/></a>
+  <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.11+"/></a>
+</p>
+
+<br>
 
 <table>
   <tr>
-    <td align="center"><a href="#-60-second-quickstart"><b>🚀 Quickstart</b></a></td>
-    <td align="center"><a href="#-ide-setup--10-seconds"><b>🔌 IDE Setup</b></a></td>
-    <td align="center"><a href="#-features"><b>✨ Features</b></a></td>
-    <td align="center"><a href="#-api-reference"><b>📡 API Docs</b></a></td>
-    <td align="center"><a href="#-architecture"><b>🏗️ Architecture</b></a></td>
-    <td align="center"><a href="#-roadmap"><b>🗺️ Roadmap</b></a></td>
+    <td align="center"><a href="#-quickstart"><b>🚀 Quickstart</b></a></td>
+    <td align="center"><a href="#-connecting-your-agents-mcp-setup"><b>🔌 IDE Setup</b></a></td>
+    <td align="center"><a href="#-deepeval-comparative-benchmarks"><b>📊 Benchmarks</b></a></td>
+    <td align="center"><a href="#features"><b>✨ Features</b></a></td>
+    <td align="center"><a href="#architecture"><b>🏗️ Architecture</b></a></td>
+    <td align="center"><a href="#roadmap"><b>🗺️ Roadmap</b></a></td>
   </tr>
 </table>
 
