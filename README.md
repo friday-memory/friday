@@ -49,7 +49,7 @@
 
 <br><br>
 
-<img src="docs/assets/neural_studio.png" alt="Friday Neural Studio — Live Knowledge Graph UI" width="100%" style="border-radius: 8px; border: 1px solid #1e293b;" />
+<img src="docs/assets/synthetic_neural_cortex.png" alt="Friday Neural Studio — Live Knowledge Graph UI" width="100%" style="border-radius: 8px; border: 1px solid #1e293b;" />
 
 <br>
 <sub><i>Live Neural Studio (Holosphere 4.0) — 3D Synthetic Neural Cortex mapping cognitive memory constellations across anatomical cybernetic lobes with active synaptic action potentials.</i></sub>
@@ -488,7 +488,7 @@ No YAML. No manual tagging. Just store memories, and your knowledge graph builds
 <br>
 
 <p align="center">
-  <img src="docs/assets/neural_studio.png" alt="Friday Synthetic Neural Cortex 4.0" width="100%" style="border-radius: 10px; border: 1px solid #1e293b;" />
+  <img src="docs/assets/synthetic_neural_cortex.png" alt="Friday Synthetic Neural Cortex 4.0" width="100%" style="border-radius: 10px; border: 1px solid #1e293b;" />
 </p>
 
 A state-of-the-art WebGL / Three.js 3D cognitive brain studio — mapping your AI's knowledge graph onto an anatomical volumetric human cerebral cortex with real-time synaptic action potentials.
