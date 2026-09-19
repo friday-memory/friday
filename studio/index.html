@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Friday's Brain — Neural Studio 2.0 (MCU Holosphere)</title>
+  <title>Friday's Brain — Neural Studio 3.0 (Hyper-Real Holosphere)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Three.js Core WebGL Engine -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <!-- 2D Force Graph Engine -->
-  <script src="https://unpkg.com/force-graph"></script>
+  <script src="https://unpkg.com/force-graph@1.43.5/dist/force-graph.min.js"></script>
   <!-- 3D WebGL Force Graph Engine -->
   <script src="https://unpkg.com/3d-force-graph@1.80.0/dist/3d-force-graph.min.js"></script>
 
@@ -16,7 +18,7 @@
     :root {
       --bg: #05070c;
       --card-bg: rgba(10, 14, 24, 0.92);
-      --card-border: rgba(56, 189, 248, 0.18);
+      --card-border: rgba(56, 189, 248, 0.22);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --accent-pink: #ec4899;
@@ -26,7 +28,7 @@
       --accent-green: #10b981;
       --accent-blue: #38bdf8;
       --accent-red: #ef4444;
-      --hud-glow: 0 0 20px rgba(56, 189, 248, 0.15);
+      --hud-glow: 0 0 24px rgba(56, 189, 248, 0.2);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,14 +50,14 @@
       top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none;
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.03) 0%, transparent 80%),
+        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.04) 0%, transparent 80%),
         linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
       background-size: 100% 100%, 64px 64px, 64px 64px;
       z-index: 0;
     }
 
-    /* Graph Containers */
+    /* Canvas Containers */
     #graph-container, #graph-3d-container {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -90,17 +92,17 @@
     .brand-pill {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-radius: 24px;
-      padding: 6px 14px 6px 12px;
+      padding: 6px 16px 6px 12px;
       display: flex;
       align-items: center;
       gap: 12px;
       box-shadow: var(--hud-glow);
     }
     .brand-title {
-      font-weight: 700;
+      font-weight: 800;
       font-size: 13px;
       letter-spacing: -0.01em;
       display: flex;
@@ -113,18 +115,18 @@
       height: 8px;
       border-radius: 50%;
       background: var(--accent-cyan);
-      box-shadow: 0 0 10px var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-cyan);
       animation: pulse-ring 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
     }
     @keyframes pulse-ring {
-      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--accent-cyan); }
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 10px var(--accent-cyan); }
       50% { opacity: 0.4; transform: scale(0.8); box-shadow: 0 0 2px var(--accent-cyan); }
     }
 
     .brand-stats {
       font-size: 11px;
       color: var(--text-muted);
-      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      border-left: 1px solid rgba(255, 255, 255, 0.12);
       padding-left: 10px;
       display: flex;
       align-items: center;
@@ -146,21 +148,21 @@
     .search-box {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-radius: 24px;
-      padding: 6px 12px;
+      padding: 6px 14px;
       display: flex;
       align-items: center;
       gap: 8px;
       width: 220px;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
       box-shadow: var(--hud-glow);
     }
     .search-box:focus-within {
       width: 280px;
       border-color: var(--accent-cyan);
-      box-shadow: 0 0 16px rgba(6, 182, 212, 0.25);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
     }
     .search-box input {
       background: transparent;
@@ -186,11 +188,11 @@
     .btn-action {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       color: var(--text-main);
       border-radius: 20px;
-      padding: 6px 12px;
+      padding: 6px 14px;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
@@ -198,40 +200,40 @@
       align-items: center;
       gap: 6px;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
     .btn-action:hover {
       background: rgba(30, 41, 59, 0.95);
-      border-color: rgba(56, 189, 248, 0.5);
+      border-color: rgba(56, 189, 248, 0.6);
       color: #fff;
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.2);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.25);
     }
     .btn-action.primary {
-      background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.25));
-      border-color: rgba(236, 72, 153, 0.4);
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.3));
+      border-color: rgba(236, 72, 153, 0.5);
       color: #fbcfe8;
     }
     .btn-action.primary:hover {
-      background: linear-gradient(135deg, rgba(236, 72, 153, 0.45), rgba(168, 85, 247, 0.45));
-      border-color: rgba(236, 72, 153, 0.8);
-      box-shadow: 0 0 16px rgba(236, 72, 153, 0.35);
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.5), rgba(168, 85, 247, 0.5));
+      border-color: rgba(236, 72, 153, 0.9);
+      box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
     }
     .btn-action.active-glow {
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(56, 189, 248, 0.3));
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.35), rgba(56, 189, 248, 0.35));
       border-color: #38bdf8;
       color: #e0f2fe;
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
     }
 
     /* Spread Range Slider */
     .spread-wrap {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-radius: 20px;
-      padding: 4px 10px;
+      padding: 4px 12px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -244,6 +246,50 @@
       cursor: pointer;
     }
 
+    /* 3D Holo Flight Bar (Appears when in 3D Mode) */
+    .holo-flight-bar {
+      position: absolute;
+      top: 76px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 14, 24, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 24px;
+      padding: 4px 10px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(56, 189, 248, 0.25);
+    }
+    .holo-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      padding-right: 6px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    .flight-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      border-radius: 14px;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .flight-btn:hover {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.5);
+      color: #fff;
+    }
+
     /* Floating Filter Bar (Bottom) */
     .filter-bar {
       position: absolute;
@@ -252,8 +298,8 @@
       transform: translateX(-50%);
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-radius: 28px;
       padding: 4px;
       display: flex;
@@ -268,7 +314,7 @@
     .filter-bar::-webkit-scrollbar { display: none; }
 
     .filter-chip {
-      padding: 5px 12px;
+      padding: 6px 13px;
       border-radius: 20px;
       font-size: 11px;
       font-weight: 500;
@@ -282,10 +328,10 @@
     }
     .filter-chip:hover {
       color: #fff;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
     }
     .filter-chip.active {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.14);
       color: #fff;
       font-weight: 600;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -305,8 +351,8 @@
       bottom: 16px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
       border-radius: 16px;
       z-index: 20;
       display: flex;
@@ -557,9 +603,6 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
-
-    /* Audio Mute & Holo Mode Badges */
-    .sfx-badge { font-size: 10px; margin-left: 2px; }
   </style>
 </head>
 <body>
@@ -573,13 +616,24 @@
   <!-- 3D WebGL Canvas Container -->
   <div id="graph-3d-container"></div>
 
+  <!-- 3D Holo Flight Bar (Quick Warp) -->
+  <div class="holo-flight-bar" id="holo-flight-bar">
+    <span class="holo-tag">WARP HUB:</span>
+    <button class="flight-btn" onclick="warpToHub('Boss')">🟡 Boss</button>
+    <button class="flight-btn" onclick="warpToHub('FRIDAY')">🌸 Friday Core</button>
+    <button class="flight-btn" onclick="warpToHub('ReelDM')">🔵 ReelDM Ingress</button>
+    <button class="flight-btn" onclick="warpToHub('AI_Agents_Intelligence')">🌹 AI Swarm</button>
+    <button class="flight-btn" onclick="warpToHub('Payments_and_Growth')">🟢 Payments</button>
+    <button class="flight-btn" onclick="warpToHub('Security_and_Hardening')">🔴 Security</button>
+  </div>
+
   <!-- Top Navigation HUD -->
   <div class="top-hud">
     <div class="hud-left">
       <div class="brand-pill">
         <div class="brand-title">
           <span class="pulse-dot"></span>
-          <span>Friday Neural Studio 2.0</span>
+          <span>Friday Neural Studio 3.0</span>
         </div>
         <div class="brand-stats">
           <span>Nodes: <strong id="stat-nodes">--</strong></span>
@@ -597,12 +651,12 @@
 
     <div class="hud-right">
       <!-- 2D / 3D Dimension Switcher -->
-      <button class="btn-action" id="btn-toggle-3d" title="Switch between 2D HUD and 3D WebGL Holosphere">
+      <button class="btn-action primary" id="btn-toggle-3d" title="Switch between 2D HUD and Hyper-Real 3D Holosphere">
         <span id="dim-icon">🌐</span> <span id="dim-text">3D Holosphere</span>
       </button>
 
       <!-- De-Clutter / Orbital Ring Mode -->
-      <button class="btn-action" id="btn-toggle-orbit" title="Multi-Ring Orbital Geometry vs Raw Particle Spread">
+      <button class="btn-action active-glow" id="btn-toggle-orbit" title="Multi-Ring Orbital Geometry vs Raw Particle Spread">
         <span>🪐</span> <span id="orbit-text">Orbital Rims</span>
       </button>
 
@@ -698,17 +752,12 @@
     </div>
 
     <div class="drawer-body">
-      <!-- Relations Tab Content -->
       <div id="tab-relations" class="tab-content">
         <div class="conn-list" id="conn-list"></div>
       </div>
-
-      <!-- Facts Ledger Tab Content -->
       <div id="tab-facts" class="tab-content" style="display: none;">
         <div id="facts-list">Loading active facts...</div>
       </div>
-
-      <!-- Vector Context Tab Content -->
       <div id="tab-vector" class="tab-content" style="display: none;">
         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;" id="vector-content">
           Click "Query Memory" to retrieve deep semantic context.
@@ -778,6 +827,12 @@
     let isTourRunning = false;
     let allActiveFacts = [];
     let Graph3DInstance = null;
+    let three3DScene = null;
+    let three3DCamera = null;
+    let three3DRenderer = null;
+    let threeStars = null;
+    let threeCage = null;
+    let gyroRingList = [];
 
     // --- Procedural Web Audio Engine ---
     class SoundEngine {
@@ -799,7 +854,7 @@
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(440, now);
-        osc.frequency.exponentialRampToValueAtTime(560, now + 0.04);
+        osc.frequency.exponentialRampToValueAtTime(580, now + 0.04);
         gain.gain.setValueAtTime(0.015, now);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
         osc.connect(gain);
@@ -833,15 +888,15 @@
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(160, now);
-        osc.frequency.exponentialRampToValueAtTime(480, now + 0.12);
-        osc.frequency.exponentialRampToValueAtTime(110, now + 0.35);
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(520, now + 0.14);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.38);
         gain.gain.setValueAtTime(0.04, now);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
         osc.start(now);
-        osc.stop(now + 0.35);
+        osc.stop(now + 0.38);
       }
     }
     const Sound = new SoundEngine();
@@ -871,7 +926,7 @@
       return node.color || '#94a3b8';
     }
 
-    // --- Starfield Particle Engine for Background ---
+    // --- 2D Starfield Particle Engine ---
     const stars = Array.from({ length: 80 }, () => ({
       x: (Math.random() - 0.5) * 3600,
       y: (Math.random() - 0.5) * 2400,
@@ -894,7 +949,7 @@
       ctx.restore();
     }
 
-    // --- Cosmic Nebula Aura Clouds (Constellation Glows) ---
+    // --- 2D Cosmic Nebula Aura Clouds ---
     function drawNebulae(ctx, globalScale) {
       const hubs = [
         { name: 'Boss', color: '#f59e0b', radius: 280 },
@@ -914,9 +969,9 @@
         if (node && node.x !== undefined && node.y !== undefined) {
           const r = h.radius;
           const grad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r);
-          grad.addColorStop(0, h.color + '26');   // vibrant center
-          grad.addColorStop(0.4, h.color + '10'); // soft mid
-          grad.addColorStop(0.8, h.color + '03'); // outer fade
+          grad.addColorStop(0, h.color + '26');
+          grad.addColorStop(0.4, h.color + '10');
+          grad.addColorStop(0.8, h.color + '03');
           grad.addColorStop(1, 'transparent');
 
           ctx.fillStyle = grad;
@@ -924,7 +979,6 @@
           ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
           ctx.fill();
 
-          // Subtle concentric radar distance ring around main nexus
           if (h.name === "Friday's Brain" || h.name === 'ReelDM') {
             ctx.strokeStyle = h.color + '18';
             ctx.lineWidth = 1 / globalScale;
@@ -977,7 +1031,6 @@
         const isSelected = selectedNode === node;
         const isHighlight = highlightNodes.has(node);
 
-        // Filter Opacity
         let opacity = 1;
         if (currentFilter !== 'all') {
           const match = matchesFilter(node, currentFilter);
@@ -989,7 +1042,6 @@
         ctx.save();
         ctx.globalAlpha = opacity;
 
-        // Ambient Outer Glow
         if (isHovered || isSelected || (node.val && node.val >= 18)) {
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius * (isHovered ? 2.2 : 1.6), 0, 2 * Math.PI, false);
@@ -997,7 +1049,6 @@
           ctx.fill();
         }
 
-        // Core Node Circle
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
         ctx.fillStyle = color;
@@ -1005,11 +1056,9 @@
         ctx.shadowBlur = (isHovered || isSelected) ? 18 : 8;
         ctx.fill();
 
-        // Node Label
         const label = (node.name || node.id || '').replace(/_/g, ' ');
         const fontSize = Math.max(10 / globalScale, 3.2);
 
-        // Show label logic: core hub or zoomed in or hovered
         if (globalScale > 1.1 || isHovered || isSelected || node.val >= 14) {
           ctx.font = `600 ${fontSize}px 'Inter', sans-serif`;
           ctx.textAlign = 'center';
@@ -1099,7 +1148,6 @@
 
         const linkForce = Graph.d3Force('link');
         if (linkForce && linkForce.distance) {
-          // Dynamic link distance: spreads dense hubs into concentric orbits!
           linkForce.distance(link => {
             if (useOrbitalRims) {
               const sId = link.source.id || link.source;
@@ -1114,7 +1162,6 @@
           });
         }
 
-        // Collision
         Graph.d3Force('collision', alpha => {
           const collideNodes = Graph.graphData().nodes;
           for (let i = 0; i < collideNodes.length; i++) {
@@ -1140,24 +1187,148 @@
       }
     }
 
-    // --- 3D Holographic Engine (WebGL) ---
+    // =========================================================================
+    // --- HYPER-REALISTIC 3D WEBGL HOLOSPHERE ENGINE (STARK INDUSTRIES) ---
+    // =========================================================================
+
+    // 3D Billboard Sprite Cache
+    const spriteCache = new Map();
+    function createTextSprite3D(text, colorHex) {
+      if (spriteCache.has(text)) return spriteCache.get(text).clone();
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 96;
+      const ctx = canvas.getContext('2d');
+
+      // Frosted Glass Pill
+      ctx.fillStyle = 'rgba(7, 11, 20, 0.86)';
+      ctx.strokeStyle = colorHex;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(14, 16, 372, 64, 32);
+      ctx.fill();
+      ctx.stroke();
+
+      // Glowing Holographic Dot
+      ctx.fillStyle = colorHex;
+      ctx.shadowColor = colorHex;
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(46, 48, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Crisp HUD Typography
+      ctx.font = "bold 26px 'Inter', sans-serif";
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const clean = text.length > 22 ? text.substring(0, 20) + '..' : text;
+      ctx.fillText(clean, 68, 48);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.minFilter = THREE.LinearFilter;
+      const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(44, 11, 1);
+
+      spriteCache.set(text, sprite);
+      return sprite.clone();
+    }
+
     function init3DGraph() {
       const elem3D = document.getElementById('graph-3d-container');
+      gyroRingList = [];
+
       Graph3DInstance = ForceGraph3D()(elem3D)
         .backgroundColor('#05070c')
         .showNavInfo(false)
         .nodeVal(node => {
           const n = (node.name || node.id || '').toLowerCase();
-          if (n === 'boss' || n === 'friday' || n === "friday's brain") return 18;
-          return Math.max((node.degree || 1) * 1.6, 4);
+          if (n === 'boss' || n === 'friday' || n === "friday's brain") return 22;
+          return Math.max((node.degree || 1) * 1.8, 4);
         })
         .nodeColor(getNodeColor)
-        .nodeResolution(16)
-        .linkColor(() => 'rgba(255, 255, 255, 0.18)')
-        .linkWidth(0.8)
-        .linkDirectionalParticles(2)
-        .linkDirectionalParticleWidth(1.2)
-        .linkDirectionalParticleSpeed(0.005)
+        // Custom Hyper-Realistic Three.js Node Geometry
+        .nodeThreeObject(node => {
+          const group = new THREE.Group();
+          const colorHex = getNodeColor(node);
+          const color = new THREE.Color(colorHex);
+          const isHub = (node.degree && node.degree >= 10) || node.id === 'Boss' || node.id === 'FRIDAY' || node.id === "Friday's Brain" || node.id === 'ReelDM';
+          const radius = isHub ? 14 : Math.max(Math.sqrt(node.val || 5) * 1.8, 3.2);
+
+          // 1. Core Sphere (Standard PBR with Emissive Bloom)
+          const coreGeo = new THREE.SphereGeometry(radius, isHub ? 24 : 12, isHub ? 24 : 12);
+          const coreMat = new THREE.MeshStandardMaterial({
+            color: color,
+            emissive: color,
+            emissiveIntensity: isHub ? 0.95 : 0.45,
+            roughness: 0.15,
+            metalness: 0.85
+          });
+          const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+          group.add(coreMesh);
+
+          // 2. Translucent Atmosphere Shell (Corona Glow)
+          if (isHub) {
+            const coronaGeo = new THREE.SphereGeometry(radius * 1.35, 16, 16);
+            const coronaMat = new THREE.MeshBasicMaterial({
+              color: color,
+              transparent: true,
+              opacity: 0.22,
+              wireframe: false
+            });
+            const coronaMesh = new THREE.Mesh(coronaGeo, coronaMat);
+            group.add(coronaMesh);
+
+            // 3. Gyroscopic Arc-Reactor Orbital Ring
+            const ringGeo = new THREE.TorusGeometry(radius * 2.2, 0.7, 8, 48);
+            const ringMat = new THREE.MeshBasicMaterial({
+              color: color,
+              transparent: true,
+              opacity: 0.75
+            });
+            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+            ringMesh.rotation.x = Math.PI / 3;
+            ringMesh.rotation.y = Math.PI / 6;
+            group.add(ringMesh);
+            gyroRingList.push({ mesh: ringMesh, speed: 0.02, axis: 'z' });
+
+            // 4. Secondary Counter-Rotating Gyro Ring (For Key Flagships)
+            if (node.id === 'Boss' || node.id === 'FRIDAY' || node.id === "Friday's Brain" || node.id === 'ReelDM') {
+              const ring2Geo = new THREE.TorusGeometry(radius * 2.8, 0.5, 8, 48);
+              const ring2Mat = new THREE.MeshBasicMaterial({
+                color: node.id === 'Boss' ? 0xffffff : 0x38bdf8,
+                transparent: true,
+                opacity: 0.55
+              });
+              const ring2Mesh = new THREE.Mesh(ring2Geo, ring2Mat);
+              ring2Mesh.rotation.x = -Math.PI / 4;
+              ring2Mesh.rotation.z = Math.PI / 3;
+              group.add(ring2Mesh);
+              gyroRingList.push({ mesh: ring2Mesh, speed: -0.015, axis: 'y' });
+            }
+
+            // 5. Billboarded Text Sprite (Floating above the hub)
+            const sprite = createTextSprite3D((node.name || node.id).replace(/_/g, ' '), colorHex);
+            sprite.position.y = radius + 15;
+            group.add(sprite);
+          }
+
+          return group;
+        })
+        // Curved Plasma Synapses
+        .linkCurvature(0.14)
+        .linkCurveRotation(link => (link.source.id || '').length % 6 * 0.5)
+        .linkWidth(link => highlightLinks.has(link) ? 2.5 : 0.8)
+        .linkColor(link => {
+          if (highlightLinks.has(link)) return '#ec4899';
+          return 'rgba(255, 255, 255, 0.16)';
+        })
+        .linkDirectionalParticles(link => highlightLinks.has(link) ? 4 : 2)
+        .linkDirectionalParticleWidth(link => highlightLinks.has(link) ? 3.0 : 1.6)
+        .linkDirectionalParticleSpeed(0.006)
         .linkDirectionalParticleColor(link => {
           const sNode = typeof link.source === 'object' ? link.source : null;
           return sNode ? getNodeColor(sNode) : '#38bdf8';
@@ -1167,7 +1338,7 @@
           Sound.playClick();
           selectedNode = node;
           openDrawer(node);
-          const distance = 120;
+          const distance = 160;
           const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
           Graph3DInstance.cameraPosition(
             { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
@@ -1177,11 +1348,105 @@
         })
         .graphData(graphData);
 
-      // Auto-Orbit camera
+      // --- Three.js Scene Enhancements: Lights, Fog, Stars, Geodesic Cage ---
+      three3DScene = Graph3DInstance.scene();
+      three3DCamera = Graph3DInstance.camera();
+      three3DRenderer = Graph3DInstance.renderer();
+
+      if (three3DScene) {
+        // Deep Cinematic Fog (Far nodes fade gracefully into cosmic darkness)
+        three3DScene.fog = new THREE.FogExp2(0x05070c, 0.00045);
+
+        // Ambient Light
+        const ambLight = new THREE.AmbientLight(0xffffff, 0.8);
+        three3DScene.add(ambLight);
+
+        // Directional Sun Lights (Cyan and Magenta rim lighting)
+        const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 1.8);
+        dirLight1.position.set(500, 800, 500);
+        three3DScene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0xec4899, 1.4);
+        dirLight2.position.set(-500, -600, -500);
+        three3DScene.add(dirLight2);
+
+        // Volumetric 3D Stardust Field (1,800 points)
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 1800;
+        const starPositions = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount * 3; i += 3) {
+          starPositions[i] = (Math.random() - 0.5) * 4400;
+          starPositions[i + 1] = (Math.random() - 0.5) * 4400;
+          starPositions[i + 2] = (Math.random() - 0.5) * 4400;
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        const starMat = new THREE.PointsMaterial({
+          color: 0x93c5fd,
+          size: 2.2,
+          transparent: true,
+          opacity: 0.65,
+          blending: THREE.AdditiveBlending
+        });
+        threeStars = new THREE.Points(starGeo, starMat);
+        three3DScene.add(threeStars);
+
+        // Geodesic Holographic Containment Cage
+        const cageGeo = new THREE.IcosahedronGeometry(2200, 2);
+        const cageMat = new THREE.MeshBasicMaterial({
+          color: 0x38bdf8,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.038
+        });
+        threeCage = new THREE.Mesh(cageGeo, cageMat);
+        three3DScene.add(threeCage);
+      }
+
+      // Continuous 3D Gyro Ring Animation & Celestial Drift
+      function animate3DFrame() {
+        if (is3DMode) {
+          // Rotate Gyro Rings on hubs
+          for (let i = 0; i < gyroRingList.length; i++) {
+            const item = gyroRingList[i];
+            if (item.mesh) {
+              item.mesh.rotation[item.axis] += item.speed;
+            }
+          }
+          // Drift outer stardust and cage
+          if (threeStars) threeStars.rotation.y += 0.0002;
+          if (threeCage) {
+            threeCage.rotation.y += 0.0003;
+            threeCage.rotation.x += 0.0001;
+          }
+        }
+        requestAnimationFrame(animate3DFrame);
+      }
+      requestAnimationFrame(animate3DFrame);
+
+      // Auto-Orbit Camera Controls
       const controls = Graph3DInstance.controls();
       if (controls) {
         controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.6;
+        controls.autoRotateSpeed = 0.55;
+      }
+    }
+
+    // --- Warp Camera to Hub in 3D ---
+    function warpToHub(hubName) {
+      if (!is3DMode) toggle3DMode();
+      Sound.playWarp();
+      const node = graphData.nodes.find(n => n.id === hubName || n.name === hubName);
+      if (node && Graph3DInstance) {
+        showToast(`Warping to ${hubName}...`, '🚀');
+        selectedNode = node;
+        openDrawer(node);
+        const distance = 160;
+        const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+        Graph3DInstance.cameraPosition(
+          { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+          node,
+          1400
+        );
       }
     }
 
@@ -1190,15 +1455,17 @@
       is3DMode = !is3DMode;
       const container2D = document.getElementById('graph-container');
       const container3D = document.getElementById('graph-3d-container');
+      const flightBar = document.getElementById('holo-flight-bar');
       const btn = document.getElementById('btn-toggle-3d');
 
       if (is3DMode) {
         container2D.style.display = 'none';
         container3D.style.display = 'block';
+        flightBar.style.display = 'flex';
         btn.classList.add('active-glow');
         document.getElementById('dim-icon').innerText = '🗺️';
-        document.getElementById('dim-text').innerText = '2D HUD';
-        showToast('3D Neural Holosphere Active', '🌐');
+        document.getElementById('dim-text').innerText = '2D Tactical HUD';
+        showToast('Hyper-Real 3D Holosphere Active', '🌐');
         if (!Graph3DInstance) {
           init3DGraph();
         } else {
@@ -1207,6 +1474,7 @@
       } else {
         container3D.style.display = 'none';
         container2D.style.display = 'block';
+        flightBar.style.display = 'none';
         btn.classList.remove('active-glow');
         document.getElementById('dim-icon').innerText = '🌐';
         document.getElementById('dim-text').innerText = '3D Holosphere';
@@ -1239,16 +1507,29 @@
         if (target && target.x !== undefined) {
           showToast(stop.label, '🎯');
           Sound.playHover();
-          Graph.centerAt(target.x, target.y, 1000);
-          Graph.zoom(stop.zoom, 1000);
+          if (is3DMode && Graph3DInstance) {
+            const distance = 160;
+            const distRatio = 1 + distance / Math.hypot(target.x, target.y, target.z);
+            Graph3DInstance.cameraPosition(
+              { x: target.x * distRatio, y: target.y * distRatio, z: target.z * distRatio },
+              target,
+              1200
+            );
+          } else {
+            Graph.centerAt(target.x, target.y, 1000);
+            Graph.zoom(stop.zoom, 1000);
+          }
           highlightNodes.clear();
           highlightNodes.add(target);
           await new Promise(r => setTimeout(r, 2800));
         }
       }
 
-      // Reset to full galaxy
-      Graph.zoomToFit(1000, 60);
+      if (is3DMode && Graph3DInstance) {
+        Graph3DInstance.cameraPosition({ x: 0, y: 0, z: 1200 }, { x: 0, y: 0, z: 0 }, 1400);
+      } else {
+        Graph.zoomToFit(1000, 60);
+      }
       highlightNodes.clear();
       showToast('Neural Galaxy Scan Complete', '✅');
       tourButton.classList.remove('active-glow');
@@ -1259,7 +1540,8 @@
     function exportSnapshot() {
       Sound.playClick();
       showToast('Capturing HUD Snapshot...', '📸');
-      const canvas = elem2D.querySelector('canvas');
+      const activeElem = is3DMode ? document.getElementById('graph-3d-container') : elem2D;
+      const canvas = activeElem.querySelector('canvas');
       if (!canvas) return;
 
       const tempCanvas = document.createElement('canvas');
@@ -1267,19 +1549,17 @@
       tempCanvas.height = canvas.height;
       const tCtx = tempCanvas.getContext('2d');
 
-      // Draw canvas
       tCtx.drawImage(canvas, 0, 0);
 
-      // Watermark HUD brand
       tCtx.font = "bold 20px 'Inter', sans-serif";
       tCtx.fillStyle = '#38bdf8';
-      tCtx.fillText("FRIDAY NEURAL STUDIO // CLOUD ARCHITECTURE", 40, tempCanvas.height - 50);
+      tCtx.fillText("FRIDAY NEURAL STUDIO 3.0 // MCU HOLOSPHERE", 40, tempCanvas.height - 50);
       tCtx.font = "14px 'JetBrains Mono', monospace";
       tCtx.fillStyle = '#94a3b8';
       tCtx.fillText(`386 Nodes • 489 Edges • AWS EC2 (18.61.244.46) • ${new Date().toISOString().split('T')[0]}`, 40, tempCanvas.height - 24);
 
       const link = document.createElement('a');
-      link.download = `friday_brain_neural_hud_${Date.now()}.png`;
+      link.download = `friday_brain_holosphere_${Date.now()}.png`;
       link.href = tempCanvas.toDataURL('image/png');
       link.click();
       showToast('Snapshot Downloaded!', '🎉');
@@ -1294,7 +1574,6 @@
         const pingMs = Math.round(performance.now() - t0);
         document.getElementById('stat-ping').innerText = `${pingMs}ms`;
 
-        // Calculate node degrees
         const degreeMap = {};
         data.links.forEach(l => {
           const s = l.source.id || l.source;
@@ -1303,19 +1582,16 @@
           degreeMap[t] = (degreeMap[t] || 0) + 1;
         });
 
-        // Assign orbital tiers to ReelDM leaves to eliminate congestion
         let reelLeafIdx = 0;
         data.nodes.forEach(n => {
           n.degree = degreeMap[n.id] || 1;
           
-          // Connect check to ReelDM
           const isReelLeaf = data.links.some(l => 
             (l.source === 'ReelDM' && l.target === n.id) || 
             (l.target === 'ReelDM' && l.source === n.id)
           );
 
           if (isReelLeaf && n.id !== 'ReelDM') {
-            // Assign to concentric tiers: 0 (inner), 1 (mid), 2 (outer), 3 (deep space)
             n._orbitalTier = (reelLeafIdx % 4);
             reelLeafIdx++;
           }
@@ -1331,10 +1607,7 @@
         document.getElementById('stat-nodes').innerText = graphData.nodes.length;
         document.getElementById('stat-edges').innerText = graphData.links.length;
 
-        // Apply initial physics forces
         applyForces(parseInt(document.getElementById('spread-slider').value));
-
-        // Background facts loading
         loadGlobalFacts();
 
       } catch (err) {
@@ -1361,7 +1634,6 @@
       document.getElementById('drawer-tag').innerText = node.group || 'NEURAL ENTITY';
       document.getElementById('inspector-drawer').classList.add('open');
 
-      // Populate Connections Tab
       const connList = document.getElementById('conn-list');
       connList.innerHTML = '';
 
@@ -1390,7 +1662,17 @@
             if (targetNode) {
               selectedNode = targetNode;
               openDrawer(targetNode);
-              Graph.centerAt(targetNode.x, targetNode.y, 500);
+              if (is3DMode && Graph3DInstance) {
+                const distance = 160;
+                const distRatio = 1 + distance / Math.hypot(targetNode.x, targetNode.y, targetNode.z);
+                Graph3DInstance.cameraPosition(
+                  { x: targetNode.x * distRatio, y: targetNode.y * distRatio, z: targetNode.z * distRatio },
+                  targetNode,
+                  1200
+                );
+              } else {
+                Graph.centerAt(targetNode.x, targetNode.y, 500);
+              }
             }
           };
           connList.appendChild(item);
@@ -1584,8 +1866,18 @@
       }
       const match = graphData.nodes.find(n => (n.name || n.id).toLowerCase().includes(q));
       if (match && match.x !== undefined && match.y !== undefined) {
-        Graph.centerAt(match.x, match.y, 500);
-        Graph.zoom(2.0, 500);
+        if (is3DMode && Graph3DInstance) {
+          const distance = 160;
+          const distRatio = 1 + distance / Math.hypot(match.x, match.y, match.z);
+          Graph3DInstance.cameraPosition(
+            { x: match.x * distRatio, y: match.y * distRatio, z: match.z * distRatio },
+            match,
+            1200
+          );
+        } else {
+          Graph.centerAt(match.x, match.y, 500);
+          Graph.zoom(2.0, 500);
+        }
         highlightNodes.clear();
         highlightNodes.add(match);
       }
@@ -1600,36 +1892,49 @@
           Sound.playClick();
           selectedNode = match;
           openDrawer(match);
-          Graph.centerAt(match.x, match.y, 600);
-          Graph.zoom(2.2, 600);
+          if (is3DMode && Graph3DInstance) {
+            const distance = 160;
+            const distRatio = 1 + distance / Math.hypot(match.x, match.y, match.z);
+            Graph3DInstance.cameraPosition(
+              { x: match.x * distRatio, y: match.y * distRatio, z: match.z * distRatio },
+              match,
+              1200
+            );
+          } else {
+            Graph.centerAt(match.x, match.y, 600);
+            Graph.zoom(2.2, 600);
+          }
         }
       }
     });
 
-    // Close modals on clicking outside
     document.querySelectorAll('.modal-backdrop').forEach(modal => {
       modal.addEventListener('click', e => {
-        if (e.target === modal) {
-          modal.classList.remove('active');
-        }
+        if (e.target === modal) modal.classList.remove('active');
       });
     });
 
     // --- Controls: Fit View & Pause Physics ---
     document.getElementById('btn-fit-view').onclick = () => {
       Sound.playClick();
-      Graph.zoomToFit(700, 60);
+      if (is3DMode && Graph3DInstance) {
+        Graph3DInstance.cameraPosition({ x: 0, y: 0, z: 1200 }, { x: 0, y: 0, z: 0 }, 1200);
+      } else {
+        Graph.zoomToFit(700, 60);
+      }
     };
 
     document.getElementById('btn-pause-physics').onclick = () => {
       Sound.playClick();
       isPhysicsFrozen = !isPhysicsFrozen;
       if (isPhysicsFrozen) {
-        Graph.pauseAnimation();
+        if (is3DMode && Graph3DInstance) Graph3DInstance.pauseAnimation();
+        else Graph.pauseAnimation();
         document.getElementById('physics-label').innerText = '▶ Unfreeze';
         showToast('Physics Frozen', '⏸');
       } else {
-        Graph.resumeAnimation();
+        if (is3DMode && Graph3DInstance) Graph3DInstance.resumeAnimation();
+        else Graph.resumeAnimation();
         document.getElementById('physics-label').innerText = '⏸ Freeze';
         showToast('Physics Resumed', '▶');
       }
@@ -1712,7 +2017,11 @@
         closeDrawer();
         document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
       } else if (e.key.toLowerCase() === 'f' && document.activeElement !== searchInput) {
-        Graph.zoomToFit(700, 60);
+        if (is3DMode && Graph3DInstance) {
+          Graph3DInstance.cameraPosition({ x: 0, y: 0, z: 1200 }, { x: 0, y: 0, z: 0 }, 1200);
+        } else {
+          Graph.zoomToFit(700, 60);
+        }
       }
     });
 
