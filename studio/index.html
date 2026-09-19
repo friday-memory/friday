@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Friday's Brain — Neural Studio 3.0 (Hyper-Real Holosphere)</title>
+  <title>Friday's Brain — Neural Studio (MCU Holosphere 3.0)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <!-- Three.js Core WebGL Engine -->
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
   <!-- 2D Force Graph Engine -->
   <script src="https://unpkg.com/force-graph@1.43.5/dist/force-graph.min.js"></script>
-  <!-- 3D WebGL Force Graph Engine -->
-  <script src="https://unpkg.com/3d-force-graph@1.80.0/dist/3d-force-graph.min.js"></script>
+  <!-- 3D WebGL Force Graph Engine (Stable Bundled Three.js) -->
+  <script src="https://unpkg.com/3d-force-graph@1.73.4/dist/3d-force-graph.min.js"></script>
 
   <style>
     :root {
@@ -44,7 +42,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Ambient Space Grid & Starfield */
+    /* Ambient Space Grid */
     .space-grid {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -651,7 +649,7 @@
 
     <div class="hud-right">
       <!-- 2D / 3D Dimension Switcher -->
-      <button class="btn-action primary" id="btn-toggle-3d" title="Switch between 2D HUD and Hyper-Real 3D Holosphere">
+      <button class="btn-action primary" id="btn-toggle-3d" title="Switch between 2D Tactical HUD and 3D WebGL Holosphere">
         <span id="dim-icon">🌐</span> <span id="dim-text">3D Holosphere</span>
       </button>
 
@@ -827,12 +825,6 @@
     let isTourRunning = false;
     let allActiveFacts = [];
     let Graph3DInstance = null;
-    let three3DScene = null;
-    let three3DCamera = null;
-    let three3DRenderer = null;
-    let threeStars = null;
-    let threeCage = null;
-    let gyroRingList = [];
 
     // --- Procedural Web Audio Engine ---
     class SoundEngine {
@@ -1188,246 +1180,81 @@
     }
 
     // =========================================================================
-    // --- HYPER-REALISTIC 3D WEBGL HOLOSPHERE ENGINE (STARK INDUSTRIES) ---
+    // --- 3D WEBGL HOLOSPHERE ENGINE (STABLE, HARDENED & FAST) ---
     // =========================================================================
-
-    // 3D Billboard Sprite Cache
-    const spriteCache = new Map();
-    function createTextSprite3D(text, colorHex) {
-      if (spriteCache.has(text)) return spriteCache.get(text).clone();
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 96;
-      const ctx = canvas.getContext('2d');
-
-      // Frosted Glass Pill
-      ctx.fillStyle = 'rgba(7, 11, 20, 0.86)';
-      ctx.strokeStyle = colorHex;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(14, 16, 372, 64, 32);
-      ctx.fill();
-      ctx.stroke();
-
-      // Glowing Holographic Dot
-      ctx.fillStyle = colorHex;
-      ctx.shadowColor = colorHex;
-      ctx.shadowBlur = 14;
-      ctx.beginPath();
-      ctx.arc(46, 48, 9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // Crisp HUD Typography
-      ctx.font = "bold 26px 'Inter', sans-serif";
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      const clean = text.length > 22 ? text.substring(0, 20) + '..' : text;
-      ctx.fillText(clean, 68, 48);
-
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.minFilter = THREE.LinearFilter;
-      const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
-      const sprite = new THREE.Sprite(mat);
-      sprite.scale.set(44, 11, 1);
-
-      spriteCache.set(text, sprite);
-      return sprite.clone();
-    }
 
     function init3DGraph() {
       const elem3D = document.getElementById('graph-3d-container');
-      gyroRingList = [];
 
-      Graph3DInstance = ForceGraph3D()(elem3D)
-        .backgroundColor('#05070c')
-        .showNavInfo(false)
-        .nodeVal(node => {
-          const n = (node.name || node.id || '').toLowerCase();
-          if (n === 'boss' || n === 'friday' || n === "friday's brain") return 22;
-          return Math.max((node.degree || 1) * 1.8, 4);
-        })
-        .nodeColor(getNodeColor)
-        // Custom Hyper-Realistic Three.js Node Geometry
-        .nodeThreeObject(node => {
-          const group = new THREE.Group();
-          const colorHex = getNodeColor(node);
-          const color = new THREE.Color(colorHex);
-          const isHub = (node.degree && node.degree >= 10) || node.id === 'Boss' || node.id === 'FRIDAY' || node.id === "Friday's Brain" || node.id === 'ReelDM';
-          const radius = isHub ? 14 : Math.max(Math.sqrt(node.val || 5) * 1.8, 3.2);
+      try {
+        Graph3DInstance = ForceGraph3D()(elem3D)
+          .backgroundColor('#05070c')
+          .showNavInfo(false)
+          .nodeResolution(20)
+          .nodeRelSize(5)
+          .nodeVal(node => {
+            const n = (node.name || node.id || '').toLowerCase();
+            if (n === 'boss') return 28;
+            if (n === 'friday' || n === "friday's brain" || n === 'reeldm') return 24;
+            return Math.max((node.degree || 1) * 1.6, 4);
+          })
+          .nodeColor(getNodeColor)
+          .nodeOpacity(0.92)
+          .nodeLabel(node => {
+            const color = getNodeColor(node);
+            const name = (node.name || node.id || '').replace(/_/g, ' ');
+            const grp = node.group || 'NEURAL ENTITY';
+            const deg = node.degree || 1;
+            return `
+              <div style="background: rgba(8, 12, 22, 0.95); border: 1px solid ${color}; padding: 8px 14px; border-radius: 8px; font-family: 'Inter', sans-serif; box-shadow: 0 0 20px ${color}50; pointer-events: none;">
+                <div style="font-size: 9px; font-weight: 700; color: #94a3b8; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em;">${grp}</div>
+                <div style="font-size: 14px; font-weight: 800; color: #ffffff; margin-top: 2px;">${name}</div>
+                <div style="font-size: 11px; color: ${color}; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                  <span>⚡</span> <span>${deg} Connections</span>
+                </div>
+              </div>
+            `;
+          })
+          .linkCurvature(0.12)
+          .linkCurveRotation(link => (link.source.id || '').length % 6 * 0.5)
+          .linkWidth(link => highlightLinks.has(link) ? 2.5 : 0.8)
+          .linkColor(link => highlightLinks.has(link) ? '#ec4899' : 'rgba(255, 255, 255, 0.16)')
+          .linkDirectionalParticles(link => highlightLinks.has(link) ? 4 : 2)
+          .linkDirectionalParticleWidth(link => highlightLinks.has(link) ? 3.0 : 1.8)
+          .linkDirectionalParticleSpeed(0.006)
+          .linkDirectionalParticleColor(link => {
+            const sNode = typeof link.source === 'object' ? link.source : null;
+            return sNode ? getNodeColor(sNode) : '#38bdf8';
+          })
+          .onNodeClick(node => {
+            if (!node) return;
+            Sound.playClick();
+            selectedNode = node;
+            openDrawer(node);
+            const distance = 160;
+            const distRatio = 1 + distance / Math.hypot(node.x || 1, node.y || 1, node.z || 1);
+            Graph3DInstance.cameraPosition(
+              { x: (node.x || 0) * distRatio, y: (node.y || 0) * distRatio, z: (node.z || 0) * distRatio },
+              node,
+              1200
+            );
+          })
+          .cameraPosition({ x: 0, y: 0, z: 1200 });
 
-          // 1. Core Sphere (Standard PBR with Emissive Bloom)
-          const coreGeo = new THREE.SphereGeometry(radius, isHub ? 24 : 12, isHub ? 24 : 12);
-          const coreMat = new THREE.MeshStandardMaterial({
-            color: color,
-            emissive: color,
-            emissiveIntensity: isHub ? 0.95 : 0.45,
-            roughness: 0.15,
-            metalness: 0.85
-          });
-          const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-          group.add(coreMesh);
+        // Populate with active data
+        Graph3DInstance.graphData(graphData);
 
-          // 2. Translucent Atmosphere Shell (Corona Glow)
-          if (isHub) {
-            const coronaGeo = new THREE.SphereGeometry(radius * 1.35, 16, 16);
-            const coronaMat = new THREE.MeshBasicMaterial({
-              color: color,
-              transparent: true,
-              opacity: 0.22,
-              wireframe: false
-            });
-            const coronaMesh = new THREE.Mesh(coronaGeo, coronaMat);
-            group.add(coronaMesh);
-
-            // 3. Gyroscopic Arc-Reactor Orbital Ring
-            const ringGeo = new THREE.TorusGeometry(radius * 2.2, 0.7, 8, 48);
-            const ringMat = new THREE.MeshBasicMaterial({
-              color: color,
-              transparent: true,
-              opacity: 0.75
-            });
-            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-            ringMesh.rotation.x = Math.PI / 3;
-            ringMesh.rotation.y = Math.PI / 6;
-            group.add(ringMesh);
-            gyroRingList.push({ mesh: ringMesh, speed: 0.02, axis: 'z' });
-
-            // 4. Secondary Counter-Rotating Gyro Ring (For Key Flagships)
-            if (node.id === 'Boss' || node.id === 'FRIDAY' || node.id === "Friday's Brain" || node.id === 'ReelDM') {
-              const ring2Geo = new THREE.TorusGeometry(radius * 2.8, 0.5, 8, 48);
-              const ring2Mat = new THREE.MeshBasicMaterial({
-                color: node.id === 'Boss' ? 0xffffff : 0x38bdf8,
-                transparent: true,
-                opacity: 0.55
-              });
-              const ring2Mesh = new THREE.Mesh(ring2Geo, ring2Mat);
-              ring2Mesh.rotation.x = -Math.PI / 4;
-              ring2Mesh.rotation.z = Math.PI / 3;
-              group.add(ring2Mesh);
-              gyroRingList.push({ mesh: ring2Mesh, speed: -0.015, axis: 'y' });
-            }
-
-            // 5. Billboarded Text Sprite (Floating above the hub)
-            const sprite = createTextSprite3D((node.name || node.id).replace(/_/g, ' '), colorHex);
-            sprite.position.y = radius + 15;
-            group.add(sprite);
-          }
-
-          return group;
-        })
-        // Curved Plasma Synapses
-        .linkCurvature(0.14)
-        .linkCurveRotation(link => (link.source.id || '').length % 6 * 0.5)
-        .linkWidth(link => highlightLinks.has(link) ? 2.5 : 0.8)
-        .linkColor(link => {
-          if (highlightLinks.has(link)) return '#ec4899';
-          return 'rgba(255, 255, 255, 0.16)';
-        })
-        .linkDirectionalParticles(link => highlightLinks.has(link) ? 4 : 2)
-        .linkDirectionalParticleWidth(link => highlightLinks.has(link) ? 3.0 : 1.6)
-        .linkDirectionalParticleSpeed(0.006)
-        .linkDirectionalParticleColor(link => {
-          const sNode = typeof link.source === 'object' ? link.source : null;
-          return sNode ? getNodeColor(sNode) : '#38bdf8';
-        })
-        .onNodeClick(node => {
-          if (!node) return;
-          Sound.playClick();
-          selectedNode = node;
-          openDrawer(node);
-          const distance = 160;
-          const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
-          Graph3DInstance.cameraPosition(
-            { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
-            node,
-            1200
-          );
-        })
-        .graphData(graphData);
-
-      // --- Three.js Scene Enhancements: Lights, Fog, Stars, Geodesic Cage ---
-      three3DScene = Graph3DInstance.scene();
-      three3DCamera = Graph3DInstance.camera();
-      three3DRenderer = Graph3DInstance.renderer();
-
-      if (three3DScene) {
-        // Deep Cinematic Fog (Far nodes fade gracefully into cosmic darkness)
-        three3DScene.fog = new THREE.FogExp2(0x05070c, 0.00045);
-
-        // Ambient Light
-        const ambLight = new THREE.AmbientLight(0xffffff, 0.8);
-        three3DScene.add(ambLight);
-
-        // Directional Sun Lights (Cyan and Magenta rim lighting)
-        const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 1.8);
-        dirLight1.position.set(500, 800, 500);
-        three3DScene.add(dirLight1);
-
-        const dirLight2 = new THREE.DirectionalLight(0xec4899, 1.4);
-        dirLight2.position.set(-500, -600, -500);
-        three3DScene.add(dirLight2);
-
-        // Volumetric 3D Stardust Field (1,800 points)
-        const starGeo = new THREE.BufferGeometry();
-        const starCount = 1800;
-        const starPositions = new Float32Array(starCount * 3);
-        for (let i = 0; i < starCount * 3; i += 3) {
-          starPositions[i] = (Math.random() - 0.5) * 4400;
-          starPositions[i + 1] = (Math.random() - 0.5) * 4400;
-          starPositions[i + 2] = (Math.random() - 0.5) * 4400;
+        // Auto-Orbit Camera
+        const controls = Graph3DInstance.controls();
+        if (controls) {
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = 0.6;
         }
-        starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        const starMat = new THREE.PointsMaterial({
-          color: 0x93c5fd,
-          size: 2.2,
-          transparent: true,
-          opacity: 0.65,
-          blending: THREE.AdditiveBlending
-        });
-        threeStars = new THREE.Points(starGeo, starMat);
-        three3DScene.add(threeStars);
 
-        // Geodesic Holographic Containment Cage
-        const cageGeo = new THREE.IcosahedronGeometry(2200, 2);
-        const cageMat = new THREE.MeshBasicMaterial({
-          color: 0x38bdf8,
-          wireframe: true,
-          transparent: true,
-          opacity: 0.038
-        });
-        threeCage = new THREE.Mesh(cageGeo, cageMat);
-        three3DScene.add(threeCage);
-      }
-
-      // Continuous 3D Gyro Ring Animation & Celestial Drift
-      function animate3DFrame() {
-        if (is3DMode) {
-          // Rotate Gyro Rings on hubs
-          for (let i = 0; i < gyroRingList.length; i++) {
-            const item = gyroRingList[i];
-            if (item.mesh) {
-              item.mesh.rotation[item.axis] += item.speed;
-            }
-          }
-          // Drift outer stardust and cage
-          if (threeStars) threeStars.rotation.y += 0.0002;
-          if (threeCage) {
-            threeCage.rotation.y += 0.0003;
-            threeCage.rotation.x += 0.0001;
-          }
-        }
-        requestAnimationFrame(animate3DFrame);
-      }
-      requestAnimationFrame(animate3DFrame);
-
-      // Auto-Orbit Camera Controls
-      const controls = Graph3DInstance.controls();
-      if (controls) {
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.55;
+        console.log("3D Holosphere engine initialized successfully!");
+      } catch (err) {
+        console.error("3D Holosphere init error:", err);
+        showToast("Error initializing 3D WebGL", "⚠️");
       }
     }
 
@@ -1441,9 +1268,9 @@
         selectedNode = node;
         openDrawer(node);
         const distance = 160;
-        const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+        const distRatio = 1 + distance / Math.hypot(node.x || 1, node.y || 1, node.z || 1);
         Graph3DInstance.cameraPosition(
-          { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+          { x: (node.x || 0) * distRatio, y: (node.y || 0) * distRatio, z: (node.z || 0) * distRatio },
           node,
           1400
         );
@@ -1465,11 +1292,13 @@
         btn.classList.add('active-glow');
         document.getElementById('dim-icon').innerText = '🗺️';
         document.getElementById('dim-text').innerText = '2D Tactical HUD';
-        showToast('Hyper-Real 3D Holosphere Active', '🌐');
+        showToast('3D Neural Holosphere Active', '🌐');
+
         if (!Graph3DInstance) {
           init3DGraph();
         } else {
           Graph3DInstance.graphData(graphData);
+          Graph3DInstance.cameraPosition({ x: 0, y: 0, z: 1200 }, { x: 0, y: 0, z: 0 }, 1000);
         }
       } else {
         container3D.style.display = 'none';
@@ -1509,9 +1338,9 @@
           Sound.playHover();
           if (is3DMode && Graph3DInstance) {
             const distance = 160;
-            const distRatio = 1 + distance / Math.hypot(target.x, target.y, target.z);
+            const distRatio = 1 + distance / Math.hypot(target.x || 1, target.y || 1, target.z || 1);
             Graph3DInstance.cameraPosition(
-              { x: target.x * distRatio, y: target.y * distRatio, z: target.z * distRatio },
+              { x: (target.x || 0) * distRatio, y: (target.y || 0) * distRatio, z: (target.z || 0) * distRatio },
               target,
               1200
             );
@@ -1664,9 +1493,9 @@
               openDrawer(targetNode);
               if (is3DMode && Graph3DInstance) {
                 const distance = 160;
-                const distRatio = 1 + distance / Math.hypot(targetNode.x, targetNode.y, targetNode.z);
+                const distRatio = 1 + distance / Math.hypot(targetNode.x || 1, targetNode.y || 1, targetNode.z || 1);
                 Graph3DInstance.cameraPosition(
-                  { x: targetNode.x * distRatio, y: targetNode.y * distRatio, z: targetNode.z * distRatio },
+                  { x: (targetNode.x || 0) * distRatio, y: (targetNode.y || 0) * distRatio, z: (targetNode.z || 0) * distRatio },
                   targetNode,
                   1200
                 );
@@ -1868,9 +1697,9 @@
       if (match && match.x !== undefined && match.y !== undefined) {
         if (is3DMode && Graph3DInstance) {
           const distance = 160;
-          const distRatio = 1 + distance / Math.hypot(match.x, match.y, match.z);
+          const distRatio = 1 + distance / Math.hypot(match.x || 1, match.y || 1, match.z || 1);
           Graph3DInstance.cameraPosition(
-            { x: match.x * distRatio, y: match.y * distRatio, z: match.z * distRatio },
+            { x: (match.x || 0) * distRatio, y: (match.y || 0) * distRatio, z: (match.z || 0) * distRatio },
             match,
             1200
           );
@@ -1894,9 +1723,9 @@
           openDrawer(match);
           if (is3DMode && Graph3DInstance) {
             const distance = 160;
-            const distRatio = 1 + distance / Math.hypot(match.x, match.y, match.z);
+            const distRatio = 1 + distance / Math.hypot(match.x || 1, match.y || 1, match.z || 1);
             Graph3DInstance.cameraPosition(
-              { x: match.x * distRatio, y: match.y * distRatio, z: match.z * distRatio },
+              { x: (match.x || 0) * distRatio, y: (match.y || 0) * distRatio, z: (match.z || 0) * distRatio },
               match,
               1200
             );
