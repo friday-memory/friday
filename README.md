@@ -52,7 +52,7 @@
 <img src="docs/assets/neural_studio.png" alt="Friday Neural Studio — Live Knowledge Graph UI" width="100%" style="border-radius: 8px; border: 1px solid #1e293b;" />
 
 <br>
-<sub><i>Live Neural Studio — Obsidian-grade knowledge graph visualizer mapping real AI cognitive memory constellations.</i></sub>
+<sub><i>Live Neural Studio (Holosphere 4.0) — 3D Synthetic Neural Cortex mapping cognitive memory constellations across anatomical cybernetic lobes with active synaptic action potentials.</i></sub>
 
 <br><br>
 
@@ -483,26 +483,26 @@ No YAML. No manual tagging. Just store memories, and your knowledge graph builds
 
 ---
 
-### Neural Studio — Graph Visualization UI
+### Neural Studio — 3D Synthetic Neural Cortex (Holosphere 4.0)
 
 <br>
 
 <p align="center">
-  <img src="docs/assets/neural_studio.png" alt="Live Neural Studio Knowledge Graph" width="100%" style="border-radius: 10px; border: 1px solid #1e293b;" />
+  <img src="docs/assets/neural_studio.png" alt="Friday Synthetic Neural Cortex 4.0" width="100%" style="border-radius: 10px; border: 1px solid #1e293b;" />
 </p>
 
-A browser-based visual explorer for your AI's knowledge — built with the same graph engine  
-that powers [Obsidian](https://obsidian.md)'s graph view.
+A state-of-the-art WebGL / Three.js 3D cognitive brain studio — mapping your AI's knowledge graph onto an anatomical volumetric human cerebral cortex with real-time synaptic action potentials.
 
 **What you can do:**
-- 🌌 Explore your entire knowledge base as a living constellation
-- 🔍 Full-text search — camera auto-follows, inspector slides open
-- 🎛️ **Spread slider** (1–10) — breathe space into dense graphs in real-time
-- 🏷️ **Project filter chips** — isolate WebApp vs Auth vs Payments constellations
-- 🖱️ **Click any node** → right-side inspector with facts, edges, actions
-- ➕ Add / ✏️ Rename / 🗑️ Delete / 🔗 Connect — full CRUD via UI
-- ❄️ **Freeze** physics to lock a layout, **Fit View** to reset camera
-- ⚡ Live auto-refresh as new memories arrive
+- 🧠 **Volumetric 3D Cerebral Cortex** — 4,000+ bioluminescent vertices shaped into bilateral hemispheres with gyri and sulci folds
+- ⚡ **Active Synaptic Action Potentials** — live photon pulses travel along synaptic arcs simulating real cognitive action potentials
+- 🌐 **Dynamic Anatomical Lobe Bar** — fly between Prefrontal (Executive directives), Cognitive Core, Visual Cortex (Ingress domain), Temporal (AI swarms), Parietal (Commerce), and Brainstem (Security)
+- 🪐 **Luminous Celestial Planet Orbs** — clean, high-fidelity glowing spheres with soft atmospheres representing major knowledge hubs
+- 🖱️ **Cybernetic Inspector Drawer** — click any entity to inspect connected synapses, live versioned facts, and retrieve deep semantic chunks directly from ChromaDB L3 Vector Store
+- 🔍 **Full-Text Cortex Search** — camera auto-glides to focused entities with smooth damping flight curves
+- 🎵 **Procedural Web Audio SFX** — subtle sci-fi clicks, hums, and warp chimes synthesizing the neural environment
+- 📸 **4K Hologram Snapshot** — export high-resolution diagrams directly from the WebGL buffer
+- ➕ Full CRUD operations: Create, Connect, Rename, and Delete entities directly from the 3D canvas
 
 ---
 
