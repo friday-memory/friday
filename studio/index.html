@@ -1014,7 +1014,7 @@
         });
 
         // 2. Render Node Meshes
-        const sphereGeo = new THREE.SphereGeometry(1, 20, 20);
+        const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
         data.nodes.forEach(n => {
           const pos = nodePosMap.get(n.id) || new THREE.Vector3(0,0,0);
           const isHub = cortexLobeMap[n.id] !== undefined;
@@ -1036,19 +1036,15 @@
           scene.add(mesh);
           nodeMeshMap.set(n.id, mesh);
 
-          // Add Gyroscopic Arc-Reactor Ring for Key Hubs
+          // Pure celestial planet atmosphere (zero rings, clean glowing orb)
           if (isHub) {
-            const ringGeo = new THREE.TorusGeometry(scale * 2.2, 0.6, 8, 48);
-            const ringMat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.75 });
-            const ring = new THREE.Mesh(ringGeo, ringMat);
-            ring.position.copy(pos);
-            ring.rotation.x = Math.PI / 3;
-            scene.add(ring);
-            gyroRingList.push({ mesh: ring, speed: 0.02, axis: 'z' });
-
-            // Corona Shell
-            const coronaGeo = new THREE.SphereGeometry(scale * 1.4, 16, 16);
-            const coronaMat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.2 });
+            const coronaGeo = new THREE.SphereGeometry(scale * 1.25, 28, 28);
+            const coronaMat = new THREE.MeshBasicMaterial({
+              color: colorHex,
+              transparent: true,
+              opacity: 0.16,
+              blending: THREE.AdditiveBlending
+            });
             const corona = new THREE.Mesh(coronaGeo, coronaMat);
             corona.position.copy(pos);
             scene.add(corona);
