@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Friday's Brain — Neural Studio</title>
+  <title>Friday's Brain — Neural Studio 2.0 (MCU Holosphere)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- 2D Force Graph Engine -->
   <script src="https://unpkg.com/force-graph"></script>
+  <!-- 3D WebGL Force Graph Engine -->
+  <script src="https://unpkg.com/3d-force-graph@1.80.0/dist/3d-force-graph.min.js"></script>
+
   <style>
     :root {
-      --bg: #07090e;
-      --card-bg: rgba(13, 17, 26, 0.92);
-      --card-border: rgba(255, 255, 255, 0.1);
+      --bg: #05070c;
+      --card-bg: rgba(10, 14, 24, 0.92);
+      --card-border: rgba(56, 189, 248, 0.18);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --accent-pink: #ec4899;
@@ -22,6 +26,7 @@
       --accent-green: #10b981;
       --accent-blue: #38bdf8;
       --accent-red: #ef4444;
+      --hud-glow: 0 0 20px rgba(56, 189, 248, 0.15);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,25 +42,28 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    #graph-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    /* Ambient Stardust Background Grid */
+    /* Ambient Space Grid & Starfield */
     .space-grid {
       position: absolute;
-      inset: 0;
+      top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none;
-      z-index: 2;
       background-image: 
-        radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        radial-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px, 80px 80px;
+        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.03) 0%, transparent 80%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 64px 64px, 64px 64px;
+      z-index: 0;
+    }
+
+    /* Graph Containers */
+    #graph-container, #graph-3d-container {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
+    }
+    #graph-3d-container {
+      display: none;
+      z-index: 2;
     }
 
     /* Top Navigation HUD */
@@ -64,246 +72,227 @@
       top: 16px;
       left: 20px;
       right: 20px;
-      z-index: 20;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
       pointer-events: none;
+      z-index: 10;
     }
-
     .hud-left, .hud-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       pointer-events: auto;
+      flex-wrap: wrap;
     }
 
     .brand-pill {
       background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
-      border-radius: 999px;
-      padding: 8px 16px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 6px 14px 6px 12px;
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--hud-glow);
     }
-
     .brand-title {
-      font-size: 13px;
       font-weight: 700;
-      letter-spacing: -0.2px;
+      font-size: 13px;
+      letter-spacing: -0.01em;
       display: flex;
       align-items: center;
       gap: 8px;
       color: #fff;
     }
-
     .pulse-dot {
       width: 8px;
       height: 8px;
-      background: var(--accent-pink);
       border-radius: 50%;
-      box-shadow: 0 0 12px var(--accent-pink);
-      animation: pulse 2s infinite ease-in-out;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+      animation: pulse-ring 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
     }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
+    @keyframes pulse-ring {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--accent-cyan); }
+      50% { opacity: 0.4; transform: scale(0.8); box-shadow: 0 0 2px var(--accent-cyan); }
     }
 
     .brand-stats {
-      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       color: var(--text-muted);
-      border-left: 1px solid rgba(255, 255, 255, 0.12);
-      padding-left: 12px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .brand-stats strong {
-      color: var(--accent-blue);
-    }
-
-    /* Search & Action Buttons */
-    .search-box {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
-      border-radius: 999px;
-      padding: 6px 14px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+      padding-left: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .brand-stats strong {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .ping-badge {
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Search Box */
+    .search-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 220px;
       transition: all 0.2s ease;
+      box-shadow: var(--hud-glow);
     }
-
     .search-box:focus-within {
-      border-color: var(--accent-pink);
-      box-shadow: 0 0 16px rgba(236, 72, 153, 0.25);
+      width: 280px;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.25);
     }
-
     .search-box input {
       background: transparent;
       border: none;
-      color: #fff;
-      font-size: 12px;
-      outline: none;
-      width: 150px;
-      font-family: inherit;
-    }
-
-    .search-box input::placeholder {
-      color: #64748b;
-    }
-
-    .kbd {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 2px 6px;
-      border-radius: 4px;
-      color: var(--text-muted);
-    }
-
-    .btn-action {
-      background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
       color: var(--text-main);
       font-size: 12px;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+    }
+    .search-box input::placeholder { color: #64748b; }
+    .kbd {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: var(--text-main);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 11px;
       font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 999px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s ease;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
-
     .btn-action:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(56, 189, 248, 0.5);
+      color: #fff;
       transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.2);
     }
-
     .btn-action.primary {
-      background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.3));
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.25));
       border-color: rgba(236, 72, 153, 0.4);
-      color: #fdf4ff;
+      color: #fbcfe8;
     }
-
     .btn-action.primary:hover {
-      background: linear-gradient(135deg, rgba(236, 72, 153, 0.5), rgba(168, 85, 247, 0.5));
-      border-color: var(--accent-pink);
+      background: linear-gradient(135deg, rgba(236, 72, 153, 0.45), rgba(168, 85, 247, 0.45));
+      border-color: rgba(236, 72, 153, 0.8);
+      box-shadow: 0 0 16px rgba(236, 72, 153, 0.35);
+    }
+    .btn-action.active-glow {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(56, 189, 248, 0.3));
+      border-color: #38bdf8;
+      color: #e0f2fe;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
     }
 
-    /* Spread Slider */
+    /* Spread Range Slider */
     .spread-wrap {
       background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
-      border-radius: 999px;
-      padding: 6px 14px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 4px 10px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .spread-wrap label {
+      gap: 8px;
       font-size: 11px;
-      font-weight: 600;
       color: var(--text-muted);
-      white-space: nowrap;
     }
-
-    #spread-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 90px;
-      height: 3px;
-      border-radius: 3px;
-      background: rgba(255, 255, 255, 0.15);
-      outline: none;
+    .spread-wrap input[type=range] {
+      width: 60px;
+      accent-color: var(--accent-cyan);
       cursor: pointer;
     }
 
-    #spread-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--accent-pink);
-      cursor: pointer;
-      box-shadow: 0 0 6px var(--accent-pink);
-    }
-
-    /* Clean Floating Filter Bar (Obsidian Style) */
+    /* Floating Filter Bar (Bottom) */
     .filter-bar {
       position: absolute;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 20;
       background: var(--card-bg);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
       border: 1px solid var(--card-border);
-      border-radius: 999px;
-      padding: 6px 10px;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-radius: 28px;
+      padding: 4px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-      max-width: 90vw;
+      gap: 4px;
+      z-index: 10;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), var(--hud-glow);
+      max-width: 95vw;
       overflow-x: auto;
       scrollbar-width: none;
     }
-
     .filter-bar::-webkit-scrollbar { display: none; }
 
     .filter-chip {
+      padding: 5px 12px;
+      border-radius: 20px;
       font-size: 11px;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 999px;
-      cursor: pointer;
+      font-weight: 500;
       color: var(--text-muted);
-      background: transparent;
-      border: 1px solid transparent;
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
+      transition: all 0.18s ease;
       white-space: nowrap;
-      transition: all 0.2s ease;
     }
-
     .filter-chip:hover {
       color: #fff;
       background: rgba(255, 255, 255, 0.05);
     }
-
     .filter-chip.active {
-      color: #fff;
       background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
-
     .chip-dot {
-      width: 6px;
-      height: 6px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
     }
 
@@ -311,338 +300,266 @@
     .inspector-drawer {
       position: absolute;
       top: 16px;
-      right: 20px;
-      bottom: 20px;
-      width: 360px;
+      right: -420px;
+      width: 380px;
+      bottom: 16px;
       background: var(--card-bg);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
-      z-index: 30;
-      box-shadow: -10px 20px 50px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 16px;
+      z-index: 20;
       display: flex;
       flex-direction: column;
-      transform: translateX(calc(100% + 40px));
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      overflow: hidden;
+      box-shadow: -12px 0 40px rgba(0, 0, 0, 0.8), var(--hud-glow);
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
     .inspector-drawer.open {
-      transform: translateX(0);
+      right: 20px;
     }
-
     .drawer-header {
-      padding: 18px 20px;
+      padding: 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
-      justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
+      justify-content: space-between;
     }
-
     .drawer-title-wrap {
-      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       overflow: hidden;
     }
-
     .drawer-tag {
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
-      letter-spacing: 0.5px;
       text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 6px;
-      display: inline-block;
-      margin-bottom: 6px;
+      letter-spacing: 0.08em;
+      color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
     }
-
     .drawer-title {
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       color: #fff;
-      line-height: 1.3;
-      word-break: break-word;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-
     .btn-close {
       background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       color: var(--text-muted);
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      font-size: 13px;
-      transition: all 0.2s;
+      font-size: 11px;
+      transition: all 0.2s ease;
     }
-
     .btn-close:hover {
       background: rgba(255, 255, 255, 0.15);
       color: #fff;
     }
 
-    /* Drawer Action Bar */
     .drawer-actions {
-      padding: 12px 20px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 16px;
       display: flex;
       gap: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.2);
     }
-
     .drawer-action-btn {
       flex: 1;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-main);
+      padding: 5px 8px;
       font-size: 11px;
       font-weight: 600;
-      padding: 7px 10px;
-      border-radius: 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      transition: all 0.2s;
+      gap: 4px;
+      transition: all 0.2s ease;
     }
-
     .drawer-action-btn:hover {
       background: rgba(255, 255, 255, 0.1);
       border-color: rgba(255, 255, 255, 0.2);
     }
-
     .drawer-action-btn.danger:hover {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.5);
       color: #fca5a5;
     }
 
-    /* Drawer Tabs */
     .drawer-tabs {
       display: flex;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       padding: 0 16px;
     }
-
     .drawer-tab {
-      flex: 1;
-      text-align: center;
-      padding: 12px 4px;
+      padding: 10px 12px;
       font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       border-bottom: 2px solid transparent;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
-
-    .drawer-tab:hover {
-      color: #fff;
-    }
-
     .drawer-tab.active {
-      color: var(--accent-pink);
-      border-bottom-color: var(--accent-pink);
+      color: var(--accent-cyan);
+      border-bottom-color: var(--accent-cyan);
     }
 
     .drawer-body {
       flex: 1;
       overflow-y: auto;
-      padding: 16px 20px;
+      padding: 16px;
     }
-
-    /* Connection Items */
     .conn-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-
     .conn-item {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 10px;
-      padding: 10px 12px;
+      border-radius: 8px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
-
     .conn-item:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.15);
-      transform: translateX(2px);
+      background: rgba(56, 189, 248, 0.08);
+      border-color: rgba(56, 189, 248, 0.3);
     }
-
     .conn-name {
       font-size: 12px;
       font-weight: 600;
-      color: #e2e8f0;
+      color: #fff;
     }
-
     .conn-rel {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      background: rgba(6, 182, 212, 0.1);
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-
-    /* Facts List */
-    .fact-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .fact-meta {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 6px;
       font-size: 10px;
       font-family: 'JetBrains Mono', monospace;
-    }
-
-    .fact-status {
-      color: var(--accent-green);
-      font-weight: 700;
-    }
-
-    .fact-date {
-      color: var(--text-muted);
+      color: var(--accent-pink);
     }
 
     /* Modals */
     .modal-backdrop {
-      position: absolute;
-      inset: 0;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      z-index: 50;
       display: none;
       align-items: center;
       justify-content: center;
+      z-index: 100;
     }
-
-    .modal-backdrop.active {
-      display: flex;
-    }
-
+    .modal-backdrop.active { display: flex; }
     .modal-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      width: 90%;
-      max-width: 400px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      border-radius: 16px;
+      width: 360px;
+      padding: 20px;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), var(--hud-glow);
     }
-
     .modal-card h3 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       color: #fff;
     }
-
     .form-group {
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
-
     .form-group label {
       display: block;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-      margin-bottom: 6px;
+      font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-family: 'JetBrains Mono', monospace;
     }
-
-    .form-group input, .form-group select {
+    .form-group input {
       width: 100%;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 8px 10px;
+      font-size: 12px;
       color: #fff;
-      font-size: 13px;
       outline: none;
       font-family: inherit;
     }
-
-    .form-group input:focus, .form-group select:focus {
-      border-color: var(--accent-pink);
+    .form-group input:focus {
+      border-color: var(--accent-cyan);
     }
-
     .modal-btns {
       display: flex;
       justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
+      gap: 8px;
+      margin-top: 16px;
     }
-
     .btn-modal {
-      padding: 8px 16px;
-      border-radius: 8px;
+      padding: 6px 14px;
       font-size: 12px;
       font-weight: 600;
+      border-radius: 8px;
       cursor: pointer;
       border: 1px solid transparent;
+      transition: all 0.2s ease;
     }
-
     .btn-modal.secondary {
-      background: transparent;
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text-muted);
-      border-color: rgba(255, 255, 255, 0.1);
     }
-
     .btn-modal.primary {
-      background: var(--accent-pink);
-      color: #fff;
+      background: var(--accent-cyan);
+      color: #000;
     }
 
     /* Toast Notification */
     .toast-msg {
-      position: absolute;
-      top: 80px;
+      position: fixed;
+      bottom: 74px;
       left: 50%;
-      transform: translateX(-50%) translateY(-20px);
-      background: var(--card-bg);
-      border: 1px solid var(--accent-green);
-      padding: 10px 18px;
-      border-radius: 999px;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 8px 18px;
       font-size: 12px;
-      font-weight: 600;
       color: #fff;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       opacity: 0;
       pointer-events: none;
-      transition: all 0.3s ease;
-      z-index: 60;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.2);
     }
-
     .toast-msg.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* Audio Mute & Holo Mode Badges */
+    .sfx-badge { font-size: 10px; margin-left: 2px; }
   </style>
 </head>
 <body>
@@ -650,8 +567,11 @@
   <!-- Ambient Grid Background -->
   <div class="space-grid"></div>
 
-  <!-- Graph Container Canvas -->
+  <!-- 2D Canvas Container -->
   <div id="graph-container"></div>
+
+  <!-- 3D WebGL Canvas Container -->
+  <div id="graph-3d-container"></div>
 
   <!-- Top Navigation HUD -->
   <div class="top-hud">
@@ -659,46 +579,75 @@
       <div class="brand-pill">
         <div class="brand-title">
           <span class="pulse-dot"></span>
-          <span>Friday Neural Studio</span>
+          <span>Friday Neural Studio 2.0</span>
         </div>
         <div class="brand-stats">
           <span>Nodes: <strong id="stat-nodes">--</strong></span>
           <span>Edges: <strong id="stat-edges">--</strong></span>
+          <span class="ping-badge">● <strong id="stat-ping">24ms</strong></span>
         </div>
       </div>
 
       <div class="search-box">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="search-input" placeholder="Search knowledge..." autocomplete="off">
+        <input type="text" id="search-input" placeholder="Search neural knowledge..." autocomplete="off">
         <span class="kbd">/</span>
       </div>
     </div>
 
     <div class="hud-right">
+      <!-- 2D / 3D Dimension Switcher -->
+      <button class="btn-action" id="btn-toggle-3d" title="Switch between 2D HUD and 3D WebGL Holosphere">
+        <span id="dim-icon">🌐</span> <span id="dim-text">3D Holosphere</span>
+      </button>
+
+      <!-- De-Clutter / Orbital Ring Mode -->
+      <button class="btn-action" id="btn-toggle-orbit" title="Multi-Ring Orbital Geometry vs Raw Particle Spread">
+        <span>🪐</span> <span id="orbit-text">Orbital Rims</span>
+      </button>
+
+      <!-- Cinematic Tour -->
+      <button class="btn-action" id="btn-cinematic-tour" title="Cinematic AI Brain Tour">
+        <span>▶</span> <span>Tour</span>
+      </button>
+
+      <!-- Audio SFX Toggle -->
+      <button class="btn-action" id="btn-toggle-sound" title="Toggle Procedural Web Audio FX">
+        <span>🔊</span> <span id="sfx-text">SFX ON</span>
+      </button>
+
+      <!-- Snapshot Export -->
+      <button class="btn-action" id="btn-export-snapshot" title="Export Clean HUD Snapshot">
+        <span>📸</span> <span>Capture</span>
+      </button>
+
       <div class="spread-wrap">
         <label>Spread</label>
         <input type="range" id="spread-slider" min="1" max="10" value="6">
       </div>
+
       <button class="btn-action primary" id="btn-add-entity">
         <span>+ Add Entity</span>
       </button>
+
       <button class="btn-action" id="btn-pause-physics" title="Pause or resume node movement">
         <span id="physics-label">⏸ Freeze</span>
       </button>
+
       <button class="btn-action" id="btn-fit-view" title="Reset Camera [F]">
         <span>Fit View</span>
       </button>
     </div>
   </div>
 
-  <!-- Floating Filter Bar (Obsidian Category Dimming) -->
+  <!-- Floating Filter Bar (Bottom) -->
   <div class="filter-bar" id="filter-bar">
     <div class="filter-chip active" data-filter="all">
       <span>All Constellations</span>
     </div>
-    <div class="filter-chip" data-filter="webapp">
+    <div class="filter-chip" data-filter="reeldm">
       <span class="chip-dot" style="background: #38bdf8;"></span>
-      <span>WebApp</span>
+      <span>ReelDM (Ingress)</span>
     </div>
     <div class="filter-chip" data-filter="friday">
       <span class="chip-dot" style="background: #ec4899;"></span>
@@ -730,7 +679,7 @@
   <div class="inspector-drawer" id="inspector-drawer">
     <div class="drawer-header">
       <div class="drawer-title-wrap">
-        <span class="drawer-tag" id="drawer-tag">PROJECT</span>
+        <span class="drawer-tag" id="drawer-tag">NEURAL ENTITY</span>
         <h2 class="drawer-title" id="drawer-title">Node Name</h2>
       </div>
       <button class="btn-close" id="btn-close-drawer">✕</button>
@@ -777,11 +726,11 @@
       <h3>+ Add New Entity</h3>
       <div class="form-group">
         <label>Entity Name</label>
-        <input type="text" id="add-entity-name" placeholder="e.g. Stripe Webhook, Redis Cache">
+        <input type="text" id="add-entity-name" placeholder="e.g. Meta Ingress Gateway, Redis Cluster">
       </div>
       <div class="form-group">
         <label>Connect to Parent Node</label>
-        <input type="text" id="add-entity-parent" placeholder="e.g. Friday's Brain, WebApp, Friday-Core">
+        <input type="text" id="add-entity-parent" placeholder="e.g. Friday's Brain, ReelDM, Friday-Core">
       </div>
       <div class="form-group">
         <label>Relationship Type</label>
@@ -824,7 +773,78 @@
     const highlightLinks = new Set();
     let currentFilter = 'all';
     let isPhysicsFrozen = false;
+    let is3DMode = false;
+    let useOrbitalRims = true;
+    let isTourRunning = false;
     let allActiveFacts = [];
+    let Graph3DInstance = null;
+
+    // --- Procedural Web Audio Engine ---
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+      playHover() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(560, now + 0.04);
+        gain.gain.setValueAtTime(0.015, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.04);
+      }
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [880, 1320].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.025);
+          gain.gain.setValueAtTime(0.025, now + idx * 0.025);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.025 + 0.12);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.025);
+          osc.stop(now + idx * 0.025 + 0.12);
+        });
+      }
+      playWarp() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, now);
+        osc.frequency.exponentialRampToValueAtTime(480, now + 0.12);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.35);
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }
+    }
+    const Sound = new SoundEngine();
 
     // --- Toast Notification ---
     function showToast(text, icon = '✨') {
@@ -835,32 +855,101 @@
       setTimeout(() => toast.classList.remove('show'), 2500);
     }
 
-    // --- Color Palette for Clusters ---
+    // --- Node Colors ---
     function getNodeColor(node) {
+      if (!node) return '#94a3b8';
       const n = (node.name || node.id || '').toLowerCase();
       if (n === 'boss') return '#f59e0b'; // Gold
-      if (n === 'friday') return '#ec4899'; // Magenta
+      if (n === 'friday' || n === 'friday-core') return '#ec4899'; // Magenta / Pink
       if (n === "friday's brain" || n === 'fridaysbrain') return '#a855f7'; // Purple
-      if (n.includes('webapp') || n.includes('frontend')) return '#38bdf8'; // Blue
-      if (n.includes('friday-core') || n.includes('friday (open source)')) return '#ec4899'; // Neon Pink
+      if (n.includes('reeldm')) return '#38bdf8'; // Electric Cyan
       if (n.includes('swarm') || n.includes('agent') || n.includes('tree-of-thought')) return '#f43f5e'; // Rose AI
       if (n.includes('crypto')) return '#8b5cf6'; // Violet
       if (n.includes('security') || n.includes('audit')) return '#ef4444'; // Red
-      if (n.includes('payment') || n.includes('stripe') || n.includes('paypal')) return '#10b981'; // Green
-      if (n.includes('ec2') || n.includes('aws') || n.includes('docker') || n.includes('infra')) return '#06b6d4'; // Cyan
+      if (n.includes('payment') || n.includes('razorpay') || n.includes('dodo') || n.includes('stripe')) return '#10b981'; // Green
+      if (n.includes('ec2') || n.includes('aws') || n.includes('docker') || n.includes('infra') || n.includes('fargate')) return '#06b6d4'; // Cyan
       return node.color || '#94a3b8';
     }
 
-    // --- Initialize ForceGraph2D ---
-    const elem = document.getElementById('graph-container');
-    let spreadStrength = -600; // default repulsion
+    // --- Starfield Particle Engine for Background ---
+    const stars = Array.from({ length: 80 }, () => ({
+      x: (Math.random() - 0.5) * 3600,
+      y: (Math.random() - 0.5) * 2400,
+      size: Math.random() * 1.8 + 0.4,
+      alpha: Math.random() * 0.7 + 0.2,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.02 + 0.01
+    }));
 
-    const Graph = ForceGraph()(elem)
-      .backgroundColor('#07090e')
+    function drawStarfield(ctx, globalScale) {
+      const time = Date.now() * 0.001;
+      ctx.save();
+      for (const s of stars) {
+        const twinkle = Math.sin(time * s.speed * 20 + s.phase) * 0.3 + s.alpha;
+        ctx.fillStyle = `rgba(186, 230, 253, ${Math.max(0, twinkle)})`;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size / Math.sqrt(globalScale), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // --- Cosmic Nebula Aura Clouds (Constellation Glows) ---
+    function drawNebulae(ctx, globalScale) {
+      const hubs = [
+        { name: 'Boss', color: '#f59e0b', radius: 280 },
+        { name: "Friday's Brain", color: '#a855f7', radius: 340 },
+        { name: 'FRIDAY', color: '#ec4899', radius: 300 },
+        { name: 'ReelDM', color: '#38bdf8', radius: 520 },
+        { name: 'AI_Agents_Intelligence', color: '#f43f5e', radius: 280 },
+        { name: 'Payments_and_Growth', color: '#10b981', radius: 260 },
+        { name: 'Security_and_Hardening', color: '#ef4444', radius: 260 },
+        { name: 'Core_Architecture', color: '#8b5cf6', radius: 260 },
+        { name: 'Frontend_and_UI', color: '#06b6d4', radius: 240 }
+      ];
+
+      ctx.save();
+      hubs.forEach(h => {
+        const node = graphData.nodes.find(n => (n.id === h.name || n.name === h.name));
+        if (node && node.x !== undefined && node.y !== undefined) {
+          const r = h.radius;
+          const grad = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, r);
+          grad.addColorStop(0, h.color + '26');   // vibrant center
+          grad.addColorStop(0.4, h.color + '10'); // soft mid
+          grad.addColorStop(0.8, h.color + '03'); // outer fade
+          grad.addColorStop(1, 'transparent');
+
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Subtle concentric radar distance ring around main nexus
+          if (h.name === "Friday's Brain" || h.name === 'ReelDM') {
+            ctx.strokeStyle = h.color + '18';
+            ctx.lineWidth = 1 / globalScale;
+            ctx.setLineDash([4 / globalScale, 6 / globalScale]);
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r * 0.65, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r * 0.95, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      });
+      ctx.restore();
+    }
+
+    // --- Initialize 2D ForceGraph ---
+    const elem2D = document.getElementById('graph-container');
+    const Graph = ForceGraph()(elem2D)
+      .backgroundColor('#05070c')
       .nodeRelSize(5)
       .nodeVal(node => {
         const n = (node.name || node.id || '').toLowerCase();
-        if (n === 'boss' || n === 'friday' || n === "friday's brain") return 24;
+        if (n === 'boss' || n === 'friday' || n === "friday's brain") return 26;
         return Math.max((node.degree || 1) * 2.2, 5);
       })
       .nodeColor(getNodeColor)
@@ -869,10 +958,18 @@
         return 'rgba(255, 255, 255, 0.12)';
       })
       .linkWidth(link => highlightLinks.has(link) ? 2.5 : 1)
-      .linkCurvature(0.1)
-      .linkDirectionalParticles(link => highlightLinks.has(link) ? 3 : 1)
-      .linkDirectionalParticleWidth(link => highlightLinks.has(link) ? 2.5 : 1.2)
-      .linkDirectionalParticleSpeed(0.004)
+      .linkCurvature(0.08)
+      .linkDirectionalParticles(link => highlightLinks.has(link) ? 4 : 2)
+      .linkDirectionalParticleWidth(link => highlightLinks.has(link) ? 2.8 : 1.4)
+      .linkDirectionalParticleSpeed(0.005)
+      .linkDirectionalParticleColor(link => {
+        const sNode = typeof link.source === 'object' ? link.source : null;
+        return sNode ? getNodeColor(sNode) : '#38bdf8';
+      })
+      .onRenderFramePre((ctx, globalScale) => {
+        drawStarfield(ctx, globalScale);
+        drawNebulae(ctx, globalScale);
+      })
       .nodeCanvasObject((node, ctx, globalScale) => {
         const color = getNodeColor(node);
         const radius = Math.sqrt(node.val || 6) * 2.4;
@@ -880,7 +977,7 @@
         const isSelected = selectedNode === node;
         const isHighlight = highlightNodes.has(node);
 
-        // Calculate opacity based on filter & hover
+        // Filter Opacity
         let opacity = 1;
         if (currentFilter !== 'all') {
           const match = matchesFilter(node, currentFilter);
@@ -892,37 +989,36 @@
         ctx.save();
         ctx.globalAlpha = opacity;
 
-        // Ambient outer glow for selected or hovered nodes
+        // Ambient Outer Glow
         if (isHovered || isSelected || (node.val && node.val >= 18)) {
           ctx.beginPath();
-          ctx.arc(node.x, node.y, radius * (isHovered ? 2.0 : 1.5), 0, 2 * Math.PI, false);
-          ctx.fillStyle = color + '22';
+          ctx.arc(node.x, node.y, radius * (isHovered ? 2.2 : 1.6), 0, 2 * Math.PI, false);
+          ctx.fillStyle = color + '28';
           ctx.fill();
         }
 
-        // Draw core node circle
+        // Core Node Circle
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
         ctx.fillStyle = color;
         ctx.shadowColor = color;
-        ctx.shadowBlur = (isHovered || isSelected) ? 16 : 8;
+        ctx.shadowBlur = (isHovered || isSelected) ? 18 : 8;
         ctx.fill();
 
-        // Node Label (Clean Obsidian Style)
+        // Node Label
         const label = (node.name || node.id || '').replace(/_/g, ' ');
         const fontSize = Math.max(10 / globalScale, 3.2);
-        
-        // Show label if zoomed in, hovered, selected, or core hub
-        if (globalScale > 1.2 || isHovered || isSelected || node.val >= 14) {
+
+        // Show label logic: core hub or zoomed in or hovered
+        if (globalScale > 1.1 || isHovered || isSelected || node.val >= 14) {
           ctx.font = `600 ${fontSize}px 'Inter', sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
 
-          // Text pill background for legibility
           const textWidth = ctx.measureText(label).width;
-          const bY = node.y + radius + fontSize + 2;
+          const bY = node.y + radius + fontSize + 3;
 
-          ctx.fillStyle = 'rgba(7, 9, 14, 0.85)';
+          ctx.fillStyle = 'rgba(5, 7, 12, 0.88)';
           ctx.beginPath();
           ctx.roundRect(node.x - textWidth / 2 - 4, bY - fontSize / 2 - 2, textWidth + 8, fontSize + 4, 4);
           ctx.fill();
@@ -934,14 +1030,14 @@
         ctx.restore();
       })
       .nodePointerAreaPaint((node, color, ctx) => {
-        const radius = Math.sqrt(node.val || 6) * 2.6 + 6;
+        const radius = Math.sqrt(node.val || 6) * 2.6 + 8;
         ctx.beginPath();
         ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
         ctx.fillStyle = color;
         ctx.fill();
       })
       .onNodeHover(node => {
-        elem.style.cursor = node ? 'pointer' : 'default';
+        elem2D.style.cursor = node ? 'pointer' : 'default';
         if ((!node && !hoveredNode) || (node && hoveredNode === node)) return;
 
         hoveredNode = node || null;
@@ -949,6 +1045,7 @@
         highlightLinks.clear();
 
         if (node) {
+          Sound.playHover();
           highlightNodes.add(node);
           graphData.links.forEach(link => {
             const sId = link.source.id || link.source;
@@ -963,10 +1060,11 @@
       })
       .onNodeClick(node => {
         if (!node) return;
+        Sound.playClick();
         selectedNode = node;
         openDrawer(node);
         Graph.centerAt(node.x, node.y, 600);
-        Graph.zoom(1.8, 600);
+        Graph.zoom(2.0, 600);
       })
       .onBackgroundClick(() => {
         closeDrawer();
@@ -978,26 +1076,22 @@
       const n = (node.name || node.id || '').toLowerCase();
       const g = (node.group || '').toLowerCase();
 
-      if (filter === 'webapp') return n.includes('webapp') || n.includes('frontend') || g === 'system';
+      if (filter === 'reeldm') return n.includes('reeldm') || g === 'system';
       if (filter === 'friday') return n.includes('friday') || g === 'friday' || g === 'brain';
       if (filter === 'swarm') return n.includes('swarm') || n.includes('agent') || n.includes('planner') || n.includes('validator') || g === 'ai';
       if (filter === 'crypto') return n.includes('crypto') || n.includes('pubsub') || n.includes('session');
       if (filter === 'infra') return n.includes('ec2') || n.includes('aws') || n.includes('docker') || n.includes('neo4j') || n.includes('chroma') || g === 'tech';
       if (filter === 'security') return n.includes('security') || n.includes('audit') || n.includes('leak') || g === 'security';
-      if (filter === 'payments') return n.includes('payment') || n.includes('stripe') || n.includes('paypal') || g === 'payments';
+      if (filter === 'payments') return n.includes('payment') || n.includes('razorpay') || n.includes('dodo') || n.includes('stripe') || g === 'payments';
       return false;
     }
 
-    // --- Load Graph Data ---
+    // --- Apply Dynamic Physics & Multi-Tier Orbital Rings ---
     function applyForces(strength) {
-      // strength: 1-10 slider value
-      const charge = -(strength * 180);    // -180 to -1800
-      const linkDist = 50 + strength * 25; // 75 to 300
-      const collideR = 14 + strength * 5;  // 19 to 64
+      const charge = -(strength * 190);
+      const collideR = 14 + strength * 5;
 
       try {
-        // force-graph exposes d3Force() getter/setter.
-        // Calling .d3Force('charge') returns the existing d3 force object.
         const chargeForce = Graph.d3Force('charge');
         if (chargeForce && chargeForce.strength) {
           chargeForce.strength(charge);
@@ -1005,214 +1099,367 @@
 
         const linkForce = Graph.d3Force('link');
         if (linkForce && linkForce.distance) {
-          linkForce.distance(linkDist);
+          // Dynamic link distance: spreads dense hubs into concentric orbits!
+          linkForce.distance(link => {
+            if (useOrbitalRims) {
+              const sId = link.source.id || link.source;
+              const tId = link.target.id || link.target;
+              if (sId === 'ReelDM' || tId === 'ReelDM') {
+                const leaf = sId === 'ReelDM' ? link.target : link.source;
+                const tier = (leaf && leaf._orbitalTier !== undefined) ? leaf._orbitalTier : 1;
+                return (90 + tier * 110) * (strength / 6);
+              }
+            }
+            return (50 + strength * 26);
+          });
         }
 
-        // Collision - add if missing, update if present
-        let collisionForce = Graph.d3Force('collision');
-        if (!collisionForce) {
-          // force-graph bundles d3 — access it via Graph's simulation
-          const sim = Graph.d3Force('charge') ? Graph : null;
-          if (sim) {
-            // Safe: inject collision via d3Force name with a plain object
-            // that has the right interface. force-graph will call it.
-            let collideNodes = [];
-            Graph.d3Force('collision', alpha => {
-              collideNodes = Graph.graphData().nodes;
-              for (let i = 0; i < collideNodes.length; i++) {
-                for (let j = i + 1; j < collideNodes.length; j++) {
-                  const a = collideNodes[i], b = collideNodes[j];
-                  const dx = (b.x || 0) - (a.x || 0);
-                  const dy = (b.y || 0) - (a.y || 0);
-                  const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-                  const minDist = collideR;
-                  if (dist < minDist) {
-                    const overlap = (minDist - dist) / dist * alpha * 0.5;
-                    const ox = dx * overlap, oy = dy * overlap;
-                    if (a.vx !== undefined) { a.vx -= ox; a.vy -= oy; }
-                    if (b.vx !== undefined) { b.vx += ox; b.vy += oy; }
-                  }
-                }
+        // Collision
+        Graph.d3Force('collision', alpha => {
+          const collideNodes = Graph.graphData().nodes;
+          for (let i = 0; i < collideNodes.length; i++) {
+            for (let j = i + 1; j < collideNodes.length; j++) {
+              const a = collideNodes[i], b = collideNodes[j];
+              const dx = (b.x || 0) - (a.x || 0);
+              const dy = (b.y || 0) - (a.y || 0);
+              const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+              const minDist = collideR;
+              if (dist < minDist) {
+                const overlap = (minDist - dist) / dist * alpha * 0.5;
+                const ox = dx * overlap, oy = dy * overlap;
+                if (a.vx !== undefined) { a.vx -= ox; a.vy -= oy; }
+                if (b.vx !== undefined) { b.vx += ox; b.vy += oy; }
               }
-            });
+            }
           }
-        }
+        });
 
         Graph.d3ReheatSimulation();
-      } catch(e) {
-        console.warn('Force apply note:', e);
+      } catch (e) {
+        console.warn('Physics tune:', e);
       }
     }
 
+    // --- 3D Holographic Engine (WebGL) ---
+    function init3DGraph() {
+      const elem3D = document.getElementById('graph-3d-container');
+      Graph3DInstance = ForceGraph3D()(elem3D)
+        .backgroundColor('#05070c')
+        .showNavInfo(false)
+        .nodeVal(node => {
+          const n = (node.name || node.id || '').toLowerCase();
+          if (n === 'boss' || n === 'friday' || n === "friday's brain") return 18;
+          return Math.max((node.degree || 1) * 1.6, 4);
+        })
+        .nodeColor(getNodeColor)
+        .nodeResolution(16)
+        .linkColor(() => 'rgba(255, 255, 255, 0.18)')
+        .linkWidth(0.8)
+        .linkDirectionalParticles(2)
+        .linkDirectionalParticleWidth(1.2)
+        .linkDirectionalParticleSpeed(0.005)
+        .linkDirectionalParticleColor(link => {
+          const sNode = typeof link.source === 'object' ? link.source : null;
+          return sNode ? getNodeColor(sNode) : '#38bdf8';
+        })
+        .onNodeClick(node => {
+          if (!node) return;
+          Sound.playClick();
+          selectedNode = node;
+          openDrawer(node);
+          const distance = 120;
+          const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+          Graph3DInstance.cameraPosition(
+            { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+            node,
+            1200
+          );
+        })
+        .graphData(graphData);
+
+      // Auto-Orbit camera
+      const controls = Graph3DInstance.controls();
+      if (controls) {
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 0.6;
+      }
+    }
+
+    function toggle3DMode() {
+      Sound.playWarp();
+      is3DMode = !is3DMode;
+      const container2D = document.getElementById('graph-container');
+      const container3D = document.getElementById('graph-3d-container');
+      const btn = document.getElementById('btn-toggle-3d');
+
+      if (is3DMode) {
+        container2D.style.display = 'none';
+        container3D.style.display = 'block';
+        btn.classList.add('active-glow');
+        document.getElementById('dim-icon').innerText = '🗺️';
+        document.getElementById('dim-text').innerText = '2D HUD';
+        showToast('3D Neural Holosphere Active', '🌐');
+        if (!Graph3DInstance) {
+          init3DGraph();
+        } else {
+          Graph3DInstance.graphData(graphData);
+        }
+      } else {
+        container3D.style.display = 'none';
+        container2D.style.display = 'block';
+        btn.classList.remove('active-glow');
+        document.getElementById('dim-icon').innerText = '🌐';
+        document.getElementById('dim-text').innerText = '3D Holosphere';
+        showToast('2D Tactical HUD Active', '🗺️');
+        Graph.d3ReheatSimulation();
+      }
+    }
+
+    // --- Cinematic Auto-Tour Engine ---
+    async function runCinematicTour() {
+      if (isTourRunning) return;
+      isTourRunning = true;
+      Sound.playWarp();
+      showToast('Initiating Cinematic Brain Tour...', '🚀');
+      const tourButton = document.getElementById('btn-cinematic-tour');
+      tourButton.classList.add('active-glow');
+
+      const tourStops = [
+        { name: 'Boss', label: 'EXECUTIVE NEXUS: Boss (Authorized Operator)', zoom: 2.4 },
+        { name: "Friday's Brain", label: 'COGNITIVE CORE: Friday Memory & Graph Nexus', zoom: 2.2 },
+        { name: 'ReelDM', label: 'FLAGSHIP PLATFORM: ReelDM Multi-Tenant Ingress', zoom: 1.8 },
+        { name: 'AI_Agents_Intelligence', label: 'AGENT SUBSTRATE: Autonomous Swarms & Reasoning', zoom: 2.2 },
+        { name: 'Payments_and_Growth', label: 'MONETIZATION: Stripe & Razorpay Substrates', zoom: 2.4 },
+        { name: 'Security_and_Hardening', label: 'DEFENSE: Zero-Leakage & Security Guardrails', zoom: 2.4 }
+      ];
+
+      for (const stop of tourStops) {
+        if (!isTourRunning) break;
+        const target = graphData.nodes.find(n => (n.name === stop.name || n.id === stop.name));
+        if (target && target.x !== undefined) {
+          showToast(stop.label, '🎯');
+          Sound.playHover();
+          Graph.centerAt(target.x, target.y, 1000);
+          Graph.zoom(stop.zoom, 1000);
+          highlightNodes.clear();
+          highlightNodes.add(target);
+          await new Promise(r => setTimeout(r, 2800));
+        }
+      }
+
+      // Reset to full galaxy
+      Graph.zoomToFit(1000, 60);
+      highlightNodes.clear();
+      showToast('Neural Galaxy Scan Complete', '✅');
+      tourButton.classList.remove('active-glow');
+      isTourRunning = false;
+    }
+
+    // --- Export High-Res Snapshot ---
+    function exportSnapshot() {
+      Sound.playClick();
+      showToast('Capturing HUD Snapshot...', '📸');
+      const canvas = elem2D.querySelector('canvas');
+      if (!canvas) return;
+
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tCtx = tempCanvas.getContext('2d');
+
+      // Draw canvas
+      tCtx.drawImage(canvas, 0, 0);
+
+      // Watermark HUD brand
+      tCtx.font = "bold 20px 'Inter', sans-serif";
+      tCtx.fillStyle = '#38bdf8';
+      tCtx.fillText("FRIDAY NEURAL STUDIO // CLOUD ARCHITECTURE", 40, tempCanvas.height - 50);
+      tCtx.font = "14px 'JetBrains Mono', monospace";
+      tCtx.fillStyle = '#94a3b8';
+      tCtx.fillText(`386 Nodes • 489 Edges • AWS EC2 (18.61.244.46) • ${new Date().toISOString().split('T')[0]}`, 40, tempCanvas.height - 24);
+
+      const link = document.createElement('a');
+      link.download = `friday_brain_neural_hud_${Date.now()}.png`;
+      link.href = tempCanvas.toDataURL('image/png');
+      link.click();
+      showToast('Snapshot Downloaded!', '🎉');
+    }
+
+    // --- Load Graph Data ---
     async function loadData() {
+      const t0 = performance.now();
       try {
         const res = await fetch('/api/graph-data');
         const data = await res.json();
+        const pingMs = Math.round(performance.now() - t0);
+        document.getElementById('stat-ping').innerText = `${pingMs}ms`;
 
         // Calculate node degrees
         const degreeMap = {};
         data.links.forEach(l => {
-          const s = l.source;
-          const t = l.target;
+          const s = l.source.id || l.source;
+          const t = l.target.id || l.target;
           degreeMap[s] = (degreeMap[s] || 0) + 1;
           degreeMap[t] = (degreeMap[t] || 0) + 1;
         });
 
+        // Assign orbital tiers to ReelDM leaves to eliminate congestion
+        let reelLeafIdx = 0;
         data.nodes.forEach(n => {
           n.degree = degreeMap[n.id] || 1;
+          
+          // Connect check to ReelDM
+          const isReelLeaf = data.links.some(l => 
+            (l.source === 'ReelDM' && l.target === n.id) || 
+            (l.target === 'ReelDM' && l.source === n.id)
+          );
+
+          if (isReelLeaf && n.id !== 'ReelDM') {
+            // Assign to concentric tiers: 0 (inner), 1 (mid), 2 (outer), 3 (deep space)
+            n._orbitalTier = (reelLeafIdx % 4);
+            reelLeafIdx++;
+          }
         });
 
         graphData = data;
         Graph.graphData(graphData);
 
-        document.getElementById('stat-nodes').innerText = data.nodes.length;
-        document.getElementById('stat-edges').innerText = data.links.length;
+        if (is3DMode && Graph3DInstance) {
+          Graph3DInstance.graphData(graphData);
+        }
 
-        // Apply forces after data load — double fire to ensure simulation reheats
-        const sliderVal = parseInt(document.getElementById('spread-slider').value) || 6;
-        applyForces(sliderVal);
-        setTimeout(() => {
-          applyForces(sliderVal);
-          Graph.zoomToFit(1200, 80);
-        }, 800);
+        document.getElementById('stat-nodes').innerText = graphData.nodes.length;
+        document.getElementById('stat-edges').innerText = graphData.links.length;
 
-        // Warm up facts cache
+        // Apply initial physics forces
+        applyForces(parseInt(document.getElementById('spread-slider').value));
+
+        // Background facts loading
         loadGlobalFacts();
+
       } catch (err) {
         console.error('Failed to load graph data:', err);
+        showToast('Network error loading brain data', '⚠️');
       }
     }
 
-    // --- Fetch Global Facts Once (Zero 401 Error) ---
+    // --- Facts Loading ---
     async function loadGlobalFacts() {
       try {
         const res = await fetch('/facts?include_superseded=false');
-        if (res.ok) {
-          const data = await res.json();
-          allActiveFacts = data.facts || [];
-        }
-      } catch (e) {
-        console.warn('Facts fetch notice:', e);
+        const data = await res.json();
+        allActiveFacts = data.facts || [];
+        if (selectedNode) renderNodeFacts(selectedNode);
+      } catch (err) {
+        console.warn('Facts fetch failed:', err);
       }
     }
 
     // --- Inspector Drawer Handling ---
-    const drawer = document.getElementById('inspector-drawer');
-
     function openDrawer(node) {
-      if (!node) return;
-      const name = (node.name || node.id).replace(/_/g, ' ');
-      const color = getNodeColor(node);
+      document.getElementById('drawer-title').innerText = (node.name || node.id || '').replace(/_/g, ' ');
+      document.getElementById('drawer-tag').innerText = node.group || 'NEURAL ENTITY';
+      document.getElementById('inspector-drawer').classList.add('open');
 
-      document.getElementById('drawer-title').innerText = name;
-      const tag = document.getElementById('drawer-tag');
-      tag.innerText = (node.group || 'ENTITY').toUpperCase();
-      tag.style.background = color + '22';
-      tag.style.color = color;
-
-      // Render Connections
+      // Populate Connections Tab
       const connList = document.getElementById('conn-list');
       connList.innerHTML = '';
 
-      const connected = graphData.links.filter(l => {
+      const connections = [];
+      graphData.links.forEach(l => {
         const s = l.source.id || l.source;
         const t = l.target.id || l.target;
-        return s === node.id || t === node.id;
+        if (s === node.id) connections.push({ target: t, rel: l.label || 'CONNECTS_TO' });
+        else if (t === node.id) connections.push({ target: s, rel: l.label || 'CONNECTED_FROM' });
       });
 
-      document.getElementById('conn-count').innerText = connected.length;
+      document.getElementById('conn-count').innerText = connections.length;
 
-      if (connected.length === 0) {
-        connList.innerHTML = '<div style="color: #64748b; font-size: 12px;">No direct relationships recorded.</div>';
+      if (connections.length === 0) {
+        connList.innerHTML = '<div style="font-size: 11px; color: #64748b;">No active connections.</div>';
       } else {
-        connected.forEach(link => {
-          const isOut = (link.source.id || link.source) === node.id;
-          const otherId = isOut ? (link.target.id || link.target) : (link.source.id || link.source);
-          const otherNode = graphData.nodes.find(n => n.id === otherId) || { name: otherId, id: otherId };
-
+        connections.forEach(c => {
           const item = document.createElement('div');
           item.className = 'conn-item';
           item.innerHTML = `
-            <span class="conn-name">${(otherNode.name || otherNode.id).replace(/_/g, ' ')}</span>
-            <span class="conn-rel">${link.label || 'LINK'}</span>
+            <span class="conn-name">${c.target.replace(/_/g, ' ')}</span>
+            <span class="conn-rel">${c.rel}</span>
           `;
           item.onclick = () => {
-            if (otherNode.x !== undefined && otherNode.y !== undefined) {
-              Graph.centerAt(otherNode.x, otherNode.y, 600);
-              Graph.zoom(2.0, 600);
-              openDrawer(otherNode);
+            const targetNode = graphData.nodes.find(n => n.id === c.target);
+            if (targetNode) {
+              selectedNode = targetNode;
+              openDrawer(targetNode);
+              Graph.centerAt(targetNode.x, targetNode.y, 500);
             }
           };
           connList.appendChild(item);
         });
       }
 
-      // Render Facts
       renderNodeFacts(node);
-
-      // Reset Vector Box
-      document.getElementById('vector-content').innerText = `Click "Query ChromaDB" to retrieve deep semantic context for ${name}.`;
-
-      drawer.classList.add('open');
     }
 
-    function closeDrawer() {
-      selectedNode = null;
-      drawer.classList.remove('open');
-    }
-
-    document.getElementById('btn-close-drawer').onclick = closeDrawer;
-
-    // --- Tab Switching in Drawer ---
-    document.querySelectorAll('.drawer-tab').forEach(tab => {
-      tab.onclick = () => {
-        document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const tabType = tab.getAttribute('data-tab');
-
-        document.getElementById('tab-relations').style.display = tabType === 'relations' ? 'block' : 'none';
-        document.getElementById('tab-facts').style.display = tabType === 'facts' ? 'block' : 'none';
-        document.getElementById('tab-vector').style.display = tabType === 'vector' ? 'block' : 'none';
-      };
-    });
-
-    // --- Render Node Facts ---
     function renderNodeFacts(node) {
-      const box = document.getElementById('facts-list');
-      const term = (node.name || node.id).toLowerCase();
-      const matched = allActiveFacts.filter(f => f.content.toLowerCase().includes(term));
+      const factsBox = document.getElementById('facts-list');
+      const nId = (node.id || '').toLowerCase();
+      const nName = (node.name || '').toLowerCase();
+
+      const matched = allActiveFacts.filter(f => {
+        const c = (f.content || '').toLowerCase();
+        return c.includes(nId) || c.includes(nName);
+      });
 
       if (matched.length === 0) {
-        box.innerHTML = `<div style="color: #64748b; font-size: 12px;">No discrete facts mention this entity yet.</div>`;
+        factsBox.innerHTML = '<div style="font-size: 11px; color: #64748b;">No discrete facts linked to this entity.</div>';
       } else {
-        box.innerHTML = matched.map(f => `
-          <div class="fact-card">
-            <div class="fact-meta">
-              <span class="fact-status">● ACTIVE (v${f.version || 1})</span>
-              <span class="fact-date">${f.created_at || ''}</span>
-            </div>
-            <div>${f.content}</div>
+        factsBox.innerHTML = matched.map(f => `
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; font-size: 11px; line-height: 1.5;">
+            ${f.content}
           </div>
         `).join('');
       }
     }
 
-    // --- Vector Context Query ---
+    function closeDrawer() {
+      document.getElementById('inspector-drawer').classList.remove('open');
+      selectedNode = null;
+    }
+
+    document.getElementById('btn-close-drawer').onclick = closeDrawer;
+
+    // --- Drawer Tabs ---
+    document.querySelectorAll('.drawer-tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.getAttribute('data-tab');
+        document.getElementById('tab-relations').style.display = target === 'relations' ? 'block' : 'none';
+        document.getElementById('tab-facts').style.display = target === 'facts' ? 'block' : 'none';
+        document.getElementById('tab-vector').style.display = target === 'vector' ? 'block' : 'none';
+      };
+    });
+
+    // --- Query Vector Context (ChromaDB) ---
     document.getElementById('btn-fetch-vector').onclick = async () => {
       if (!selectedNode) return;
       const box = document.getElementById('vector-content');
-      box.innerText = '🧠 Querying ChromaDB vector memory...';
+      box.innerText = 'Connecting to ChromaDB L3 Vector Store...';
       try {
-        const queryTerm = (selectedNode.name || selectedNode.id).replace(/_/g, ' ');
-        const res = await fetch(`/api/search-quick?q=${encodeURIComponent(queryTerm)}`);
+        const query = encodeURIComponent(selectedNode.name || selectedNode.id);
+        const res = await fetch(`/api/search?q=${query}&limit=3`);
         const data = await res.json();
         if (data.results && data.results.length > 0) {
-          box.innerHTML = data.results.map(r => `<div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12px;">${r.substring(0, 240)}...</div>`).join('');
+          box.innerHTML = data.results.map(r => `
+            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 11px; line-height: 1.5;">
+              ${r.substring(0, 240)}...
+            </div>
+          `).join('');
         } else {
-          box.innerText = 'No specific memory chunk found for this entity.';
+          box.innerText = 'No specific vector memory chunk found for this entity.';
         }
       } catch (e) {
-        box.innerText = 'Failed to fetch vector context.';
+        box.innerText = 'Failed to fetch vector context from ChromaDB.';
       }
     };
 
@@ -1337,8 +1584,8 @@
       }
       const match = graphData.nodes.find(n => (n.name || n.id).toLowerCase().includes(q));
       if (match && match.x !== undefined && match.y !== undefined) {
-        Graph.centerAt(match.x, match.y, 600);
-        Graph.zoom(2.0, 600);
+        Graph.centerAt(match.x, match.y, 500);
+        Graph.zoom(2.0, 500);
         highlightNodes.clear();
         highlightNodes.add(match);
       }
@@ -1350,6 +1597,7 @@
         if (!q) return;
         const match = graphData.nodes.find(n => (n.name || n.id).toLowerCase().includes(q));
         if (match) {
+          Sound.playClick();
           selectedNode = match;
           openDrawer(match);
           Graph.centerAt(match.x, match.y, 600);
@@ -1369,10 +1617,12 @@
 
     // --- Controls: Fit View & Pause Physics ---
     document.getElementById('btn-fit-view').onclick = () => {
+      Sound.playClick();
       Graph.zoomToFit(700, 60);
     };
 
     document.getElementById('btn-pause-physics').onclick = () => {
+      Sound.playClick();
       isPhysicsFrozen = !isPhysicsFrozen;
       if (isPhysicsFrozen) {
         Graph.pauseAnimation();
@@ -1385,7 +1635,58 @@
       }
     };
 
-    // --- Spread Slider — Live Graph Expansion ---
+    // --- Controls: 3D Toggle ---
+    document.getElementById('btn-toggle-3d').onclick = toggle3DMode;
+
+    // --- Controls: Orbit Rims Toggle ---
+    document.getElementById('btn-toggle-orbit').onclick = () => {
+      Sound.playClick();
+      useOrbitalRims = !useOrbitalRims;
+      const btn = document.getElementById('btn-toggle-orbit');
+      if (useOrbitalRims) {
+        btn.classList.add('active-glow');
+        document.getElementById('orbit-text').innerText = 'Orbital Rims';
+        showToast('Concentric Orbital Geometry Activated', '🪐');
+      } else {
+        btn.classList.remove('active-glow');
+        document.getElementById('orbit-text').innerText = 'Raw Spread';
+        showToast('Raw Repulsion Geometry Activated', '💥');
+      }
+      applyForces(parseInt(document.getElementById('spread-slider').value));
+    };
+
+    // --- Controls: Cinematic Tour ---
+    document.getElementById('btn-cinematic-tour').onclick = () => {
+      if (isTourRunning) {
+        isTourRunning = false;
+        showToast('Tour Stopped', '⏹');
+        document.getElementById('btn-cinematic-tour').classList.remove('active-glow');
+      } else {
+        runCinematicTour();
+      }
+    };
+
+    // --- Controls: Audio Toggle ---
+    document.getElementById('btn-toggle-sound').onclick = () => {
+      Sound.enabled = !Sound.enabled;
+      const sfxText = document.getElementById('sfx-text');
+      if (Sound.enabled) {
+        Sound.init();
+        Sound.playClick();
+        sfxText.innerText = 'SFX ON';
+        document.getElementById('btn-toggle-sound').classList.add('active-glow');
+        showToast('Procedural Audio FX Enabled', '🔊');
+      } else {
+        sfxText.innerText = 'SFX OFF';
+        document.getElementById('btn-toggle-sound').classList.remove('active-glow');
+        showToast('Audio FX Muted', '🔇');
+      }
+    };
+
+    // --- Controls: Export Snapshot ---
+    document.getElementById('btn-export-snapshot').onclick = exportSnapshot;
+
+    // --- Spread Slider ---
     document.getElementById('spread-slider').addEventListener('input', e => {
       const val = parseInt(e.target.value);
       applyForces(val);
@@ -1394,6 +1695,7 @@
     // --- Filter Bar Chips ---
     document.querySelectorAll('.filter-chip').forEach(chip => {
       chip.onclick = () => {
+        Sound.playClick();
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
         currentFilter = chip.getAttribute('data-filter');
@@ -1406,6 +1708,7 @@
         e.preventDefault();
         searchInput.focus();
       } else if (e.key === 'Escape') {
+        isTourRunning = false;
         closeDrawer();
         document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
       } else if (e.key.toLowerCase() === 'f' && document.activeElement !== searchInput) {
@@ -1416,6 +1719,10 @@
     window.addEventListener('resize', () => {
       Graph.width(window.innerWidth);
       Graph.height(window.innerHeight);
+      if (Graph3DInstance) {
+        Graph3DInstance.width(window.innerWidth);
+        Graph3DInstance.height(window.innerHeight);
+      }
     });
 
     // Initial Load
