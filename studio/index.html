@@ -946,6 +946,31 @@
     };
 
     // Build Graph into Scene
+    
+    function renderDynamicLobeBar(data) {
+      const lobeBar = document.getElementById('lobe-bar');
+      if (!lobeBar || !data || !data.nodes) return;
+
+      const bossHub = data.nodes.find(n => n.group === 'boss' || n.id.toLowerCase() === 'boss' || n.id.toLowerCase() === 'user');
+      const coreHub = data.nodes.find(n => n.group === 'brain' || n.group === 'friday' || n.id.toLowerCase().includes('friday'));
+      const sortedByDegree = [...data.nodes].sort((a, b) => (b.degree || 0) - (a.degree || 0));
+      const majorDomainHub = sortedByDegree.find(n => n !== bossHub && n !== coreHub) || { id: 'ReelDM', name: 'Visual Cortex' };
+      const aiHub = data.nodes.find(n => (n.group || '').includes('agent') || (n.id || '').toLowerCase().includes('agent') || (n.id || '').toLowerCase().includes('ai'));
+      const commerceHub = data.nodes.find(n => (n.group || '').includes('payment') || (n.id || '').toLowerCase().includes('payment'));
+      const secHub = data.nodes.find(n => (n.group || '').includes('security') || (n.id || '').toLowerCase().includes('security'));
+
+      lobeBar.innerHTML = `
+        <span class="lobe-tag">CORTEX LOBE:</span>
+        <button class="lobe-btn active" onclick="filterLobe('all', this)">🌐 Full Cortex</button>
+        ${bossHub ? `<button class="lobe-btn" onclick="focusCortexHub('${bossHub.id}', this)">🟡 Prefrontal (${(bossHub.name || bossHub.id).replace(/_/g, ' ')})</button>` : ''}
+        ${coreHub ? `<button class="lobe-btn" onclick="focusCortexHub('${coreHub.id}', this)">🌸 Cognitive Core (${(coreHub.name || coreHub.id).replace(/_/g, ' ')})</button>` : ''}
+        ${majorDomainHub ? `<button class="lobe-btn" onclick="focusCortexHub('${majorDomainHub.id}', this)">🔵 Visual Cortex (${(majorDomainHub.name || majorDomainHub.id).replace(/_/g, ' ')})</button>` : ''}
+        ${aiHub ? `<button class="lobe-btn" onclick="focusCortexHub('${aiHub.id}', this)">🌹 Temporal (${(aiHub.name || aiHub.id).replace(/_/g, ' ')})</button>` : ''}
+        ${commerceHub ? `<button class="lobe-btn" onclick="focusCortexHub('${commerceHub.id}', this)">🟢 Parietal (${(commerceHub.name || commerceHub.id).replace(/_/g, ' ')})</button>` : ''}
+        ${secHub ? `<button class="lobe-btn" onclick="focusCortexHub('${secHub.id}', this)">🔴 Brainstem (${(secHub.name || secHub.id).replace(/_/g, ' ')})</button>` : ''}
+      `;
+    }
+
     async function loadData() {
       const t0 = performance.now();
       try {
@@ -969,6 +994,9 @@
         // Place Hubs
         data.nodes.forEach(n => {
           n.degree = degreeMap[n.id] || 1;
+        });
+        renderDynamicLobeBar(data);
+        data.nodes.forEach(n => {
           if (cortexLobeMap[n.id]) {
             nodePosMap.set(n.id, cortexLobeMap[n.id].clone());
           }
@@ -1391,22 +1419,36 @@
       renderNodeFacts(node);
     }
 
+    function getNodeKeywords(node) {
+      const raw = (node.name || node.id || '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[^a-zA-Z0-9]+/g, ' ').toLowerCase();
+      return raw.split(' ').filter(w => w.length > 2 && !['and', 'for', 'the', 'with', 'from', 'that', 'this'].includes(w));
+    }
+
     function renderNodeFacts(node) {
       const factsBox = document.getElementById('facts-list');
-      const nId = (node.id || '').toLowerCase();
-      const nName = (node.name || '').toLowerCase();
+      const keywords = getNodeKeywords(node);
 
-      const matched = allActiveFacts.filter(f => {
-        const c = (f.content || '').toLowerCase();
-        return c.includes(nId) || c.includes(nName);
+      const scored = [];
+      allActiveFacts.forEach(f => {
+        const t = (f.content || '').toLowerCase();
+        let score = 0;
+        keywords.forEach(kw => {
+          if (t.includes(kw)) score += 1;
+        });
+        if (score > 0) {
+          scored.push({ fact: f, score: score });
+        }
       });
 
-      if (matched.length === 0) {
-        factsBox.innerHTML = '<div style="font-size: 11px; color: #64748b;">No discrete facts linked to this synapse.</div>';
+      scored.sort((a, b) => b.score - a.score);
+
+      if (scored.length === 0) {
+        factsBox.innerHTML = '<div style="font-size: 11px; color: #64748b; padding: 12px 0;">No discrete facts linked to this synapse.</div>';
       } else {
-        factsBox.innerHTML = matched.map(f => `
-          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); padding: 8px 10px; border-radius: 6px; margin-bottom: 8px; font-size: 11px; line-height: 1.5;">
-            ${f.content}
+        factsBox.innerHTML = scored.slice(0, 15).map(item => `
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.2); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; line-height: 1.55; color: #e2e8f0;">
+            <div style="color: #38bdf8; font-size: 9px; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.05em;">⚡ FACT #${item.fact.id || 'ACTIVE'}</div>
+            ${item.fact.content}
           </div>
         `).join('');
       }
@@ -1428,33 +1470,41 @@
         document.getElementById('tab-relations').style.display = target === 'relations' ? 'block' : 'none';
         document.getElementById('tab-facts').style.display = target === 'facts' ? 'block' : 'none';
         document.getElementById('tab-vector').style.display = target === 'vector' ? 'block' : 'none';
+        if (target === 'vector' && selectedNode) {
+          fetchVectorContext(selectedNode);
+        }
       };
     });
 
     // Query Vector Context
-    document.getElementById('btn-fetch-vector').onclick = async () => {
-      if (!selectedNode) return;
+    async function fetchVectorContext(node) {
+      if (!node) return;
       const box = document.getElementById('vector-content');
-      box.innerText = 'Connecting to ChromaDB L3 Vector Store...';
+      box.innerHTML = '<span style="color: #38bdf8;">Connecting to ChromaDB L3 Vector Store...</span>';
       try {
-        const query = encodeURIComponent(selectedNode.name || selectedNode.id);
-        const res = await fetch(`/api/search?q=${query}&limit=3`);
+        const cleanName = (node.name || node.id || '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[^a-zA-Z0-9]+/g, ' ').trim();
+        const query = encodeURIComponent(cleanName);
+        const res = await fetch('/api/search-quick?q=' + query);
         const data = await res.json();
         if (data.results && data.results.length > 0) {
-          box.innerHTML = data.results.map(r => `
-            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 11px; line-height: 1.5;">
-              ${r.substring(0, 240)}...
+          box.innerHTML = data.results.map((r, i) => `
+            <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(168,85,247,0.25); border-radius: 6px; font-size: 11px; line-height: 1.6; color: #cbd5e1;">
+              <div style="color: #a855f7; font-size: 9px; font-weight: 700; margin-bottom: 4px;">🧠 VECTOR CHUNK #${i+1}</div>
+              ${r}
             </div>
           `).join('');
         } else {
-          box.innerText = 'No specific vector memory chunk found for this entity.';
+          box.innerHTML = '<span style="color: #94a3b8;">No specific vector memory chunk found for this entity.</span>';
         }
       } catch (e) {
-        box.innerText = 'Failed to fetch vector context from ChromaDB.';
+        box.innerHTML = '<span style="color: #ef4444;">Failed to fetch vector context from ChromaDB.</span>';
       }
+    }
+
+    document.getElementById('btn-fetch-vector').onclick = () => {
+      if (selectedNode) fetchVectorContext(selectedNode);
     };
 
-    // Node Delete, Rename, Connect
     document.getElementById('btn-delete-node').onclick = async () => {
       if (!selectedNode) return;
       if (selectedNode.id === 'Boss' || selectedNode.id === 'FRIDAY' || selectedNode.id === "Friday's Brain") {
