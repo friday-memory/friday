@@ -1,0 +1,35 @@
+name: Feature Request
+description: Suggest an idea or enhancement for Friday
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We welcome architectural proposals, new MCP tools, and integration ideas!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem or limitation?
+      placeholder: I encounter friction when trying to...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution / Architecture
+      description: Describe the solution you'd like to see implemented.
+      placeholder: Friday should provide an endpoint / tool that...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you have considered.
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to submit a pull request implementing this feature

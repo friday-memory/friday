@@ -1,48 +1,60 @@
 # Contributing to Friday
 
-Thank you for helping make AI coding agents smarter! 🧠
+Thank you for your interest in contributing to Friday. We welcome bug reports, architectural improvements, new integrations, and documentation updates.
 
-## Quick Start
+## Development Setup
 
+### Prerequisites
+- Python 3.11+
+- Docker and Docker Compose
+- Git
+
+### Quick Start
 ```bash
-git clone https://github.com/itskie/friday.git
+git clone https://github.com/friday-memory/friday.git
 cd friday
-cp .env.example .env  # fill in your keys
-pip install -r requirements.txt
-python -m pytest tests/ -q  # all green? you're ready
+cp .env.example .env
+
+# Install dependencies
+make install
+# or: pip install -r requirements.txt
+
+# Run test suite
+make test
+# or: python -m pytest tests/ -v
 ```
 
-## How to Contribute
+## Contribution Workflow
 
-1. **Fork** the repo
-2. **Create** a feature branch: `git checkout -b feat/your-feature`
-3. **Write** tests for your change
-4. **Ensure** all tests pass: `python -m pytest tests/ -q`
-5. **Commit** with a clear message: `git commit -m "feat: add X"`
-6. **Open** a Pull Request
+1. **Fork the Repository**: Create your fork on GitHub.
+2. **Create a Feature Branch**:
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+3. **Write Tests**: Add test coverage under `tests/` for any new functionality or bug fixes.
+4. **Verify Standards**:
+   ```bash
+   make test
+   make lint
+   ```
+5. **Commit Changes**: Use [Conventional Commits](https://www.conventionalcommits.org/):
+   - `feat:` New features or tools
+   - `fix:` Bug fixes
+   - `docs:` Documentation updates
+   - `refactor:` Code restructuring without behavior changes
+   - `perf:` Performance improvements
+   - `chore:` Dependency or CI updates
+6. **Open a Pull Request**: Submit your PR with a completed checklist from the PR template.
 
-## Commit Convention
+## Architectural Conventions
 
-| Prefix | Use for |
-|:---|:---|
-| `feat:` | New features |
-| `fix:` | Bug fixes |
-| `docs:` | Documentation only |
-| `refactor:` | Code cleanup (no behavior change) |
-| `test:` | Adding tests |
-| `chore:` | Build, CI, dependency updates |
+- **State Persistence**: Memory layers must remain modular:
+  - Facts Ledger: Strict deterministic ground truths.
+  - Episodic Memory: Semantic vector embeddings.
+  - Graph Topology: Relational entity relationships.
+- **Protocol Compliance**: Tool schemas must adhere strictly to the Model Context Protocol (MCP) standard.
+- **Performance**: Operations in the hot path of MCP tool execution should maintain sub-100ms response latencies where possible.
 
-## Code Style
+## Questions & Discussions
 
-- Python: follow PEP 8, type hints everywhere
-- Keep functions small and focused
-- Every public function needs a docstring
-
-## Reporting Bugs
-
-Use the [Bug Report template](.github/ISSUE_TEMPLATE/bug_report.md).  
-Include logs, OS, and steps to reproduce.
-
-## Questions?
-
-Open a [Discussion](https://github.com/itskie/friday/discussions) — we're friendly! 😊
+For technical discussions, feature proposals, and architectural questions, visit [GitHub Discussions](https://github.com/friday-memory/friday/discussions).
