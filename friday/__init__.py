@@ -13,7 +13,7 @@ from .exceptions import (
 )
 from .types import Fact, GraphData, HealthStatus, MemoryResult, SearchResult
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 __all__ = [
     "Friday",

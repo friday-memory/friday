@@ -20,7 +20,7 @@ from friday.integrations.langchain import FridayRetriever
 
 def test_sdk_version_and_exports():
     """Verify package version and public exports."""
-    assert __version__ == "1.1.0"
+    assert __version__ == "1.2.0"
     assert Friday is not None
     assert AsyncFriday is not None
     assert FridayAuthenticationError is not None
@@ -69,7 +69,7 @@ def test_sync_client_operations():
                 json={
                     "status": "healthy",
                     "service": "friday-cognitive-substrate",
-                    "version": "1.1.0",
+                    "version": "1.2.0",
                     "layers": {"L1_core": "healthy", "L2_mem0": "healthy"},
                     "timestamp": 123456789.0,
                 },
@@ -110,7 +110,7 @@ def test_sync_client_operations():
         # Health
         health = client.health()
         assert health["status"] == "healthy"
-        assert health["version"] == "1.1.0"
+        assert health["version"] == "1.2.0"
 
         # Add memory
         mem = client.add_memory("Chose FastAPI", project="reeldm")

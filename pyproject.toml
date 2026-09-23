@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "friday-memory"
-version = "1.1.0"
+version = "1.2.0"
 description = "Official Python SDK and self-hosted persistent cognitive memory layer for AI coding agents"
 readme = "README.md"
 requires-python = ">=3.11"
