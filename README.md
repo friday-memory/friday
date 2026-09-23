@@ -17,6 +17,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 <p align="center">
   <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat&color=334155&label=Stars" alt="GitHub Stars"/></a>
   <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.2.0-334155?style=flat" alt="Release"/></a>
+  <a href="https://pypi.org/project/friday-memory/"><img src="https://img.shields.io/pypi/v/friday-memory?style=flat&color=334155&label=PyPI" alt="PyPI Package"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-334155?style=flat" alt="MIT License"/></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-334155?style=flat" alt="Python 3.11+"/></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/protocol-MCP_2024--11--05-334155?style=flat" alt="MCP Protocol"/></a>
@@ -221,7 +222,7 @@ curl -X POST http://localhost/add \
 
 ## Python SDK (`friday-memory`)
 
-Connect your agentic workflows, LangChain pipelines, or autonomous scripts directly to Friday with zero boilerplate:
+The official Python client for Friday is available on PyPI as [**`friday-memory`**](https://pypi.org/project/friday-memory/). Connect your agentic workflows, LangChain pipelines, or autonomous scripts directly to Friday with zero boilerplate:
 
 ```bash
 pip install friday-memory
@@ -471,6 +472,7 @@ POST /facts -> {"content": "Migrated database to Aurora PostgreSQL on port 5432"
 
 ```
 friday/
+├── friday/                  # Official Python SDK (client, types, LangChain retriever)
 ├── gateway/                 # FastAPI REST application & routing
 ├── layers/                  # Pluggable storage adapters (SQLite, ChromaDB, Neo4j)
 ├── pipelines/               # Background entity extraction & fact pipelines
