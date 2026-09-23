@@ -1,7 +1,11 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "friday-memory"
 version = "1.1.0"
-description = "Self-hosted persistent cognitive memory layer for AI coding agents (MCP)"
+description = "Official Python SDK and self-hosted persistent cognitive memory layer for AI coding agents"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -12,11 +16,13 @@ keywords = [
     "mcp",
     "model-context-protocol",
     "ai-agents",
+    "memory",
     "cursor",
     "claude-code",
     "knowledge-graph",
     "neo4j",
-    "persistent-memory"
+    "persistent-memory",
+    "sdk"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -24,8 +30,41 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Application Frameworks"
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
 ]
+dependencies = [
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.6",
+    "pydantic>=2.9.2",
+    "python-dotenv>=1.0.1",
+    "neo4j>=5.24.0",
+    "chromadb>=0.5.7",
+    "mem0ai>=0.1.29",
+    "openai>=1.45.0",
+    "sentence-transformers>=3.1.0",
+]
+langchain = [
+    "langchain-core>=0.1.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "ruff>=0.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/friday-memory/friday"
+Repository = "https://github.com/friday-memory/friday.git"
+Issues = "https://github.com/friday-memory/friday/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["friday"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

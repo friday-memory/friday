@@ -4,6 +4,7 @@ Friday — Smoke Tests
 Tests core Friday API without external services (Neo4j, Mem0).
 Uses FastAPI TestClient with mocked dependencies.
 """
+
 import os
 import tempfile
 from unittest.mock import patch
@@ -32,8 +33,10 @@ def test_studio_loads():
 
 def test_health_endpoint():
     """Health check should always respond."""
-    with patch("gateway.main.get_neo4j_driver", return_value=None), \
-         patch("gateway.main.get_mem0_client", return_value=None):
+    with (
+        patch("gateway.main.get_neo4j_driver", return_value=None),
+        patch("gateway.main.get_mem0_client", return_value=None),
+    ):
         r = client.get("/health")
     assert r.status_code == 200
     data = r.json()
@@ -91,7 +94,6 @@ def test_quick_search_public():
     with patch("gateway.main.get_neo4j_driver", return_value=None):
         r = client.get("/api/search-quick?q=test")
     assert r.status_code == 200
-
 
 
 def test_export_persona_requires_auth():

@@ -32,8 +32,9 @@ import httpx
 logger = logging.getLogger("friday.mcp")
 
 FRIDAY_URL: str = os.getenv("FRIDAY_URL", "http://localhost:8000")
-API_KEY: str    = os.getenv("FRIDAY_API_KEY") or os.getenv("BRAIN_API_KEY", "change_me")
+API_KEY: str = os.getenv("FRIDAY_API_KEY") or os.getenv("BRAIN_API_KEY", "change_me")
 HEADERS = {"X-Friday-Key": API_KEY, "X-Brain-Key": API_KEY, "Content-Type": "application/json"}
+
 
 # ── MCP Protocol Helpers ───────────────────────────────────────────────────────
 def _respond(result: Any, req_id: Any = None) -> None:
@@ -44,12 +45,14 @@ def _respond(result: Any, req_id: Any = None) -> None:
     sys.stdout.write(json.dumps(res) + "\n")
     sys.stdout.flush()
 
+
 def _error(code: int, message: str, req_id: Any = None) -> None:
     err = {"jsonrpc": "2.0", "error": {"code": code, "message": message}}
     if req_id is not None:
         err["id"] = req_id
     sys.stdout.write(json.dumps(err) + "\n")
     sys.stdout.flush()
+
 
 # ── Tool Definitions ───────────────────────────────────────────────────────────
 TOOLS = [
@@ -59,9 +62,17 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "content":  {"type": "string", "description": "The memory text to store."},
-                "project":  {"type": "string", "description": "Project name (e.g. 'MyApp')", "default": "default"},
-                "source":   {"type": "string", "description": "Origin: agent | user | system", "default": "agent"},
+                "content": {"type": "string", "description": "The memory text to store."},
+                "project": {
+                    "type": "string",
+                    "description": "Project name (e.g. 'MyApp')",
+                    "default": "default",
+                },
+                "source": {
+                    "type": "string",
+                    "description": "Origin: agent | user | system",
+                    "default": "agent",
+                },
             },
             "required": ["content"],
         },
@@ -72,7 +83,10 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "content": {"type": "string", "description": "The fact to store. Keep it short and atomic."},
+                "content": {
+                    "type": "string",
+                    "description": "The fact to store. Keep it short and atomic.",
+                },
             },
             "required": ["content"],
         },
@@ -83,9 +97,17 @@ TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {
-                "query":   {"type": "string", "description": "Natural language search query."},
-                "top_k":   {"type": "integer", "description": "Number of results (1-20)", "default": 5},
-                "project": {"type": "string", "description": "Optional project filter.", "default": ""},
+                "query": {"type": "string", "description": "Natural language search query."},
+                "top_k": {
+                    "type": "integer",
+                    "description": "Number of results (1-20)",
+                    "default": 5,
+                },
+                "project": {
+                    "type": "string",
+                    "description": "Optional project filter.",
+                    "default": "",
+                },
             },
             "required": ["query"],
         },
@@ -100,32 +122,46 @@ TOOLS = [
     },
 ]
 
+
 # ── Tool Implementations ────────────────────────────────────────────────────────
 async def add_memory(args: dict) -> dict:
     async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.post(f"{FRIDAY_URL}/add", headers=HEADERS, json={
-            "content": args["content"],
-            "project": args.get("project", "default"),
-            "source":  args.get("source", "agent"),
-        })
+        r = await client.post(
+            f"{FRIDAY_URL}/add",
+            headers=HEADERS,
+            json={
+                "content": args["content"],
+                "project": args.get("project", "default"),
+                "source": args.get("source", "agent"),
+            },
+        )
         r.raise_for_status()
         return r.json()
+
 
 async def add_fact(args: dict) -> dict:
     async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.post(f"{FRIDAY_URL}/facts", headers=HEADERS, json={"content": args["content"]})
+        r = await client.post(
+            f"{FRIDAY_URL}/facts", headers=HEADERS, json={"content": args["content"]}
+        )
         r.raise_for_status()
         return r.json()
 
+
 async def memory_search(args: dict) -> dict:
     async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.post(f"{FRIDAY_URL}/search", headers=HEADERS, json={
-            "query":   args["query"],
-            "top_k":   args.get("top_k", 5),
-            "project": args.get("project", ""),
-        })
+        r = await client.post(
+            f"{FRIDAY_URL}/search",
+            headers=HEADERS,
+            json={
+                "query": args["query"],
+                "top_k": args.get("top_k", 5),
+                "project": args.get("project", ""),
+            },
+        )
         r.raise_for_status()
         return r.json()
+
 
 async def get_context(args: dict) -> dict:
     async with httpx.AsyncClient(timeout=30) as client:
@@ -136,12 +172,14 @@ async def get_context(args: dict) -> dict:
             "instruction": "Use these facts as absolute truth when responding. Search memory for project-specific context.",
         }
 
+
 TOOL_HANDLERS = {
-    "add_memory":    add_memory,
-    "add_fact":      add_fact,
+    "add_memory": add_memory,
+    "add_fact": add_fact,
     "memory_search": memory_search,
-    "get_context":   get_context,
+    "get_context": get_context,
 }
+
 
 # ── MCP Main Loop ──────────────────────────────────────────────────────────────
 async def main():
@@ -159,11 +197,14 @@ async def main():
         req_id = msg.get("id")
 
         if method == "initialize":
-            _respond({
-                "protocolVersion": "2024-11-05",
-                "serverInfo": {"name": "friday", "version": "1.0.0"},
-                "capabilities": {"tools": {}},
-            }, req_id=req_id)
+            _respond(
+                {
+                    "protocolVersion": "2024-11-05",
+                    "serverInfo": {"name": "friday", "version": "1.0.0"},
+                    "capabilities": {"tools": {}},
+                },
+                req_id=req_id,
+            )
 
         elif method == "notifications/initialized":
             continue
@@ -173,14 +214,17 @@ async def main():
 
         elif method == "tools/call":
             tool_name = msg.get("params", {}).get("name", "")
-            arguments  = msg.get("params", {}).get("arguments", {})
+            arguments = msg.get("params", {}).get("arguments", {})
             handler = TOOL_HANDLERS.get(tool_name)
             if not handler:
                 _error(-32601, f"Unknown tool: {tool_name}", req_id=req_id)
                 continue
             try:
                 result = await handler(arguments)
-                _respond({"content": [{"type": "text", "text": json.dumps(result, indent=2)}]}, req_id=req_id)
+                _respond(
+                    {"content": [{"type": "text", "text": json.dumps(result, indent=2)}]},
+                    req_id=req_id,
+                )
             except Exception as e:
                 _error(-32603, str(e), req_id=req_id)
 

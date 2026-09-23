@@ -29,13 +29,15 @@ from pydantic import BaseModel, Field
 load_dotenv()
 
 # ── Configuration (all from .env) ─────────────────────────────────────────────
-FRIDAY_API_KEY: str = os.getenv("FRIDAY_API_KEY") or os.getenv("BRAIN_API_KEY", "change_me_in_dotenv")
-FACTS_PATH: str    = os.getenv("FACTS_PATH", "/app/facts/facts.json")
-NEO4J_URI: str     = os.getenv("NEO4J_URI", "bolt://neo4j:7687")
-NEO4J_USER: str    = os.getenv("NEO4J_USER", "neo4j")
+FRIDAY_API_KEY: str = os.getenv("FRIDAY_API_KEY") or os.getenv(
+    "BRAIN_API_KEY", "change_me_in_dotenv"
+)
+FACTS_PATH: str = os.getenv("FACTS_PATH", "/app/facts/facts.json")
+NEO4J_URI: str = os.getenv("NEO4J_URI", "bolt://neo4j:7687")
+NEO4J_USER: str = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD: str = os.getenv("NEO4J_PASSWORD", "change_this_strong_password")
-MEM0_API_KEY: str  = os.getenv("MEM0_API_KEY", "")
-DEEPSEEK_KEY: str  = os.getenv("DEEPSEEK_API_KEY", "")
+MEM0_API_KEY: str = os.getenv("MEM0_API_KEY", "")
+DEEPSEEK_KEY: str = os.getenv("DEEPSEEK_API_KEY", "")
 DEEPSEEK_BASE: str = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 DEEPSEEK_MODEL: str = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
@@ -61,6 +63,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ── Auth ───────────────────────────────────────────────────────────────────────
 def verify_key(request: Request):
     key = (
@@ -73,36 +76,44 @@ def verify_key(request: Request):
         raise HTTPException(status_code=401, detail="Invalid Friday Server Secret Key.")
     return key
 
+
 # ── Lazy layer imports (graceful if services not yet running) ──────────────────
 def get_neo4j_driver():
     try:
         from neo4j import GraphDatabase
+
         return GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
     except Exception as e:
         logger.warning(f"Neo4j not available: {e}")
         return None
 
+
 def get_mem0_client():
     try:
         from mem0 import MemoryClient
+
         return MemoryClient(api_key=MEM0_API_KEY) if MEM0_API_KEY else None
     except Exception as e:
         logger.warning(f"Mem0 not available: {e}")
         return None
 
+
 # ── Pydantic Models ────────────────────────────────────────────────────────────
 class MemoryPayload(BaseModel):
     content: str = Field(..., description="The memory text to store.")
-    source: str  = Field("agent", description="Origin: agent | user | system")
+    source: str = Field("agent", description="Origin: agent | user | system")
     project: str = Field("default", description="Project namespace.")
+
 
 class FactPayload(BaseModel):
     content: str = Field(..., description="A discrete, versioned fact.")
 
+
 class SearchPayload(BaseModel):
-    query: str   = Field(..., description="Natural language search query.")
-    top_k: int   = Field(5, ge=1, le=20)
+    query: str = Field(..., description="Natural language search query.")
+    top_k: int = Field(5, ge=1, le=20)
     project: str = Field("", description="Optional project filter.")
+
 
 # ── Facts File (S3-style versioned ledger) ─────────────────────────────────────
 def _load_facts() -> dict:
@@ -115,8 +126,10 @@ def _load_facts() -> dict:
             pass
     return {"facts": []}
 
+
 def _save_facts(data: dict):
     Path(FACTS_PATH).write_text(json.dumps(data, indent=2, ensure_ascii=False))
+
 
 # ── Routes ─────────────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
@@ -125,6 +138,7 @@ async def studio():
     if STUDIO_PATH.exists():
         return HTMLResponse(content=STUDIO_PATH.read_text(), status_code=200)
     return HTMLResponse("<h1>Friday Neural Studio</h1><p>studio/index.html not found.</p>")
+
 
 @app.get("/health")
 async def health():
@@ -154,10 +168,17 @@ async def health():
     layers["facts"] = f"ok ({len(facts_data.get('facts', []))} entries)"
 
     overall = "healthy" if all("ok" in str(v) for v in layers.values()) else "degraded"
-    return {"status": overall, "layers": layers, "timestamp": datetime.now(timezone.utc).isoformat()}
+    return {
+        "status": overall,
+        "layers": layers,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
 
 @app.post("/add")
-async def add_memory(payload: MemoryPayload, background_tasks: BackgroundTasks, _key=Depends(verify_key)):
+async def add_memory(
+    payload: MemoryPayload, background_tasks: BackgroundTasks, _key=Depends(verify_key)
+):
     """Store a memory in Mem0 + ChromaDB and trigger autonomous graph wiring."""
     results = {}
 
@@ -165,9 +186,11 @@ async def add_memory(payload: MemoryPayload, background_tasks: BackgroundTasks, 
     mem0 = get_mem0_client()
     if mem0:
         try:
-            r = mem0.add(payload.content, user_id="friday_user", metadata={
-                "source": payload.source, "project": payload.project
-            })
+            r = mem0.add(
+                payload.content,
+                user_id="friday_user",
+                metadata={"source": payload.source, "project": payload.project},
+            )
             results["mem0_id"] = r[0].get("id") if r else None
         except Exception as e:
             results["mem0_error"] = str(e)
@@ -175,14 +198,22 @@ async def add_memory(payload: MemoryPayload, background_tasks: BackgroundTasks, 
     # Background: auto-extract entities → Neo4j graph
     if DEEPSEEK_KEY:
         from pipelines.auto_graph import auto_extract_and_link_graph
+
         background_tasks.add_task(
             auto_extract_and_link_graph,
-            payload.content, payload.project,
-            NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD, DEEPSEEK_KEY, DEEPSEEK_BASE, DEEPSEEK_MODEL
+            payload.content,
+            payload.project,
+            NEO4J_URI,
+            NEO4J_USER,
+            NEO4J_PASSWORD,
+            DEEPSEEK_KEY,
+            DEEPSEEK_BASE,
+            DEEPSEEK_MODEL,
         )
 
     results["status"] = "added"
     return results
+
 
 @app.post("/facts")
 async def add_fact(payload: FactPayload, _key=Depends(verify_key)):
@@ -196,14 +227,17 @@ async def add_fact(payload: FactPayload, _key=Depends(verify_key)):
         if f.get("content") == payload.content:
             return {"status": "duplicate", "fact_id": fact_id}
 
-    data["facts"].append({
-        "id": fact_id,
-        "content": payload.content,
-        "created_at": now,
-        "superseded": False,
-    })
+    data["facts"].append(
+        {
+            "id": fact_id,
+            "content": payload.content,
+            "created_at": now,
+            "superseded": False,
+        }
+    )
     _save_facts(data)
     return {"status": "added", "fact_id": fact_id}
+
 
 @app.get("/facts")
 async def get_facts(include_superseded: bool = False):
@@ -213,6 +247,7 @@ async def get_facts(include_superseded: bool = False):
     if not include_superseded:
         facts = [f for f in facts if not f.get("superseded", False)]
     return {"total": len(facts), "facts": facts}
+
 
 @app.post("/search")
 async def search_memory(payload: SearchPayload, _key=Depends(verify_key)):
@@ -226,8 +261,11 @@ async def search_memory(payload: SearchPayload, _key=Depends(verify_key)):
     except Exception as e:
         raise HTTPException(500, str(e))
 
+
 @app.post("/ingest")
-async def ingest_blueprint(payload: dict, background_tasks: BackgroundTasks, _key=Depends(verify_key)):
+async def ingest_blueprint(
+    payload: dict, background_tasks: BackgroundTasks, _key=Depends(verify_key)
+):
     """Ingest a text blob (blueprint, architecture doc) into the memory system."""
     text = payload.get("text", "")
     source = payload.get("source", "blueprint")
@@ -246,12 +284,15 @@ async def ingest_blueprint(payload: dict, background_tasks: BackgroundTasks, _ke
     mem0_id = None
     if mem0:
         try:
-            r = mem0.add(text[:2000], user_id="friday_user", metadata={"source": source, "file": filename})
+            r = mem0.add(
+                text[:2000], user_id="friday_user", metadata={"source": source, "file": filename}
+            )
             mem0_id = r[0].get("id") if r else None
         except Exception:
             pass
 
     return {"status": "ingested", "filename": filename, "mem0_id": mem0_id}
+
 
 # ── Graph API ──────────────────────────────────────────────────────────────────
 @app.get("/api/graph-data")
@@ -270,21 +311,26 @@ async def graph_data():
             nodes = []
             for row in node_res:
                 name = row["name"] or row["id"] or "Unknown"
-                nodes.append({
-                    "id": name,
-                    "name": name,
-                    "project": row.get("project", "default"),
-                    "color": row.get("color"),
-                    "degree": row["degree"],
-                    "val": max(int(row["degree"]) * 2.2, 5),
-                })
+                nodes.append(
+                    {
+                        "id": name,
+                        "name": name,
+                        "project": row.get("project", "default"),
+                        "color": row.get("color"),
+                        "degree": row["degree"],
+                        "val": max(int(row["degree"]) * 2.2, 5),
+                    }
+                )
 
             link_res = session.run(
                 "MATCH (a)-[r]->(b) RETURN a.name AS source, b.name AS target, "
                 "type(r) AS label LIMIT 1000"
             )
-            links = [{"source": r["source"], "target": r["target"], "label": r["label"]}
-                     for r in link_res if r["source"] and r["target"]]
+            links = [
+                {"source": r["source"], "target": r["target"], "label": r["label"]}
+                for r in link_res
+                if r["source"] and r["target"]
+            ]
 
         return {"nodes": nodes, "links": links}
     except Exception as e:
@@ -292,6 +338,7 @@ async def graph_data():
         return {"nodes": [], "links": [], "error": str(e)}
     finally:
         driver.close()
+
 
 @app.post("/api/node/create")
 async def create_node(payload: dict, _key=Depends(verify_key)):
@@ -310,11 +357,13 @@ async def create_node(payload: dict, _key=Depends(verify_key)):
                 "MERGE (n:Entity {name: $name}) "
                 "WITH n MERGE (p:Entity {name: $parent}) "
                 "MERGE (p)-[:" + relation + "]->(n)",
-                name=name, parent=parent_id
+                name=name,
+                parent=parent_id,
             )
         return {"status": "created", "name": name, "parent": parent_id}
     finally:
         driver.close()
+
 
 @app.delete("/api/node/{node_id}")
 async def delete_node(node_id: str, _key=Depends(verify_key)):
@@ -328,6 +377,7 @@ async def delete_node(node_id: str, _key=Depends(verify_key)):
         return {"status": "deleted", "node_id": node_id}
     finally:
         driver.close()
+
 
 @app.post("/api/node/rename")
 async def rename_node(payload: dict, _key=Depends(verify_key)):
@@ -345,11 +395,12 @@ async def rename_node(payload: dict, _key=Depends(verify_key)):
     finally:
         driver.close()
 
+
 @app.post("/api/link/create")
 async def create_link(payload: dict, _key=Depends(verify_key)):
     source = payload.get("source", "").strip()
     target = payload.get("target", "").strip()
-    label  = payload.get("label", "RELATES_TO").strip().upper().replace(" ", "_")
+    label = payload.get("label", "RELATES_TO").strip().upper().replace(" ", "_")
     if not source or not target:
         raise HTTPException(400, "Fields 'source' and 'target' required.")
     driver = get_neo4j_driver()
@@ -359,11 +410,13 @@ async def create_link(payload: dict, _key=Depends(verify_key)):
         with driver.session() as s:
             s.run(
                 f"MERGE (a:Entity {{name: $src}}) MERGE (b:Entity {{name: $tgt}}) MERGE (a)-[:{label}]->(b)",
-                src=source, tgt=target
+                src=source,
+                tgt=target,
             )
         return {"status": "linked", "source": source, "target": target, "label": label}
     finally:
         driver.close()
+
 
 @app.get("/api/search-quick")
 async def search_quick(q: str = ""):
@@ -376,12 +429,13 @@ async def search_quick(q: str = ""):
             result = s.run(
                 "MATCH (n) WHERE toLower(n.name) CONTAINS toLower($q) "
                 "RETURN n.name AS name, n.project AS project LIMIT 10",
-                q=q
+                q=q,
             )
             results = [{"name": r["name"], "project": r.get("project", "")} for r in result]
         return {"results": results}
     finally:
         driver.close()
+
 
 @app.get("/export/persona")
 async def export_persona(target: str = "agents", _key=Depends(verify_key)):
@@ -391,8 +445,7 @@ async def export_persona(target: str = "agents", _key=Depends(verify_key)):
     """
     facts_data = _load_facts()
     active_facts = [
-        f["content"] for f in facts_data.get("facts", [])
-        if f.get("status", "active") == "active"
+        f["content"] for f in facts_data.get("facts", []) if f.get("status", "active") == "active"
     ]
 
     if target == "soul":
@@ -424,14 +477,15 @@ async def export_persona(target: str = "agents", _key=Depends(verify_key)):
     else:
         lines.append("- (No active facts stored in memory ledger yet)")
 
-    lines.extend([
-        "",
-        "## Persistent Memory Protocol (MCP)",
-        "- Before refactoring major subsystems, query Friday Brain via `memory_search`.",
-        "- When confirming architectural decisions, schema changes, or bug fixes, record them via `add_memory` or `add_fact`.",
-        "- Zero duplicate prompt bloat: keep prompt context lean and rely on Friday for deep retrieval.",
-        ""
-    ])
+    lines.extend(
+        [
+            "",
+            "## Persistent Memory Protocol (MCP)",
+            "- Before refactoring major subsystems, query Friday Brain via `memory_search`.",
+            "- When confirming architectural decisions, schema changes, or bug fixes, record them via `add_memory` or `add_fact`.",
+            "- Zero duplicate prompt bloat: keep prompt context lean and rely on Friday for deep retrieval.",
+            "",
+        ]
+    )
 
     return Response(content="\n".join(lines), media_type="text/markdown")
-

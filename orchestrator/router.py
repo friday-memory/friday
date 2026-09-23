@@ -4,9 +4,11 @@ Friday — Query Router
 Routes incoming queries to the best memory layer
 based on query type, recency, and relevance scoring.
 """
+
 import logging
 
 logger = logging.getLogger("friday.router")
+
 
 async def route_query(query: str, layers: list) -> dict:
     """Route query to best available layer and merge results."""

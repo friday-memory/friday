@@ -30,7 +30,8 @@ Persists architecture decisions, schemas, and constraints across sessions via th
   <tr>
     <td align="center"><a href="#the-problem-session-amnesia"><b>Overview</b></a></td>
     <td align="center"><a href="#quickstart"><b>Quickstart</b></a></td>
-    <td align="center"><a href="#client-setup-mcp"><b>Client Setup</b></a></td>
+    <td align="center"><a href="#python-sdk-friday-memory"><b>Python SDK</b></a></td>
+    <td align="center"><a href="#client-setup-mcp"><b>Client Setup (MCP)</b></a></td>
     <td align="center"><a href="#architecture"><b>Architecture</b></a></td>
     <td align="center"><a href="#deepeval-benchmarks"><b>Benchmarks</b></a></td>
     <td align="center"><a href="#api-reference"><b>API Reference</b></a></td>
@@ -214,6 +215,83 @@ curl -X POST http://localhost/add \
     "content": "Authentication uses JWT access tokens (15m expiration) with httpOnly refresh cookies. Implementation in gateway/auth.py.",
     "project": "CoreApp"
   }'
+```
+
+---
+
+## Python SDK (`friday-memory`)
+
+Connect your agentic workflows, LangChain pipelines, or autonomous scripts directly to Friday with zero boilerplate:
+
+```bash
+pip install friday-memory
+```
+
+### Synchronous Client
+
+```python
+from friday import Friday
+
+# Automatically resolves FRIDAY_URL and FRIDAY_API_KEY from environment
+with Friday(api_key="your_secret_key", base_url="http://localhost:8000") as client:
+    # 1. Health check
+    status = client.health()
+    print("Friday Status:", status["status"])
+
+    # 2. Store architectural decision
+    client.add_memory(
+        "PostgreSQL 16 selected with pgvector for hybrid retrieval",
+        project="backend-api",
+    )
+
+    # 3. Commit immutable ground-truth fact
+    client.add_fact("Production database endpoint is db.internal.net:5432")
+
+    # 4. Multi-layer search (L2 Facts + L3 ChromaDB + L4 Knowledge Graph)
+    context = client.search("database connection configuration", project="backend-api")
+    print(context["results"])
+```
+
+### Asynchronous Client (FastAPI / Agent Workers)
+
+```python
+import asyncio
+from friday import AsyncFriday
+
+async def main():
+    async with AsyncFriday(api_key="your_secret_key") as client:
+        # Commit context concurrently
+        await client.add_memory("Redis cluster deployed for token bucket rate limiting")
+        facts = await client.get_facts()
+        print(f"Verified facts count: {len(facts)}")
+
+asyncio.run(main())
+```
+
+### LangChain Integration (`FridayRetriever`)
+
+```bash
+pip install "friday-memory[langchain]"
+```
+
+```python
+from friday.integrations.langchain import FridayRetriever
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+retriever = FridayRetriever(
+    api_key="your_secret_key",
+    base_url="http://localhost:8000",
+    project="reeldm",
+)
+
+# Connect directly to LCEL chains
+prompt = ChatPromptTemplate.from_template("""Answer using verified system memory:
+{context}
+
+Question: {question}""")
+
+chain = {"context": retriever, "question": RunnablePassthrough()} | prompt | ChatOpenAI()
 ```
 
 ---

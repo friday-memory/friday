@@ -33,15 +33,20 @@ async def auto_extract_and_link_graph(
         entities = await _extract_entities(text, project, api_key, base_url, model)
         if entities:
             await _upsert_to_neo4j(entities, project, neo4j_uri, neo4j_user, neo4j_password)
-            logger.info(f"[auto_graph] {project}: {len(entities.get('entities', []))} nodes, {len(entities.get('links', []))} edges upserted.")
+            logger.info(
+                f"[auto_graph] {project}: {len(entities.get('entities', []))} nodes, {len(entities.get('links', []))} edges upserted."
+            )
     except Exception as e:
         logger.warning(f"[auto_graph] Non-fatal error: {e}")
 
 
-async def _extract_entities(text: str, project: str, api_key: str, base_url: str, model: str) -> Optional[dict]:
+async def _extract_entities(
+    text: str, project: str, api_key: str, base_url: str, model: str
+) -> Optional[dict]:
     """Call LLM to extract structured entities and relationships."""
     try:
         from openai import AsyncOpenAI
+
         client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
         system_prompt = """You are a knowledge graph extraction engine.
@@ -90,7 +95,8 @@ async def _upsert_to_neo4j(entities: dict, project: str, uri: str, user: str, pa
                 # Upsert project node
                 await session.run(
                     "MERGE (p:Entity {name: $name}) SET p.type = 'Project', p.project = $project",
-                    name=project, project=project
+                    name=project,
+                    project=project,
                 )
 
                 # Upsert entity nodes
@@ -100,13 +106,15 @@ async def _upsert_to_neo4j(entities: dict, project: str, uri: str, user: str, pa
                             "MERGE (n:Entity {name: $name}) "
                             "ON CREATE SET n.project = $project, n.created_at = datetime() "
                             "ON MATCH SET n.last_seen = datetime()",
-                            name=entity_name, project=project
+                            name=entity_name,
+                            project=project,
                         )
                         # Link entity to project
                         await session.run(
                             "MATCH (p:Entity {name: $proj}), (n:Entity {name: $name}) "
                             "MERGE (p)-[:CONTAINS]->(n)",
-                            proj=project, name=entity_name
+                            proj=project,
+                            name=entity_name,
                         )
 
                 # Upsert relationship edges
@@ -118,7 +126,8 @@ async def _upsert_to_neo4j(entities: dict, project: str, uri: str, user: str, pa
                         await session.run(
                             f"MATCH (a:Entity {{name: $src}}), (b:Entity {{name: $tgt}}) "
                             f"MERGE (a)-[:{label}]->(b)",
-                            src=src, tgt=tgt
+                            src=src,
+                            tgt=tgt,
                         )
     except Exception as e:
         logger.warning(f"[auto_graph] Neo4j upsert failed: {e}")
