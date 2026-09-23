@@ -13,18 +13,18 @@ Endpoints:
   ...and more. See /docs for full OpenAPI spec.
 """
 
-import os
-import json
 import hashlib
+import json
 import logging
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import FastAPI, Depends, HTTPException, BackgroundTasks, Request
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, Response
+from pydantic import BaseModel, Field
 
 load_dotenv()
 
@@ -394,7 +394,7 @@ async def export_persona(target: str = "agents", _key=Depends(verify_key)):
         f["content"] for f in facts_data.get("facts", [])
         if f.get("status", "active") == "active"
     ]
-    
+
     if target == "soul":
         lines = [
             "# Persona & Directives (SOUL.md)",
@@ -417,13 +417,13 @@ async def export_persona(target: str = "agents", _key=Depends(verify_key)):
             "",
             "## Verified Architectural Facts",
         ]
-    
+
     if active_facts:
         for fact in active_facts:
             lines.append(f"- {fact}")
     else:
         lines.append("- (No active facts stored in memory ledger yet)")
-    
+
     lines.extend([
         "",
         "## Persistent Memory Protocol (MCP)",
@@ -432,6 +432,6 @@ async def export_persona(target: str = "agents", _key=Depends(verify_key)):
         "- Zero duplicate prompt bloat: keep prompt context lean and rely on Friday for deep retrieval.",
         ""
     ])
-    
+
     return Response(content="\n".join(lines), media_type="text/markdown")
 

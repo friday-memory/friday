@@ -6,9 +6,9 @@ Uses FastAPI TestClient with mocked dependencies.
 """
 import os
 import tempfile
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import patch
+
+from fastapi.testclient import TestClient
 
 # Use a writable temp path for facts in local testing
 _TMP_FACTS = os.path.join(tempfile.gettempdir(), "friday_test_facts.json")

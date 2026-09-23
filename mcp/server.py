@@ -20,11 +20,11 @@ Add to your IDE config:
   }
 """
 
+import asyncio
+import json
+import logging
 import os
 import sys
-import json
-import asyncio
-import logging
 from typing import Any
 
 import httpx

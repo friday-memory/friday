@@ -17,10 +17,9 @@ Usage:
   python benchmarks/benchmark_deepeval.py
 """
 
-import sys
 import time
 from dataclasses import dataclass
-from typing import List, Dict
+from typing import List
 
 # ANSI styling
 CYAN = "\033[0;36m"
@@ -101,29 +100,29 @@ def run_benchmark():
     print(f"{CYAN}{BOLD} ⚡ Friday DeepEval Architecture Benchmark & Comparative Evaluation{RESET}")
     print(f"{CYAN}{BOLD}========================================================================={RESET}")
     print(f"Evaluating {len(TEST_CASES)} engineering scenarios across 3 memory architectures...\n")
-    
+
     for tc in TEST_CASES:
         time.sleep(0.1)
         print(f"  {BOLD}[{tc.id}]{RESET} {tc.scenario}: {GREEN}Evaluated ✓{RESET}")
-    
+
     print("\n" + "=" * 80)
     print(f"{BOLD}{'Architecture':<32} | {'Precision':<10} | {'Recall':<8} | {'Faithful':<9} | {'Tokens/Turn':<12} | {'Retention'}{RESET}")
     print("-" * 80)
-    
+
     for arch, metrics in BENCHMARK_RESULTS.items():
         p = f"{metrics['contextual_precision']*100:.1f}%"
         r = f"{metrics['contextual_recall']*100:.1f}%"
         f = f"{metrics['faithfulness']*100:.1f}%"
         t = f"{metrics['avg_tokens_per_turn']} tok"
         s = f"{metrics['cross_session_retention']*100:.1f}%"
-        
+
         if "Friday" in arch:
             print(f"{GREEN}{BOLD}{arch:<32} | {p:<10} | {r:<8} | {f:<9} | {t:<12} | {s}{RESET}")
         elif "Naive" in arch:
             print(f"{YELLOW}{arch:<32} | {p:<10} | {r:<8} | {f:<9} | {t:<12} | {s}{RESET}")
         else:
             print(f"{arch:<32} | {p:<10} | {r:<8} | {f:<9} | {t:<12} | {s}")
-            
+
     print("-" * 80)
     print(f"\n{BOLD}Key Takeaways from DeepEval Methodology:{RESET}")
     print(f" 1. {GREEN}91% Token Reduction:{RESET} Friday consumes ~280 tokens/turn vs 3,150 tokens in static .cursorrules files.")

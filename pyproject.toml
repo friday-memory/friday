@@ -31,8 +31,8 @@ classifiers = [
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 filterwarnings = [
-    "ignore::DeprecationWarning",
-    "ignore::starlette.exceptions.StarletteDeprecationWarning"
+    "ignore:.*deprecated.*:Warning",
+    "ignore::DeprecationWarning"
 ]
 
 [tool.ruff]
@@ -41,4 +41,4 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W"]
-ignore = ["E501"]
+ignore = ["E501", "E402"]
