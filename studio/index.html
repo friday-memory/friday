@@ -61,25 +61,25 @@
       z-index: 0;
     }
 
-    /* Top Navigation HUD */
+    /* Top Navigation HUD (Single Clean Row, Zero Wrap Overlap) */
     .top-hud {
       position: absolute;
-      top: 16px;
-      left: 20px;
-      right: 20px;
+      top: 12px;
+      left: 16px;
+      right: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       pointer-events: none;
-      z-index: 10;
+      z-index: 20;
     }
     .hud-left, .hud-right {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 6px;
       pointer-events: auto;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
     }
 
     .brand-pill {
@@ -251,16 +251,17 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       color: var(--text-main);
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 11px;
+      border-radius: 18px;
+      padding: 5px 11px;
+      font-size: 10.5px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      white-space: nowrap;
     }
     .btn-action:hover {
       background: rgba(30, 41, 59, 0.95);
@@ -299,27 +300,29 @@
       50% { box-shadow: 0 0 24px rgba(6, 182, 212, 0.6); border-color: rgba(6, 182, 212, 0.8); }
     }
 
-    /* Anatomical Lobe Flight Bar */
+    /* Anatomical Lobe Flight Bar (Clean Floating Capsule) */
     .lobe-bar {
       position: absolute;
-      top: 76px;
+      top: 62px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(8, 12, 22, 0.94);
       border: 1px solid rgba(56, 189, 248, 0.35);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      border-radius: 28px;
-      padding: 4px 10px;
+      border-radius: 24px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
-      gap: 6px;
-      z-index: 10;
+      gap: 5px;
+      z-index: 15;
       box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 24px rgba(56, 189, 248, 0.25);
-      flex-wrap: wrap;
-      justify-content: center;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      overflow-x: auto;
       max-width: 96vw;
     }
+    .lobe-bar::-webkit-scrollbar { display: none; }
     .lobe-tag {
       font-size: 10px;
       font-weight: 800;
@@ -821,15 +824,15 @@
 
   <!-- Anatomical Cortex Lobe Flight Bar -->
   <div class="lobe-bar" id="lobe-bar">
-    <span class="lobe-tag">CORTEX LOBE:</span>
+    <span class="lobe-tag">LOBES:</span>
     <button class="lobe-btn active" onclick="filterLobe('all', this)">🌐 Full Cortex</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Boss', this)">👑 Prefrontal (Boss)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('FRIDAY', this)">⚡ Cognitive Core (Friday)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('ReelDM', this)">🔵 Visual Cortex (ReelDM)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('AI_Agents_Intelligence', this)">🌹 Temporal (AI Swarms)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Payments_and_Growth', this)">🟢 Parietal (Payments)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Security_and_Hardening', this)">🔴 Brainstem (Security)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Infrastructure', this)">☁️ Exocortex (Cloud & EC2)</button>
+    <button class="lobe-btn" onclick="focusCortexHub('Boss', this)">👑 Prefrontal</button>
+    <button class="lobe-btn" onclick="focusCortexHub('FRIDAY', this)">⚡ Cognitive Core</button>
+    <button class="lobe-btn" onclick="focusCortexHub('ReelDM', this)">🔵 Visual Cortex</button>
+    <button class="lobe-btn" onclick="focusCortexHub('AI_Agents_Intelligence', this)">🌹 Temporal AI</button>
+    <button class="lobe-btn" onclick="focusCortexHub('Payments_and_Growth', this)">🟢 Parietal</button>
+    <button class="lobe-btn" onclick="focusCortexHub('Security_and_Hardening', this)">🔴 Brainstem</button>
+    <button class="lobe-btn" onclick="focusCortexHub('Infrastructure', this)">☁️ Exocortex</button>
   </div>
 
   <!-- Detail Inspector Drawer -->
