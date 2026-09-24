@@ -19,6 +19,7 @@ import logging
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
@@ -27,6 +28,14 @@ from fastapi.responses import HTMLResponse, Response
 from pydantic import BaseModel, Field
 
 load_dotenv()
+
+from orchestrator.cognitive_state import (
+    get_cognitive_state,
+    update_cognitive_state,
+    format_state_prompt,
+)
+from layers.decay import apply_system_decay
+from pipelines.dream_cycle import run_dream_cycle
 
 # ── Configuration (all from .env) ─────────────────────────────────────────────
 FRIDAY_API_KEY: str = os.getenv("FRIDAY_API_KEY") or os.getenv(
@@ -108,6 +117,25 @@ class MemoryPayload(BaseModel):
 class FactPayload(BaseModel):
     content: str = Field(..., description="A discrete, versioned fact.")
 
+
+
+class CognitiveStatePayload(BaseModel):
+    current_mode: Optional[str] = None
+    urgency_level: Optional[float] = None
+    stress_level: Optional[float] = None
+    valence: Optional[float] = None
+    response_calibration: Optional[dict] = None
+    recent_context_tags: Optional[list] = None
+
+
+class DreamCyclePayload(BaseModel):
+    half_life_days: float = Field(14.0, description="Half-life in days for synaptic decay.")
+    archive_threshold: float = Field(0.25, description="Energy threshold below which facts are decayed.")
+
+
+class DecayPayload(BaseModel):
+    half_life_days: float = Field(14.0, description="Half-life in days for synaptic decay.")
+    archive_threshold: float = Field(0.25, description="Energy threshold below which facts are decayed.")
 
 class SearchPayload(BaseModel):
     query: str = Field(..., description="Natural language search query.")
@@ -233,6 +261,10 @@ async def add_fact(payload: FactPayload, _key=Depends(verify_key)):
             "content": payload.content,
             "created_at": now,
             "superseded": False,
+            "energy_score": 1.0,
+            "recall_count": 0,
+            "last_recalled_at": now,
+            "status": "active",
         }
     )
     _save_facts(data)
@@ -240,12 +272,18 @@ async def add_fact(payload: FactPayload, _key=Depends(verify_key)):
 
 
 @app.get("/facts")
-async def get_facts(include_superseded: bool = False):
+async def get_facts(include_superseded: bool = False, min_energy: float = 0.0):
     """Retrieve the active facts ledger. Public endpoint — no auth required."""
     data = _load_facts()
     facts = data.get("facts", [])
     if not include_superseded:
-        facts = [f for f in facts if not f.get("superseded", False)]
+        facts = [
+            f for f in facts
+            if not f.get("superseded", False) and f.get("status", "active") != "decayed"
+        ]
+    if min_energy > 0.0:
+        facts = [f for f in facts if f.get("energy_score", 1.0) >= min_energy]
+    facts.sort(key=lambda x: x.get("energy_score", 1.0), reverse=True)
     return {"total": len(facts), "facts": facts}
 
 
@@ -489,3 +527,42 @@ async def export_persona(target: str = "agents", _key=Depends(verify_key)):
     )
 
     return Response(content="\n".join(lines), media_type="text/markdown")
+
+
+# ── Cognitive State & Memory Decay Endpoints ────────────────────────────────────
+@app.get("/state")
+async def get_state_endpoint():
+    """Retrieve active user cognitive workload, stress level, and response calibration."""
+    return get_cognitive_state()
+
+
+@app.post("/state/update")
+async def update_state_endpoint(payload: CognitiveStatePayload, _key=Depends(verify_key)):
+    """Update active user cognitive workload, stress level, and response calibration."""
+    return update_cognitive_state(payload.model_dump(exclude_unset=True))
+
+
+@app.post("/dream/run")
+async def run_dream_cycle_endpoint(
+    payload: DreamCyclePayload, background_tasks: BackgroundTasks, _key=Depends(verify_key)
+):
+    """Trigger biological Dream Cycle memory consolidation pass."""
+    report = run_dream_cycle(
+        facts_path=FACTS_PATH,
+        neo4j_uri=NEO4J_URI,
+        neo4j_user=NEO4J_USER,
+        neo4j_password=NEO4J_PASSWORD,
+        half_life_days=payload.half_life_days,
+        archive_threshold=payload.archive_threshold,
+    )
+    return report
+
+
+@app.post("/decay/apply")
+async def apply_decay_endpoint(payload: DecayPayload, _key=Depends(verify_key)):
+    """Apply synaptic exponential decay across all active facts and memory nodes."""
+    return apply_system_decay(
+        facts_path=FACTS_PATH,
+        half_life_days=payload.half_life_days,
+        archive_threshold=payload.archive_threshold,
+    )

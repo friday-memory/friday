@@ -16,7 +16,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 <p align="center">
   <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat&color=334155&label=Stars" alt="GitHub Stars"/></a>
-  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.2.0-334155?style=flat" alt="Release"/></a>
+  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.3.0-334155?style=flat" alt="Release"/></a>
   <a href="https://pypi.org/project/friday-memory/"><img src="https://img.shields.io/pypi/v/friday-memory?style=flat&color=334155&label=PyPI" alt="PyPI Package"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-334155?style=flat" alt="MIT License"/></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-334155?style=flat" alt="Python 3.11+"/></a>
@@ -128,6 +128,56 @@ Friday runs as a self-hosted background service providing a structured, four-tie
 | **Conflict Resolution** | Manual file editing required | Ingests conflicting chunks | Versioned Fact Ledger with status flags |
 | **Topology Auditing** | None | None | Neural Studio 3D interactive viewer |
 | **Deployment Model** | Local flat files | Cloud SaaS vendor lock-in | 100% Self-Hosted Docker Compose |
+
+---
+
+
+---
+
+## Cognitive Core 2.0 (Biological Memory Architecture)
+
+Friday incorporates biologically-inspired memory mechanics to ensure AI agents maintain pristine context without bloat, stale instruction interference, or communication misalignment:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                          FRIDAY COGNITIVE DYNAMICS ENGINE                              │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                        │
+│  🔥 Dynamic Memory Heat & Decay           🌙 The Dream Cycle (Nightly 03:00 UTC)      │
+│  ┌───────────────────────────────────┐    ┌────────────────────────────────────────┐   │
+│  │ Exponential Synaptic Decay        │    │ 1. Synaptic Pruning (Evaporates noise) │   │
+│  │ • E(t) = E₀ · 2^(-Δt / T_half)    │───>│ 2. Episodic Synthesis (Distills gems)  │   │
+│  │ • Recall Potentiation (+0.25)     │    │ 3. Neo4j Crystallization (Graph edges) │   │
+│  │ • Soft Archive if E < 0.25        │    │ 4. Autonomous Backup to Git            │   │
+│  └───────────────────────────────────┘    └────────────────────────────────────────┘   │
+│                                                                                        │
+│  🤍 Empathy & Cognitive State Tracking                                                 │
+│  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
+│  │ Multi-Dimensional User Calibration                                               │  │
+│  │ • Interaction Modes: tactical_sprint | deep_architecture | casual_brainstorm      │  │
+│  │ • Real-time Stress & Urgency Detection (0.0 to 1.0)                              │  │
+│  │ • Dynamic Response Calibration: Brevity (high/med/low) & Tone Tuning             │  │
+│  └──────────────────────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 1. 🔥 Dynamic Memory Heat & Decay
+Memories and verified facts are not static text—they have energy. Active, frequently recalled directives remain bright ($E > 1.0$). Irrelevant or outdated details experience exponential half-life decay ($T_{half} = 14\text{ days}$):
+$$E(t) = E_0 \times 2^{-\frac{\Delta t}{T_{half}}}$$
+When a memory is queried during coding, it receives a recall potentiation boost ($+0.25$), preventing stale knowledge from cluttering the agent prompt while preserving core architectural invariants.
+
+### 2. 🌙 The Dream Cycle
+Every night at 03:00 UTC (or on-demand), Friday enters the **Dream Cycle**:
+- **Synaptic Pruning**: Identifies cold/stale facts and transitions them to archived storage.
+- **Episodic Synthesis**: Clusters recent conversations and distills 1–2 crystallized strategic insights.
+- **Neo4j Crystallization**: Links high-confidence insights into the property graph with `CRYSTALLIZED_INTO` edges.
+- **Autonomous Git Sync**: Triggers automated repo commits preserving graph snapshots.
+
+### 3. 🤍 Empathy & Cognitive State Tracking
+Friday monitors the developer interaction context (urgent bug-fix sprint, late-night architecture exploration, or casual brainstorming). The engine dynamically adjusts agent response characteristics:
+- **Brevity Calibration**: `high` (zero fluff, code-first) vs. `detailed` (system-wide breakdown).
+- **Tone Calibration**: `sharp_tactical` (Kerry Condon MCU wit) vs. `structured_analytical`.
+- Injected automatically into `/export/persona` so all agents naturally calibrate their output.
 
 ---
 
@@ -251,6 +301,18 @@ with Friday(api_key="your_secret_key", base_url="http://localhost:8000") as clie
     # 4. Multi-layer search (L2 Facts + L3 ChromaDB + L4 Knowledge Graph)
     context = client.search("database connection configuration", project="backend-api")
     print(context["results"])
+
+    # 5. Cognitive State & Dynamic Response Calibration
+    state = client.get_cognitive_state()
+    print("Active Mode:", state["current_mode"])  # tactical_sprint, deep_architecture, etc.
+
+    # 6. Trigger Nightly Dream Cycle Consolidation (Consolidates & Prunes)
+    dream_report = client.run_dream_cycle(half_life_days=14.0)
+    print("Crystallized Insights:", dream_report["crystallized_insights"])
+
+    # 7. Apply Synaptic Decay
+    decay_report = client.apply_decay(half_life_days=14.0)
+    print("Active Facts Remaining:", decay_report["active_facts_count"])
 ```
 
 ### Asynchronous Client (FastAPI / Agent Workers)
@@ -503,6 +565,10 @@ All authenticated endpoints require the `X-Brain-Key` request header.
 | `POST` | `/ingest` | Yes | Batch ingest architectural specifications. |
 | `GET` | `/export/persona` | Yes | Export synchronized IDE rules (`agents` or `cursor`). |
 | `GET` | `/api/graph-data` | No | Fetch nodes and edges for 3D visualizer. |
+| `GET` | `/state` | No | Retrieve active developer cognitive state & calibration. |
+| `POST` | `/state/update` | Yes | Update mode, urgency, stress, and response calibration. |
+| `POST` | `/dream/run` | Yes | Trigger biological Dream Cycle memory consolidation. |
+| `POST` | `/decay/apply` | Yes | Apply exponential synaptic decay across facts ledger. |
 | `POST` | `/api/node/create` | Yes | Create a graph entity node. |
 | `DELETE` | `/api/node/{id}` | Yes | Delete an entity and cascading relationships. |
 

@@ -30,3 +30,4 @@ integrations/*.md
 # Docker volumes
 neo4j_data/
 neo4j_logs/
+core/cognitive_state.json

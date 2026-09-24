@@ -11,9 +11,18 @@ from .exceptions import (
     FridayError,
     FridayNotFoundError,
 )
-from .types import Fact, GraphData, HealthStatus, MemoryResult, SearchResult
+from .types import (
+    CognitiveState,
+    DreamReport,
+    Fact,
+    GraphData,
+    HealthStatus,
+    MemoryDecayReport,
+    MemoryResult,
+    SearchResult,
+)
 
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 __all__ = [
     "Friday",
@@ -28,5 +37,8 @@ __all__ = [
     "SearchResult",
     "HealthStatus",
     "GraphData",
+    "CognitiveState",
+    "DreamReport",
+    "MemoryDecayReport",
     "__version__",
 ]

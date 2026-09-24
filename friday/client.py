@@ -15,7 +15,15 @@ from .exceptions import (
     FridayConnectionError,
     FridayNotFoundError,
 )
-from .types import Fact, GraphData, HealthStatus, MemoryResult
+from .types import (
+    CognitiveState,
+    DreamReport,
+    Fact,
+    GraphData,
+    HealthStatus,
+    MemoryDecayReport,
+    MemoryResult,
+)
 
 
 def _resolve_config(
@@ -79,36 +87,29 @@ class Friday:
         self.close()
 
     def close(self) -> None:
-        """Close the underlying HTTP client."""
+        """Close underlying HTTP client connection pool."""
         self.client.close()
 
     def health(self) -> HealthStatus:
-        """Check the health status of all Friday memory layers."""
+        """Query cognitive substrate health status and layer connectivity."""
         try:
             r = self.client.get("/health")
             _handle_response_error(r)
             return r.json()
-        except httpx.ConnectError as e:
-            raise FridayConnectionError(
-                f"Could not connect to Friday at {self.base_url}: {e}"
-            ) from e
-        except httpx.TimeoutException as e:
-            raise FridayConnectionError(
-                f"Connection timed out connecting to Friday at {self.base_url}: {e}"
-            ) from e
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Cannot connect to Friday server at {self.base_url}: {e}") from e
 
     def add_memory(self, content: str, project: str = "default") -> MemoryResult:
-        """Store an architectural decision or context chunk into episodic memory."""
+        """Store conversational or episodic memory, triggering autonomous graph extraction."""
         try:
-            payload = {"content": content, "project": project}
-            r = self.client.post("/add", json=payload)
+            r = self.client.post("/add", json={"content": content, "project": project})
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
-            raise FridayConnectionError(f"Network error adding memory: {e}") from e
+            raise FridayConnectionError(f"Network error storing memory: {e}") from e
 
     def search(self, query: str, project: Optional[str] = None) -> Dict[str, Any]:
-        """Search memory layers semantically for relevant architectural context."""
+        """Perform semantic vector search across persistent memory layers."""
         try:
             payload: Dict[str, Any] = {"query": query}
             if project:
@@ -117,23 +118,24 @@ class Friday:
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
-            raise FridayConnectionError(f"Network error searching memory: {e}") from e
+            raise FridayConnectionError(f"Network error executing search: {e}") from e
 
     def add_fact(self, content: str) -> Dict[str, Any]:
-        """Commit an atomic, versioned ground-truth fact to the facts ledger."""
+        """Record an immutable, discrete, version-tracked verified fact."""
         try:
-            payload = {"content": content}
-            r = self.client.post("/facts", json=payload)
+            r = self.client.post("/facts", json={"content": content})
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error adding fact: {e}") from e
 
-    def get_facts(self, include_superseded: bool = False) -> List[Fact]:
-        """Retrieve verified ground-truth facts from the ledger."""
+    def get_facts(self, include_superseded: bool = False, min_energy: float = 0.0) -> List[Fact]:
+        """Fetch the active facts ledger, filtered by minimum energy score."""
         try:
-            url = "/facts?include_superseded=true" if include_superseded else "/facts"
-            r = self.client.get(url)
+            params: Dict[str, Any] = {"include_superseded": include_superseded}
+            if min_energy > 0.0:
+                params["min_energy"] = min_energy
+            r = self.client.get("/facts", params=params)
             _handle_response_error(r)
             data = r.json()
             return data.get("facts", [])
@@ -141,17 +143,19 @@ class Friday:
             raise FridayConnectionError(f"Network error retrieving facts: {e}") from e
 
     def get_context(self, query: Optional[str] = None, target: str = "agents") -> str:
-        """Export compiled architectural directives and verified facts for prompt injection."""
+        """Retrieve pre-compiled markdown context tailored for specific agent targets."""
         try:
-            url = f"/export/persona?target={target}"
-            r = self.client.get(url)
+            params = {"target": target}
+            if query:
+                params["query"] = query
+            r = self.client.get("/export/persona", params=params)
             _handle_response_error(r)
             return r.text
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error retrieving context: {e}") from e
 
     def get_graph_data(self) -> GraphData:
-        """Fetch all entities and typed relationships from the Neo4j knowledge graph."""
+        """Fetch raw D3-ready graph topology (nodes and links) from Layer 4 Neo4j."""
         try:
             r = self.client.get("/api/graph-data")
             _handle_response_error(r)
@@ -164,7 +168,7 @@ class Friday:
     ) -> Dict[str, Any]:
         """Batch ingest architectural specifications or documentation into the knowledge base."""
         try:
-            payload = {"text": text, "source": source}
+            payload: Dict[str, Any] = {"text": text, "source": source}
             if filename:
                 payload["filename"] = filename
             r = self.client.post("/ingest", json=payload)
@@ -172,6 +176,76 @@ class Friday:
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error ingesting document: {e}") from e
+
+    def get_cognitive_state(self) -> CognitiveState:
+        """Retrieve current user cognitive workload and response calibration state."""
+        try:
+            r = self.client.get("/state")
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error retrieving cognitive state: {e}") from e
+
+    def update_cognitive_state(
+        self,
+        mode: Optional[str] = None,
+        urgency: Optional[float] = None,
+        stress: Optional[float] = None,
+        valence: Optional[float] = None,
+        response_calibration: Optional[Dict[str, Any]] = None,
+        recent_context_tags: Optional[List[str]] = None,
+    ) -> CognitiveState:
+        """Update user cognitive calibration (mode, urgency, stress, brevity, tone)."""
+        payload: Dict[str, Any] = {}
+        if mode is not None:
+            payload["current_mode"] = mode
+        if urgency is not None:
+            payload["urgency_level"] = urgency
+        if stress is not None:
+            payload["stress_level"] = stress
+        if valence is not None:
+            payload["valence"] = valence
+        if response_calibration is not None:
+            payload["response_calibration"] = response_calibration
+        if recent_context_tags is not None:
+            payload["recent_context_tags"] = recent_context_tags
+
+        try:
+            r = self.client.post("/state/update", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error updating cognitive state: {e}") from e
+
+    def run_dream_cycle(
+        self, half_life_days: float = 14.0, archive_threshold: float = 0.25
+    ) -> DreamReport:
+        """Trigger the nightly cognitive consolidation pass (Dream Cycle)."""
+        try:
+            payload = {
+                "half_life_days": half_life_days,
+                "archive_threshold": archive_threshold,
+            }
+            r = self.client.post("/dream/run", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error running dream cycle: {e}") from e
+
+    def apply_decay(
+        self, half_life_days: float = 14.0, archive_threshold: float = 0.25
+    ) -> MemoryDecayReport:
+        """Apply synaptic memory heat decay across all active facts and nodes."""
+        try:
+            payload = {
+                "half_life_days": half_life_days,
+                "archive_threshold": archive_threshold,
+            }
+            r = self.client.post("/decay/apply", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error applying memory decay: {e}") from e
 
 
 class AsyncFriday:
@@ -203,36 +277,29 @@ class AsyncFriday:
         await self.close()
 
     async def close(self) -> None:
-        """Close the underlying HTTP client."""
+        """Close underlying async HTTP client connection pool."""
         await self.client.aclose()
 
     async def health(self) -> HealthStatus:
-        """Check the health status of all Friday memory layers."""
+        """Query cognitive substrate health status and layer connectivity."""
         try:
             r = await self.client.get("/health")
             _handle_response_error(r)
             return r.json()
-        except httpx.ConnectError as e:
-            raise FridayConnectionError(
-                f"Could not connect to Friday at {self.base_url}: {e}"
-            ) from e
-        except httpx.TimeoutException as e:
-            raise FridayConnectionError(
-                f"Connection timed out connecting to Friday at {self.base_url}: {e}"
-            ) from e
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Cannot connect to Friday server at {self.base_url}: {e}") from e
 
     async def add_memory(self, content: str, project: str = "default") -> MemoryResult:
-        """Store an architectural decision or context chunk into episodic memory."""
+        """Store conversational or episodic memory, triggering autonomous graph extraction."""
         try:
-            payload = {"content": content, "project": project}
-            r = await self.client.post("/add", json=payload)
+            r = await self.client.post("/add", json={"content": content, "project": project})
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
-            raise FridayConnectionError(f"Network error adding memory: {e}") from e
+            raise FridayConnectionError(f"Network error storing memory: {e}") from e
 
     async def search(self, query: str, project: Optional[str] = None) -> Dict[str, Any]:
-        """Search memory layers semantically for relevant architectural context."""
+        """Perform semantic vector search across persistent memory layers."""
         try:
             payload: Dict[str, Any] = {"query": query}
             if project:
@@ -241,23 +308,24 @@ class AsyncFriday:
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
-            raise FridayConnectionError(f"Network error searching memory: {e}") from e
+            raise FridayConnectionError(f"Network error executing search: {e}") from e
 
     async def add_fact(self, content: str) -> Dict[str, Any]:
-        """Commit an atomic, versioned ground-truth fact to the facts ledger."""
+        """Record an immutable, discrete, version-tracked verified fact."""
         try:
-            payload = {"content": content}
-            r = await self.client.post("/facts", json=payload)
+            r = await self.client.post("/facts", json={"content": content})
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error adding fact: {e}") from e
 
-    async def get_facts(self, include_superseded: bool = False) -> List[Fact]:
-        """Retrieve verified ground-truth facts from the ledger."""
+    async def get_facts(self, include_superseded: bool = False, min_energy: float = 0.0) -> List[Fact]:
+        """Fetch the active facts ledger, filtered by minimum energy score."""
         try:
-            url = "/facts?include_superseded=true" if include_superseded else "/facts"
-            r = await self.client.get(url)
+            params: Dict[str, Any] = {"include_superseded": include_superseded}
+            if min_energy > 0.0:
+                params["min_energy"] = min_energy
+            r = await self.client.get("/facts", params=params)
             _handle_response_error(r)
             data = r.json()
             return data.get("facts", [])
@@ -265,17 +333,19 @@ class AsyncFriday:
             raise FridayConnectionError(f"Network error retrieving facts: {e}") from e
 
     async def get_context(self, query: Optional[str] = None, target: str = "agents") -> str:
-        """Export compiled architectural directives and verified facts for prompt injection."""
+        """Retrieve pre-compiled markdown context tailored for specific agent targets."""
         try:
-            url = f"/export/persona?target={target}"
-            r = await self.client.get(url)
+            params = {"target": target}
+            if query:
+                params["query"] = query
+            r = await self.client.get("/export/persona", params=params)
             _handle_response_error(r)
             return r.text
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error retrieving context: {e}") from e
 
     async def get_graph_data(self) -> GraphData:
-        """Fetch all entities and typed relationships from the Neo4j knowledge graph."""
+        """Fetch raw D3-ready graph topology (nodes and links) from Layer 4 Neo4j."""
         try:
             r = await self.client.get("/api/graph-data")
             _handle_response_error(r)
@@ -288,7 +358,7 @@ class AsyncFriday:
     ) -> Dict[str, Any]:
         """Batch ingest architectural specifications or documentation into the knowledge base."""
         try:
-            payload = {"text": text, "source": source}
+            payload: Dict[str, Any] = {"text": text, "source": source}
             if filename:
                 payload["filename"] = filename
             r = await self.client.post("/ingest", json=payload)
@@ -296,3 +366,73 @@ class AsyncFriday:
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error ingesting document: {e}") from e
+
+    async def get_cognitive_state(self) -> CognitiveState:
+        """Retrieve current user cognitive workload and response calibration state."""
+        try:
+            r = await self.client.get("/state")
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error retrieving cognitive state: {e}") from e
+
+    async def update_cognitive_state(
+        self,
+        mode: Optional[str] = None,
+        urgency: Optional[float] = None,
+        stress: Optional[float] = None,
+        valence: Optional[float] = None,
+        response_calibration: Optional[Dict[str, Any]] = None,
+        recent_context_tags: Optional[List[str]] = None,
+    ) -> CognitiveState:
+        """Update user cognitive calibration (mode, urgency, stress, brevity, tone)."""
+        payload: Dict[str, Any] = {}
+        if mode is not None:
+            payload["current_mode"] = mode
+        if urgency is not None:
+            payload["urgency_level"] = urgency
+        if stress is not None:
+            payload["stress_level"] = stress
+        if valence is not None:
+            payload["valence"] = valence
+        if response_calibration is not None:
+            payload["response_calibration"] = response_calibration
+        if recent_context_tags is not None:
+            payload["recent_context_tags"] = recent_context_tags
+
+        try:
+            r = await self.client.post("/state/update", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error updating cognitive state: {e}") from e
+
+    async def run_dream_cycle(
+        self, half_life_days: float = 14.0, archive_threshold: float = 0.25
+    ) -> DreamReport:
+        """Trigger the nightly cognitive consolidation pass (Dream Cycle)."""
+        try:
+            payload = {
+                "half_life_days": half_life_days,
+                "archive_threshold": archive_threshold,
+            }
+            r = await self.client.post("/dream/run", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error running dream cycle: {e}") from e
+
+    async def apply_decay(
+        self, half_life_days: float = 14.0, archive_threshold: float = 0.25
+    ) -> MemoryDecayReport:
+        """Apply synaptic memory heat decay across all active facts and nodes."""
+        try:
+            payload = {
+                "half_life_days": half_life_days,
+                "archive_threshold": archive_threshold,
+            }
+            r = await self.client.post("/decay/apply", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error applying memory decay: {e}") from e

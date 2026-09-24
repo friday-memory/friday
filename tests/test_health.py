@@ -114,3 +114,44 @@ def teardown_module(module):
     """Cleanup temp facts file after tests."""
     if os.path.exists(_TMP_FACTS):
         os.remove(_TMP_FACTS)
+
+
+def test_state_endpoint_public():
+    """Cognitive state endpoint should be publicly readable."""
+    r = client.get("/state")
+    assert r.status_code == 200
+    data = r.json()
+    assert "current_mode" in data
+    assert "urgency_level" in data
+    assert "response_calibration" in data
+
+
+def test_state_update_requires_auth():
+    """Updating state requires authorization."""
+    r = client.post("/state/update", json={"current_mode": "tactical_sprint"})
+    assert r.status_code == 401
+
+
+def test_state_update_with_auth():
+    """Updating state with authorization succeeds."""
+    r = client.post(
+        "/state/update",
+        json={"current_mode": "tactical_sprint", "urgency_level": 0.8},
+        headers=HEADERS,
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["current_mode"] == "tactical_sprint"
+    assert data["urgency_level"] == 0.8
+
+
+def test_dream_run_requires_auth():
+    """Dream cycle run requires authorization."""
+    r = client.post("/dream/run", json={"half_life_days": 14.0})
+    assert r.status_code == 401
+
+
+def test_decay_apply_requires_auth():
+    """Decay application requires authorization."""
+    r = client.post("/decay/apply", json={"half_life_days": 14.0})
+    assert r.status_code == 401
