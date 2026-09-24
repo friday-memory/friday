@@ -19,7 +19,7 @@ import logging
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
@@ -29,12 +29,11 @@ from pydantic import BaseModel, Field
 
 load_dotenv()
 
+from layers.decay import apply_system_decay
 from orchestrator.cognitive_state import (
     get_cognitive_state,
     update_cognitive_state,
-    format_state_prompt,
 )
-from layers.decay import apply_system_decay
 from pipelines.dream_cycle import run_dream_cycle
 
 # ── Configuration (all from .env) ─────────────────────────────────────────────
@@ -118,7 +117,6 @@ class FactPayload(BaseModel):
     content: str = Field(..., description="A discrete, versioned fact.")
 
 
-
 class CognitiveStatePayload(BaseModel):
     current_mode: Optional[str] = None
     urgency_level: Optional[float] = None
@@ -130,12 +128,17 @@ class CognitiveStatePayload(BaseModel):
 
 class DreamCyclePayload(BaseModel):
     half_life_days: float = Field(14.0, description="Half-life in days for synaptic decay.")
-    archive_threshold: float = Field(0.25, description="Energy threshold below which facts are decayed.")
+    archive_threshold: float = Field(
+        0.25, description="Energy threshold below which facts are decayed."
+    )
 
 
 class DecayPayload(BaseModel):
     half_life_days: float = Field(14.0, description="Half-life in days for synaptic decay.")
-    archive_threshold: float = Field(0.25, description="Energy threshold below which facts are decayed.")
+    archive_threshold: float = Field(
+        0.25, description="Energy threshold below which facts are decayed."
+    )
+
 
 class SearchPayload(BaseModel):
     query: str = Field(..., description="Natural language search query.")
@@ -278,7 +281,8 @@ async def get_facts(include_superseded: bool = False, min_energy: float = 0.0):
     facts = data.get("facts", [])
     if not include_superseded:
         facts = [
-            f for f in facts
+            f
+            for f in facts
             if not f.get("superseded", False) and f.get("status", "active") != "decayed"
         ]
     if min_energy > 0.0:

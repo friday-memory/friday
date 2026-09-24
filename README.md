@@ -321,12 +321,14 @@ with Friday(api_key="your_secret_key", base_url="http://localhost:8000") as clie
 import asyncio
 from friday import AsyncFriday
 
+
 async def main():
     async with AsyncFriday(api_key="your_secret_key") as client:
         # Commit context concurrently
         await client.add_memory("Redis cluster deployed for token bucket rate limiting")
         facts = await client.get_facts()
         print(f"Verified facts count: {len(facts)}")
+
 
 asyncio.run(main())
 ```

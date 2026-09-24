@@ -30,8 +30,7 @@ def synthesize_recent_insights(facts: List[Dict[str, Any]], max_insights: int = 
 
     # Filter to active facts with high energy
     high_energy = [
-        f for f in facts
-        if f.get("status") == "active" and f.get("energy_score", 1.0) >= 0.8
+        f for f in facts if f.get("status") == "active" and f.get("energy_score", 1.0) >= 0.8
     ]
     if not high_energy:
         high_energy = [f for f in facts if f.get("status") == "active"]
@@ -49,7 +48,10 @@ def synthesize_recent_insights(facts: List[Dict[str, Any]], max_insights: int = 
 
     for f in high_energy:
         content = f.get("content", "").lower()
-        if any(w in content for w in ("razorpay", "dodo", "payment", "subscription", "pass", "pricing", "inr")):
+        if any(
+            w in content
+            for w in ("razorpay", "dodo", "payment", "subscription", "pass", "pricing", "inr")
+        ):
             topics["payments"].append(f.get("content", ""))
         elif any(w in content for w in ("ec2", "aws", "server", "docker", "ssh", "cron", "backup")):
             topics["infrastructure"].append(f.get("content", ""))
@@ -115,6 +117,7 @@ def run_dream_cycle(
     if uri and user and pwd:
         try:
             from neo4j import GraphDatabase
+
             driver = GraphDatabase.driver(uri, auth=(user, pwd))
             with driver.session() as session:
                 for idx, insight in enumerate(crystallized_insights):

@@ -1,6 +1,7 @@
 """Friday Python SDK — Type Definitions."""
 
 from typing import Any, Dict, List, Optional
+
 from typing_extensions import TypedDict
 
 

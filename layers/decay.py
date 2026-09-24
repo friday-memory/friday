@@ -9,7 +9,7 @@ import math
 import os
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 
 def calculate_decayed_energy(
@@ -37,11 +37,16 @@ def calculate_decayed_energy(
         clean_str = ref_str.replace("Z", "+00:00")
         if "T" not in clean_str and " " in clean_str:
             clean_str = clean_str.replace(" ", "T")
-        if "+" not in clean_str and "-" not in clean_str[10:]:
-            clean_str += "+00:00"
         ref_dt = datetime.fromisoformat(clean_str)
+        if ref_dt.tzinfo is None:
+            ref_dt = ref_dt.replace(tzinfo=timezone.utc)
+        else:
+            ref_dt = ref_dt.astimezone(timezone.utc)
     except Exception:
         return max(0.05, min(2.0, initial_energy))
+
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
 
     delta_seconds = (now - ref_dt).total_seconds()
     if delta_seconds < 0:

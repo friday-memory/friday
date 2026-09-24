@@ -9,7 +9,7 @@ import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 DEFAULT_STATE: Dict[str, Any] = {
     "current_mode": "tactical_sprint",
@@ -96,7 +96,9 @@ def update_cognitive_state(
         mode = current.get("current_mode", "tactical_sprint")
         brevity = current.get("response_calibration", {}).get("brevity", "high")
         tone = current.get("response_calibration", {}).get("tone", "sharp_tactical")
-        current["summary"] = f"Mode: {mode} | Brevity: {brevity} | Tone: {tone} | Urgency: {current.get('urgency_level')}"
+        current["summary"] = (
+            f"Mode: {mode} | Brevity: {brevity} | Tone: {tone} | Urgency: {current.get('urgency_level')}"
+        )
 
     p = _resolve_state_path(state_path)
     try:
@@ -112,8 +114,27 @@ def detect_state_from_prompt(prompt: str) -> Dict[str, Any]:
     p_lower = prompt.lower()
     inferred: Dict[str, Any] = {}
 
-    urgent_signals = ["urgent", "jaldi", "asap", "quick", "emergency", "broken", "down", "error", "fail"]
-    arch_signals = ["architecture", "blueprint", "scale", "system design", "future", "schema", "database", "modular"]
+    urgent_signals = [
+        "urgent",
+        "jaldi",
+        "asap",
+        "quick",
+        "emergency",
+        "broken",
+        "down",
+        "error",
+        "fail",
+    ]
+    arch_signals = [
+        "architecture",
+        "blueprint",
+        "scale",
+        "system design",
+        "future",
+        "schema",
+        "database",
+        "modular",
+    ]
     casual_signals = ["kya lagta hai", "soch raha tha", "explore", "idea", "brainstorm", "opinion"]
 
     is_urgent = any(re.search(rf"\b{s}\b", p_lower) for s in urgent_signals)

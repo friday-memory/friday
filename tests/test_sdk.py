@@ -285,6 +285,7 @@ def test_retriever_search_parsing_logic():
 
 def test_cognitive_state_and_decay_sync():
     """Verify sync client endpoints for cognitive state, dream cycle, and memory decay."""
+
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.headers.get("X-Brain-Key") == "secret-key"
 
@@ -376,19 +377,28 @@ def test_cognitive_state_and_decay_sync():
 @pytest.mark.anyio
 async def test_cognitive_state_and_decay_async():
     """Verify async client endpoints for cognitive state, dream cycle, and memory decay."""
+
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/state":
-            return httpx.Response(200, json={"current_mode": "casual_brainstorm", "urgency_level": 0.2})
+            return httpx.Response(
+                200, json={"current_mode": "casual_brainstorm", "urgency_level": 0.2}
+            )
         elif request.url.path == "/state/update":
-            return httpx.Response(200, json={"current_mode": "tactical_sprint", "urgency_level": 0.9})
+            return httpx.Response(
+                200, json={"current_mode": "tactical_sprint", "urgency_level": 0.9}
+            )
         elif request.url.path == "/dream/run":
-            return httpx.Response(200, json={"status": "completed", "crystallized_insights": ["Consolidated facts"]})
+            return httpx.Response(
+                200, json={"status": "completed", "crystallized_insights": ["Consolidated facts"]}
+            )
         elif request.url.path == "/decay/apply":
             return httpx.Response(200, json={"decayed_facts_count": 1, "active_facts_count": 5})
         return httpx.Response(404, text="Not Found")
 
     transport = httpx.MockTransport(handler)
-    async with AsyncFriday(api_key="secret", base_url="http://mock-friday", transport=transport) as client:
+    async with AsyncFriday(
+        api_key="secret", base_url="http://mock-friday", transport=transport
+    ) as client:
         state = await client.get_cognitive_state()
         assert state["current_mode"] == "casual_brainstorm"
 
@@ -405,6 +415,7 @@ async def test_cognitive_state_and_decay_async():
 def test_memory_decay_calculations():
     """Verify exponential half-life decay math and recall potentiation."""
     from datetime import datetime, timedelta, timezone
+
     from layers.decay import calculate_decayed_energy
 
     now = datetime.now(timezone.utc)
@@ -412,16 +423,22 @@ def test_memory_decay_calculations():
     four_weeks_ago = (now - timedelta(days=28)).isoformat()
 
     # After 1 half-life (14 days), energy should be ~50%
-    energy_14d = calculate_decayed_energy(initial_energy=1.0, last_recalled_at=two_weeks_ago, half_life_days=14.0, current_time=now)
+    energy_14d = calculate_decayed_energy(
+        initial_energy=1.0, last_recalled_at=two_weeks_ago, half_life_days=14.0, current_time=now
+    )
     assert 0.49 <= energy_14d <= 0.51
 
     # After 2 half-lives (28 days), energy should be ~25%
-    energy_28d = calculate_decayed_energy(initial_energy=1.0, last_recalled_at=four_weeks_ago, half_life_days=14.0, current_time=now)
+    energy_28d = calculate_decayed_energy(
+        initial_energy=1.0, last_recalled_at=four_weeks_ago, half_life_days=14.0, current_time=now
+    )
     assert 0.24 <= energy_28d <= 0.26
 
     # Minimum floor clamping
     ancient = (now - timedelta(days=365)).isoformat()
-    energy_ancient = calculate_decayed_energy(initial_energy=1.0, last_recalled_at=ancient, half_life_days=14.0, current_time=now)
+    energy_ancient = calculate_decayed_energy(
+        initial_energy=1.0, last_recalled_at=ancient, half_life_days=14.0, current_time=now
+    )
     assert energy_ancient == 0.05
 
 
@@ -436,12 +453,20 @@ def test_cognitive_state_detection():
     assert res_urgent["response_calibration"]["brevity"] == "high"
 
     # Architecture design prompt
-    res_arch = detect_state_from_prompt("Let us review the multi-layer system architecture blueprint")
+    res_arch = detect_state_from_prompt(
+        "Let us review the multi-layer system architecture blueprint"
+    )
     assert res_arch["current_mode"] == "deep_architecture"
     assert res_arch["response_calibration"]["brevity"] == "detailed"
 
     # Prompt formatter
-    prompt_str = format_state_prompt({"current_mode": "tactical_sprint", "urgency_level": 0.9, "response_calibration": {"brevity": "high", "tone": "sharp_tactical"}})
+    prompt_str = format_state_prompt(
+        {
+            "current_mode": "tactical_sprint",
+            "urgency_level": 0.9,
+            "response_calibration": {"brevity": "high", "tone": "sharp_tactical"},
+        }
+    )
     assert "tactical_sprint" in prompt_str
     assert "sharp_tactical" in prompt_str
 
@@ -451,9 +476,21 @@ def test_dream_cycle_synthesis():
     from pipelines.dream_cycle import synthesize_recent_insights
 
     sample_facts = [
-        {"content": "Razorpay ₹349 prepaid 30-day pass launched in India.", "energy_score": 1.2, "status": "active"},
-        {"content": "AWS EC2 13.200.195.74 unified server hosting ReelDM and Friday Brain.", "energy_score": 1.5, "status": "active"},
-        {"content": "Meta WhatsApp verification pending GSTIN documents.", "energy_score": 0.9, "status": "active"},
+        {
+            "content": "Razorpay ₹349 prepaid 30-day pass launched in India.",
+            "energy_score": 1.2,
+            "status": "active",
+        },
+        {
+            "content": "AWS EC2 13.200.195.74 unified server hosting ReelDM and Friday Brain.",
+            "energy_score": 1.5,
+            "status": "active",
+        },
+        {
+            "content": "Meta WhatsApp verification pending GSTIN documents.",
+            "energy_score": 0.9,
+            "status": "active",
+        },
     ]
 
     insights = synthesize_recent_insights(sample_facts, max_insights=2)

@@ -97,7 +97,9 @@ class Friday:
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
-            raise FridayConnectionError(f"Cannot connect to Friday server at {self.base_url}: {e}") from e
+            raise FridayConnectionError(
+                f"Cannot connect to Friday server at {self.base_url}: {e}"
+            ) from e
 
     def add_memory(self, content: str, project: str = "default") -> MemoryResult:
         """Store conversational or episodic memory, triggering autonomous graph extraction."""
@@ -287,7 +289,9 @@ class AsyncFriday:
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
-            raise FridayConnectionError(f"Cannot connect to Friday server at {self.base_url}: {e}") from e
+            raise FridayConnectionError(
+                f"Cannot connect to Friday server at {self.base_url}: {e}"
+            ) from e
 
     async def add_memory(self, content: str, project: str = "default") -> MemoryResult:
         """Store conversational or episodic memory, triggering autonomous graph extraction."""
@@ -319,7 +323,9 @@ class AsyncFriday:
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error adding fact: {e}") from e
 
-    async def get_facts(self, include_superseded: bool = False, min_energy: float = 0.0) -> List[Fact]:
+    async def get_facts(
+        self, include_superseded: bool = False, min_energy: float = 0.0
+    ) -> List[Fact]:
         """Fetch the active facts ledger, filtered by minimum energy score."""
         try:
             params: Dict[str, Any] = {"include_superseded": include_superseded}
