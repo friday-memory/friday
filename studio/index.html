@@ -137,6 +137,35 @@
       gap: 4px;
     }
 
+    /* Cognitive State HUD Pill */
+    .state-pill {
+      background: var(--card-bg);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-main);
+      box-shadow: var(--hud-glow);
+    }
+    .state-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse-ring 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+    .state-mode { color: #38bdf8; font-weight: 700; letter-spacing: -0.01em; }
+    .state-divider { color: rgba(255, 255, 255, 0.15); }
+    .state-urgency { color: #f59e0b; }
+    .state-stress { color: #10b981; }
+
     /* Search Box */
     .search-box {
       background: var(--card-bg);
@@ -148,12 +177,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      width: 220px;
+      width: 200px;
       transition: all 0.25s ease;
       box-shadow: var(--hud-glow);
     }
     .search-box:focus-within {
-      width: 280px;
+      width: 260px;
       border-color: var(--accent-cyan);
       box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
     }
@@ -175,6 +204,44 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 1px 5px;
       border-radius: 4px;
+    }
+
+    /* Synaptic Heat Filter Pill */
+    .heat-filter-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 3px 8px 3px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--hud-glow);
+    }
+    .heat-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.04em;
+    }
+    .heat-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border-radius: 14px;
+      padding: 3px 9px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .heat-btn:hover, .heat-btn.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: rgba(56, 189, 248, 0.6);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
     }
 
     /* Action Buttons */
@@ -214,6 +281,24 @@
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
     }
 
+    /* 1-Click Dream Cycle Button */
+    .dream-btn {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.28), rgba(6, 182, 212, 0.28)) !important;
+      border-color: rgba(168, 85, 247, 0.6) !important;
+      color: #f3e8ff !important;
+      box-shadow: 0 0 16px rgba(168, 85, 247, 0.35) !important;
+      animation: dream-pulse 3s infinite ease-in-out;
+    }
+    .dream-btn:hover {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.45), rgba(6, 182, 212, 0.45)) !important;
+      box-shadow: 0 0 26px rgba(168, 85, 247, 0.7) !important;
+      transform: translateY(-1px);
+    }
+    @keyframes dream-pulse {
+      0%, 100% { box-shadow: 0 0 14px rgba(168, 85, 247, 0.35); }
+      50% { box-shadow: 0 0 24px rgba(6, 182, 212, 0.6); border-color: rgba(6, 182, 212, 0.8); }
+    }
+
     /* Anatomical Lobe Flight Bar */
     .lobe-bar {
       position: absolute;
@@ -228,9 +313,12 @@
       padding: 4px 10px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       z-index: 10;
       box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 24px rgba(56, 189, 248, 0.25);
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 96vw;
     }
     .lobe-tag {
       font-size: 10px;
@@ -246,14 +334,15 @@
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--text-muted);
       border-radius: 16px;
-      padding: 5px 12px;
+      padding: 5px 11px;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
     .lobe-btn:hover, .lobe-btn.active {
       background: rgba(56, 189, 248, 0.18);
@@ -280,119 +369,200 @@
     .tooltip-tag {
       font-size: 9px;
       font-weight: 800;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      font-family: 'JetBrains Mono', monospace;
       text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #38bdf8;
+      margin-bottom: 3px;
     }
     .tooltip-title {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       color: #fff;
-      margin-top: 2px;
     }
     .tooltip-meta {
       font-size: 11px;
-      font-weight: 600;
-      color: #38bdf8;
+      color: #94a3b8;
       margin-top: 4px;
       display: flex;
-      align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
     /* Detail Inspector Drawer */
     .inspector-drawer {
       position: absolute;
-      top: 16px;
-      right: -420px;
-      width: 380px;
-      bottom: 16px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      border-radius: 16px;
-      z-index: 20;
+      top: 20px;
+      right: 20px;
+      bottom: 20px;
+      width: 400px;
+      max-width: calc(100vw - 40px);
+      background: rgba(8, 12, 22, 0.96);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border-radius: 20px;
       display: flex;
       flex-direction: column;
-      box-shadow: -12px 0 40px rgba(0, 0, 0, 0.8), var(--hud-glow);
-      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 40;
+      transform: translateX(450px);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 32px rgba(56, 189, 248, 0.2);
     }
-    .inspector-drawer.open { right: 20px; }
+    .inspector-drawer.open {
+      transform: translateX(0);
+    }
     .drawer-header {
-      padding: 16px;
+      padding: 18px 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
     }
-    .drawer-title-wrap { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+    .drawer-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow: hidden;
+    }
     .drawer-tag {
       font-size: 9px;
       font-weight: 800;
-      text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: var(--accent-cyan);
+      color: #38bdf8;
       font-family: 'JetBrains Mono', monospace;
     }
     .drawer-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      word-break: break-word;
     }
     .btn-close {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-muted);
-      width: 26px;
-      height: 26px;
+      color: #94a3b8;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      cursor: pointer;
       transition: all 0.2s ease;
+      font-size: 12px;
     }
-    .btn-close:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+    .btn-close:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    /* Retention Card in Inspector */
+    .retention-card {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 14px 18px 0 18px;
+      box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.08);
+    }
+    .retention-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .retention-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.06em;
+    }
+    .retention-score {
+      font-size: 12px;
+      font-weight: 700;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .retention-bar-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .retention-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ec4899, #38bdf8, #10b981);
+      border-radius: 4px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .retention-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #64748b;
+    }
+    .retention-state-active { color: #10b981; font-weight: 600; }
+    .retention-state-decay { color: #f59e0b; font-weight: 600; }
+    .retention-state-dormant { color: #64748b; font-weight: 600; }
 
     .drawer-actions {
-      padding: 8px 16px;
+      padding: 12px 18px 0 18px;
       display: flex;
-      gap: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(0, 0, 0, 0.2);
+      gap: 6px;
+      flex-wrap: wrap;
     }
     .drawer-action-btn {
       flex: 1;
-      padding: 5px 8px;
+      min-width: 75px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 7px 10px;
       font-size: 11px;
       font-weight: 600;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-main);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 5px;
       transition: all 0.2s ease;
     }
-    .drawer-action-btn:hover { background: rgba(255, 255, 255, 0.1); }
-    .drawer-action-btn.danger:hover { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .drawer-action-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .drawer-action-btn.reinforce {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+    .drawer-action-btn.reinforce:hover {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.35), rgba(6, 182, 212, 0.35));
+      border-color: rgba(16, 185, 129, 0.7);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+    }
+    .drawer-action-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
 
     .drawer-tabs {
       display: flex;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 0 16px;
+      padding: 12px 18px 0 18px;
+      gap: 14px;
     }
     .drawer-tab {
-      padding: 10px 12px;
+      padding-bottom: 10px;
       font-size: 11px;
       font-weight: 600;
       color: var(--text-muted);
@@ -400,126 +570,177 @@
       border-bottom: 2px solid transparent;
       transition: all 0.2s ease;
     }
-    .drawer-tab.active { color: var(--accent-cyan); border-bottom-color: var(--accent-cyan); }
+    .drawer-tab:hover, .drawer-tab.active {
+      color: #fff;
+      border-color: #38bdf8;
+    }
 
-    .drawer-body { flex: 1; overflow-y: auto; padding: 16px; }
-    .conn-list { display: flex; flex-direction: column; gap: 8px; }
+    .drawer-body {
+      padding: 14px 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .conn-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
     .conn-item {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 8px;
       padding: 8px 12px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .conn-item:hover {
-      background: rgba(56, 189, 248, 0.08);
-      border-color: rgba(56, 189, 248, 0.3);
+      background: rgba(56, 189, 248, 0.15);
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateX(3px);
     }
-    .conn-name { font-size: 12px; font-weight: 600; color: #fff; }
-    .conn-rel { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--accent-pink); }
+    .conn-label {
+      font-size: 9px;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-    /* Modals */
+    .fact-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .fact-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Modal Dialogs */
     .modal-backdrop {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.75);
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      z-index: 100;
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 100;
     }
-    .modal-backdrop.active { display: flex; }
+    .modal-backdrop.active {
+      display: flex;
+    }
     .modal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
+      background: rgba(10, 15, 28, 0.98);
+      border: 1px solid rgba(56, 189, 248, 0.4);
       border-radius: 16px;
-      width: 360px;
-      padding: 20px;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), var(--hud-glow);
+      width: 420px;
+      max-width: 90vw;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 32px rgba(56, 189, 248, 0.3);
     }
-    .modal-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #fff; }
-    .form-group { margin-bottom: 12px; }
+    .modal-card h3 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
     .form-group label {
       display: block;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
     }
     .form-group input {
       width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
-      padding: 8px 10px;
-      font-size: 12px;
+      padding: 8px 12px;
       color: #fff;
+      font-size: 12px;
       outline: none;
     }
-    .form-group input:focus { border-color: var(--accent-cyan); }
-    .modal-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .form-group input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+    .modal-btns {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
     .btn-modal {
-      padding: 6px 14px;
+      border-radius: 8px;
+      padding: 8px 16px;
       font-size: 12px;
       font-weight: 600;
-      border-radius: 8px;
       cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.2s ease;
     }
-    .btn-modal.secondary { background: rgba(255, 255, 255, 0.06); color: var(--text-muted); }
-    .btn-modal.primary { background: var(--accent-cyan); color: #000; }
+    .btn-modal.secondary {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #94a3b8;
+    }
+    .btn-modal.primary {
+      background: #38bdf8;
+      border: none;
+      color: #030509;
+    }
 
     /* Toast Notification */
     .toast-msg {
-      position: fixed;
-      bottom: 30px;
+      position: absolute;
+      bottom: 24px;
       left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: rgba(15, 23, 42, 0.95);
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(8, 12, 22, 0.95);
       border: 1px solid rgba(56, 189, 248, 0.4);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
       border-radius: 24px;
-      padding: 8px 18px;
+      padding: 8px 20px;
       font-size: 12px;
+      font-weight: 600;
       color: #fff;
       display: flex;
       align-items: center;
       gap: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(56, 189, 248, 0.3);
+      z-index: 100;
       opacity: 0;
-      pointer-events: none;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      z-index: 1000;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.25);
+      pointer-events: none;
     }
     .toast-msg.show {
-      opacity: 1;
       transform: translateX(-50%) translateY(0);
+      opacity: 1;
     }
   </style>
 </head>
 <body>
 
-  <!-- Ambient Grid Background -->
   <div class="space-grid"></div>
-
-  <!-- WebGL Canvas for Synthetic Cortex -->
   <canvas id="webgl-canvas"></canvas>
 
-  <!-- Interactive Hover Tooltip -->
+  <!-- Interactive 3D Tooltip -->
   <div class="hover-tooltip" id="hover-tooltip">
     <div class="tooltip-tag" id="tt-tag">NEURAL SECTOR</div>
     <div class="tooltip-title" id="tt-title">Node Name</div>
-    <div class="tooltip-meta" id="tt-meta">⚡ Degree: 5</div>
+    <div class="tooltip-meta" id="tt-meta">⚡ Connections: 5</div>
   </div>
 
   <!-- Top Navigation HUD -->
@@ -533,8 +754,18 @@
         <div class="brand-stats">
           <span>Nodes: <strong id="stat-nodes">--</strong></span>
           <span>Edges: <strong id="stat-edges">--</strong></span>
-          <span class="ping-badge">● <strong id="stat-ping">22ms</strong></span>
+          <span class="ping-badge">● <strong id="stat-ping">--</strong></span>
         </div>
+      </div>
+
+      <!-- Cognitive State HUD Pill -->
+      <div class="state-pill" id="state-pill" title="Live Friday Cognitive State">
+        <div class="state-pulse"></div>
+        <span class="state-mode" id="state-mode">TACTICAL SPRINT ⚡</span>
+        <span class="state-divider">|</span>
+        <span class="state-urgency" id="state-urgency">URG: 0.85</span>
+        <span class="state-divider">|</span>
+        <span class="state-stress" id="state-stress">STRESS: 0.20 🟢</span>
       </div>
 
       <div class="search-box">
@@ -545,6 +776,19 @@
     </div>
 
     <div class="hud-right">
+      <!-- Synaptic Heat Filter Pill -->
+      <div class="heat-filter-pill" id="heat-filter-pill">
+        <span class="heat-tag">⚡ SYNAPSE HEAT:</span>
+        <button class="heat-btn active" id="heat-all" onclick="filterHeat('all', this)">All</button>
+        <button class="heat-btn" id="heat-hot" onclick="filterHeat('hot', this)">🔥 Hot (≥0.7)</button>
+        <button class="heat-btn" id="heat-cold" onclick="filterHeat('cold', this)">❄️ Decayed (&lt;0.4)</button>
+      </div>
+
+      <!-- 1-Click Dream Cycle Button -->
+      <button class="btn-action dream-btn" id="btn-dream-cycle" onclick="triggerDreamCycle()" title="Trigger Autonomous Dream Cycle & Synaptic Consolidation">
+        <span class="dream-icon">🌙</span> <span id="dream-text">Dream Cycle</span>
+      </button>
+
       <button class="btn-action active-glow" id="btn-toggle-orbit" title="Toggle Cinematic Auto-Orbit">
         <span>🔄</span> <span id="orbit-text">Auto-Orbit</span>
       </button>
@@ -579,12 +823,13 @@
   <div class="lobe-bar" id="lobe-bar">
     <span class="lobe-tag">CORTEX LOBE:</span>
     <button class="lobe-btn active" onclick="filterLobe('all', this)">🌐 Full Cortex</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Boss', this)">🟡 Prefrontal (Boss)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('FRIDAY', this)">🌸 Cognitive Core (Friday)</button>
+    <button class="lobe-btn" onclick="focusCortexHub('Boss', this)">👑 Prefrontal (Boss)</button>
+    <button class="lobe-btn" onclick="focusCortexHub('FRIDAY', this)">⚡ Cognitive Core (Friday)</button>
     <button class="lobe-btn" onclick="focusCortexHub('ReelDM', this)">🔵 Visual Cortex (ReelDM)</button>
-    <button class="lobe-btn" onclick="focusCortexHub('AI_Agents_Intelligence', this)">🌹 Temporal (AI Swarm)</button>
+    <button class="lobe-btn" onclick="focusCortexHub('AI_Agents_Intelligence', this)">🌹 Temporal (AI Swarms)</button>
     <button class="lobe-btn" onclick="focusCortexHub('Payments_and_Growth', this)">🟢 Parietal (Payments)</button>
     <button class="lobe-btn" onclick="focusCortexHub('Security_and_Hardening', this)">🔴 Brainstem (Security)</button>
+    <button class="lobe-btn" onclick="focusCortexHub('Infrastructure', this)">☁️ Exocortex (Cloud & EC2)</button>
   </div>
 
   <!-- Detail Inspector Drawer -->
@@ -597,7 +842,24 @@
       <button class="btn-close" id="btn-close-drawer">✕</button>
     </div>
 
+    <!-- Synaptic Retention Card -->
+    <div class="retention-card" id="retention-card">
+      <div class="retention-header">
+        <span class="retention-title">⚡ SYNAPTIC RETENTION</span>
+        <span class="retention-score" id="drawer-energy-score">1.00</span>
+      </div>
+      <div class="retention-bar-bg">
+        <div class="retention-bar-fill" id="drawer-energy-bar" style="width: 100%;"></div>
+      </div>
+      <div class="retention-footer">
+        <span id="drawer-recall-count">Recalls: 0</span>
+        <span id="drawer-retention-state" class="retention-state-active">PRIME SYNAPSE</span>
+      </div>
+    </div>
+
     <div class="drawer-actions">
+      <button class="drawer-action-btn reinforce" id="btn-reinforce-node" onclick="reinforceSelectedNode()">⚡ Reinforce (+0.25)</button>
+      <button class="drawer-action-btn" id="btn-fly-node" onclick="flyToSelectedNode()">🚀 Fly Focus</button>
       <button class="drawer-action-btn" id="btn-rename-node">✏️ Rename</button>
       <button class="drawer-action-btn" id="btn-link-node">🔗 Connect</button>
       <button class="drawer-action-btn danger" id="btn-delete-node">🗑️ Delete</button>
@@ -677,10 +939,12 @@
     let selectedNode = null;
     let hoveredNode = null;
     let activeFilter = 'all';
+    let activeHeatFilter = 'all';
     let isTourRunning = false;
     let allActiveFacts = [];
     const nodeMeshMap = new Map();
     const nodePosMap = new Map();
+    const nodeLobeMap = new Map();
     const linkLineList = [];
     const photonParticleList = [];
     const gyroRingList = [];
@@ -751,9 +1015,45 @@
         osc.start(now);
         osc.stop(now + 0.38);
       }
+      playDream() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [220, 330, 440, 660].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.5, now + idx * 0.08 + 1.2);
+          gain.gain.setValueAtTime(0.03, now + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 1.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 1.2);
+        });
+      }
+      playReinforce() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+          gain.gain.setValueAtTime(0.03, now + idx * 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.04 + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.04);
+          osc.stop(now + idx * 0.04 + 0.3);
+        });
+      }
     }
     const Sound = new SoundEngine();
-
 
     function createHubSprite(text, colorHex) {
       const canvas = document.createElement('canvas');
@@ -787,7 +1087,7 @@
       texture.minFilter = THREE.LinearFilter;
       const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthWrite: false });
       const sprite = new THREE.Sprite(spriteMat);
-      sprite.scale.set(65, 14, 1);
+      sprite.scale.set(70, 15, 1);
       return sprite;
     }
 
@@ -796,20 +1096,20 @@
       document.getElementById('toast-text').innerText = text;
       document.getElementById('toast-icon').innerText = icon;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      setTimeout(() => toast.classList.remove('show'), 2800);
     }
 
     function getNodeColorHex(nodeId) {
       const n = (nodeId || '').toLowerCase();
       if (n === 'boss') return 0xf59e0b; // Gold
       if (n === 'friday' || n === 'friday-core') return 0xec4899; // Magenta
-      if (n === "friday's brain" || n === 'fridaysbrain') return 0xa855f7; // Purple
+      if (n === "friday's brain" || n === 'fridaysbrain' || n === 'friday central brain') return 0xa855f7; // Purple
       if (n.includes('reeldm')) return 0x38bdf8; // Electric Cyan
       if (n.includes('swarm') || n.includes('agent') || n.includes('tree-of-thought')) return 0xf43f5e; // Rose AI
       if (n.includes('crypto')) return 0x8b5cf6; // Violet
       if (n.includes('security') || n.includes('audit')) return 0xef4444; // Red
       if (n.includes('payment') || n.includes('razorpay') || n.includes('dodo') || n.includes('stripe')) return 0x10b981; // Green
-      if (n.includes('ec2') || n.includes('aws') || n.includes('docker') || n.includes('infra') || n.includes('fargate')) return 0x06b6d4; // Cyan
+      if (n.includes('ec2') || n.includes('aws') || n.includes('docker') || n.includes('infra') || n.includes('cloud')) return 0x06b6d4; // Cyan
       return 0x94a3b8;
     }
 
@@ -819,10 +1119,10 @@
 
     const canvas = document.getElementById('webgl-canvas');
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x030509, 0.0005);
+    scene.fog = new THREE.FogExp2(0x030509, 0.0004);
 
-    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 1, 8000);
-    camera.position.set(0, 320, 850);
+    const camera = new THREE.PerspectiveCamera(52, window.innerWidth / window.innerHeight, 1, 10000);
+    camera.position.set(0, 360, 960);
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -832,22 +1132,23 @@
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.5;
+    controls.autoRotateSpeed = 0.4;
+    controls.target.set(0, 20, 0);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 1.8);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 2.0);
     dirLight1.position.set(400, 600, 500);
     scene.add(dirLight1);
-    const dirLight2 = new THREE.DirectionalLight(0xec4899, 1.4);
+    const dirLight2 = new THREE.DirectionalLight(0xec4899, 1.6);
     dirLight2.position.set(-400, -500, -500);
     scene.add(dirLight2);
 
-    // Cosmic Deep Space Starfield (1,800 points)
+    // Cosmic Deep Space Starfield (2,200 points)
     const starGeo = new THREE.BufferGeometry();
     const starCoords = [];
-    for (let i = 0; i < 1800; i++) {
-      starCoords.push((Math.random() - 0.5) * 4500, (Math.random() - 0.5) * 4500, (Math.random() - 0.5) * 4500);
+    for (let i = 0; i < 2200; i++) {
+      starCoords.push((Math.random() - 0.5) * 5500, (Math.random() - 0.5) * 5500, (Math.random() - 0.5) * 5500);
     }
     starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starCoords, 3));
     const starMat = new THREE.PointsMaterial({ color: 0x93c5fd, size: 2.2, transparent: true, opacity: 0.65 });
@@ -855,7 +1156,7 @@
     scene.add(stars);
 
     // =========================================================================
-    // --- PROCEDURAL 3D CEREBRAL CORTEX SILHOUETTE (BIOLOGICAL LATTICE) ---
+    // --- PROCEDURAL 3D CEREBRAL CORTEX SILHOUETTE (SCALED FOR GALACTIC LOBES) ---
     // =========================================================================
 
     function createBrainCortexLattice() {
@@ -863,40 +1164,29 @@
       const points = [];
       const colors = [];
 
-      // Generate 2 Hemispheres with realistic Gyri & Sulci folds
       [-1, 1].forEach(side => {
-        for (let u = 0; u < Math.PI * 2; u += 0.12) {
-          for (let v = -Math.PI / 2 + 0.15; v < Math.PI / 2 - 0.15; v += 0.12) {
-            // Ellipsoid base
-            const rx = 180, ry = 150, rz = 240;
-            
-            // Anatomical sculpting: Frontal lobe wider, occipital narrower, temporal bulge
-            const zNorm = Math.sin(v); // -1 (back) to +1 (front)
-            const yMod = 1.0 - 0.2 * Math.max(0, -zNorm); // lower at back
-            const xMod = 1.0 + 0.15 * Math.sin(u * 2); // bilateral fullness
+        for (let u = 0; u < Math.PI * 2; u += 0.14) {
+          for (let v = -Math.PI / 2 + 0.15; v < Math.PI / 2 - 0.15; v += 0.14) {
+            const rx = 440, ry = 320, rz = 460;
+            const zNorm = Math.sin(v);
+            const yMod = 1.0 - 0.2 * Math.max(0, -zNorm);
+            const xMod = 1.0 + 0.15 * Math.sin(u * 2);
+            const wrinkle = Math.sin(u * 6) * Math.cos(v * 8) * 18 + Math.cos(u * 12) * 8;
 
-            // Undulating Gyri & Sulci (cerebral wrinkles)
-            const wrinkle = Math.sin(u * 6) * Math.cos(v * 8) * 12 + Math.cos(u * 12) * 5;
-
-            const x = side * (rx * Math.cos(u) * Math.cos(v) * xMod + wrinkle + 22);
+            const x = side * (rx * Math.cos(u) * Math.cos(v) * xMod + wrinkle + 35);
             const y = (ry * Math.sin(v) * yMod + wrinkle * 0.8) + 20;
             const z = rz * Math.sin(u) * Math.cos(v) + wrinkle;
 
             points.push(x, y, z);
 
-            // Bioluminescent Color Mapping across lobes
-            if (z > 80) {
-              // Prefrontal (Gold/Amber to Cyan)
-              colors.push(0.96, 0.62, 0.04);
-            } else if (z < -80) {
-              // Occipital / Sensory (Electric Cyan)
-              colors.push(0.22, 0.74, 0.97);
+            if (z > 140) {
+              colors.push(0.96, 0.62, 0.04); // Prefrontal Gold
+            } else if (z < -140) {
+              colors.push(0.22, 0.74, 0.97); // Occipital Cyan
             } else if (side < 0) {
-              // Left Temporal (Magenta)
-              colors.push(0.92, 0.28, 0.6);
+              colors.push(0.92, 0.28, 0.6);  // Left Temporal Rose
             } else {
-              // Right Temporal (Purple)
-              colors.push(0.66, 0.33, 0.97);
+              colors.push(0.66, 0.33, 0.97); // Right Parietal Violet
             }
           }
         }
@@ -907,19 +1197,18 @@
       brainGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
       const brainMat = new THREE.PointsMaterial({
-        size: 2.8,
+        size: 2.6,
         vertexColors: true,
         transparent: true,
-        opacity: 0.25,
+        opacity: 0.18,
         blending: THREE.AdditiveBlending
       });
 
       const cortexPoints = new THREE.Points(brainGeo, brainMat);
       brainGroup.add(cortexPoints);
 
-      // Translucent Ghost Wireframe Cage
-      const cageGeo = new THREE.IcosahedronGeometry(380, 2);
-      const cageMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.025 });
+      const cageGeo = new THREE.IcosahedronGeometry(620, 2);
+      const cageMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.018 });
       brainGroup.add(new THREE.Mesh(cageGeo, cageMat));
 
       scene.add(brainGroup);
@@ -928,48 +1217,257 @@
 
     const brainLattice = createBrainCortexLattice();
 
+
+    // Dynamic Dream Consolidation Shockwave Sphere
+    const waveGeo = new THREE.SphereGeometry(1, 48, 48);
+    const waveMat = new THREE.MeshBasicMaterial({
+      color: 0xa855f7,
+      transparent: true,
+      opacity: 0.0,
+      wireframe: true,
+      blending: THREE.AdditiveBlending
+    });
+    const dreamWaveMesh = new THREE.Mesh(waveGeo, waveMat);
+    scene.add(dreamWaveMesh);
+    let dreamWaveState = { active: false, radius: 1, maxRadius: 750, progress: 0 };
+
     // =========================================================================
-    // --- KNOWLEDGE GRAPH TO CORTEX MAPPING ---
+    // --- GALACTIC CORTICAL LOBE CONSTELLATION MAPPING (DE-CLUTTERING 1,167 NODES) ---
     // =========================================================================
 
-    const cortexLobeMap = {
-      'Boss': new THREE.Vector3(0, 60, 230),                      // Prefrontal Cortex (Executive)
-      'FRIDAY': new THREE.Vector3(-45, 30, 20),                    // Corpus Callosum / Core Left
-      'FridaysBrain': new THREE.Vector3(45, 30, 20),               // Corpus Callosum / Core Right
-      "Friday's Brain": new THREE.Vector3(30, 45, 35),             // Corpus Callosum Arch
-      'ReelDM': new THREE.Vector3(0, -20, -180),                   // Sensory & Visual Cortex (Occipital)
-      'AI_Agents_Intelligence': new THREE.Vector3(-190, 40, -40),  // Left Temporal Lobe (Reasoning)
-      'Payments_and_Growth': new THREE.Vector3(190, 80, -20),      // Right Parietal Lobe (Transaction)
-      'Security_and_Hardening': new THREE.Vector3(0, -160, -60),   // Brainstem / Cerebellum (Defense)
-      'Core_Architecture': new THREE.Vector3(-140, -100, 60),      // Subcortical Architecture
-      'Frontend_and_UI': new THREE.Vector3(140, -90, 70)           // Frontal UI Projection
+    const LOBE_CENTERS = {
+      'prefrontal': new THREE.Vector3(0, 190, 270),        // Top-Front (Boss 👑)
+      'cognitive_core': new THREE.Vector3(0, 80, 40),      // Center Core (Friday ⚡)
+      'visual_cortex': new THREE.Vector3(0, -90, -340),    // Occipital Base (ReelDM 🔵)
+      'temporal_ai': new THREE.Vector3(-420, 50, -40),     // Left Wing (AI Swarms 🌹)
+      'parietal_payments': new THREE.Vector3(420, 50, -40),// Right Wing (Payments 🟢)
+      'brainstem_security': new THREE.Vector3(0, -320, -50),// Lower Stem (Defense 🔴)
+      'exocortex_infra': new THREE.Vector3(0, 20, 0),      // Orbital Satellite Ring ☁️
+      'architecture_bridge': new THREE.Vector3(0, 60, -120)// Intermediate Nexus ⚙️
     };
 
-    // Build Graph into Scene
-    
-    function renderDynamicLobeBar(data) {
-      const lobeBar = document.getElementById('lobe-bar');
-      if (!lobeBar || !data || !data.nodes) return;
+    const LOBE_HUBS = {
+      'Boss': 'prefrontal',
+      'FRIDAY': 'cognitive_core',
+      'Friday': 'cognitive_core',
+      "Friday's Brain": 'cognitive_core',
+      'FridaysBrain': 'cognitive_core',
+      'Friday Central Brain': 'cognitive_core',
+      'Friday-Core': 'cognitive_core',
+      'ReelDM': 'visual_cortex',
+      'reeldm': 'visual_cortex',
+      'AI_Agents_Intelligence': 'temporal_ai',
+      'Autonomous_Agent_Squad': 'temporal_ai',
+      'Payments_and_Growth': 'parietal_payments',
+      'Security_and_Hardening': 'brainstem_security',
+      'Infrastructure': 'exocortex_infra',
+      'Cloud Infra': 'exocortex_infra',
+      'AWS EC2': 'exocortex_infra',
+      'Core_Architecture': 'architecture_bridge'
+    };
 
-      const bossHub = data.nodes.find(n => n.group === 'boss' || n.id.toLowerCase() === 'boss' || n.id.toLowerCase() === 'user');
-      const coreHub = data.nodes.find(n => n.group === 'brain' || n.group === 'friday' || n.id.toLowerCase().includes('friday'));
-      const sortedByDegree = [...data.nodes].sort((a, b) => (b.degree || 0) - (a.degree || 0));
-      const majorDomainHub = sortedByDegree.find(n => n !== bossHub && n !== coreHub) || { id: 'ReelDM', name: 'Visual Cortex' };
-      const aiHub = data.nodes.find(n => (n.group || '').includes('agent') || (n.id || '').toLowerCase().includes('agent') || (n.id || '').toLowerCase().includes('ai'));
-      const commerceHub = data.nodes.find(n => (n.group || '').includes('payment') || (n.id || '').toLowerCase().includes('payment'));
-      const secHub = data.nodes.find(n => (n.group || '').includes('security') || (n.id || '').toLowerCase().includes('security'));
+    function classifyNodeLobe(node, links) {
+      const nid = (node.id || '').toLowerCase();
+      const grp = (node.group || '').toLowerCase();
 
-      lobeBar.innerHTML = `
-        <span class="lobe-tag">CORTEX LOBE:</span>
-        <button class="lobe-btn active" onclick="filterLobe('all', this)">🌐 Full Cortex</button>
-        ${bossHub ? `<button class="lobe-btn" onclick="focusCortexHub('${bossHub.id}', this)">🟡 Prefrontal (${(bossHub.name || bossHub.id).replace(/_/g, ' ')})</button>` : ''}
-        ${coreHub ? `<button class="lobe-btn" onclick="focusCortexHub('${coreHub.id}', this)">🌸 Cognitive Core (${(coreHub.name || coreHub.id).replace(/_/g, ' ')})</button>` : ''}
-        ${majorDomainHub ? `<button class="lobe-btn" onclick="focusCortexHub('${majorDomainHub.id}', this)">🔵 Visual Cortex (${(majorDomainHub.name || majorDomainHub.id).replace(/_/g, ' ')})</button>` : ''}
-        ${aiHub ? `<button class="lobe-btn" onclick="focusCortexHub('${aiHub.id}', this)">🌹 Temporal (${(aiHub.name || aiHub.id).replace(/_/g, ' ')})</button>` : ''}
-        ${commerceHub ? `<button class="lobe-btn" onclick="focusCortexHub('${commerceHub.id}', this)">🟢 Parietal (${(commerceHub.name || commerceHub.id).replace(/_/g, ' ')})</button>` : ''}
-        ${secHub ? `<button class="lobe-btn" onclick="focusCortexHub('${secHub.id}', this)">🔴 Brainstem (${(secHub.name || secHub.id).replace(/_/g, ' ')})</button>` : ''}
-      `;
+      // Prefrontal (Boss & Directives)
+      if (nid === 'boss' || grp === 'boss' || nid === 'personal' || nid === 'career-ops') return 'prefrontal';
+      for (let i = 0; i < links.length; i++) {
+        const l = links[i];
+        if ((l.source === 'Boss' || l.source === 'career-ops' || l.source === 'Personal') && l.target === node.id) return 'prefrontal';
+        if ((l.target === 'Boss' || l.target === 'career-ops' || l.target === 'Personal') && l.source === node.id) return 'prefrontal';
+      }
+
+      // Cognitive Core (Friday & Brain Nexus)
+      if (nid.includes('friday') || grp === 'friday' || grp === 'brain' || grp === 'memory_layer' ||
+          nid.includes('mem0') || nid.includes('chroma') || nid.includes('neo4j') || nid.includes('core')) return 'cognitive_core';
+      for (let i = 0; i < links.length; i++) {
+        const l = links[i];
+        if (['FRIDAY', 'Friday', "Friday's Brain", 'FridaysBrain', 'Friday Central Brain', 'Friday-Core', 'friday-launch', 'Friday-Launch', 'friday-oss'].includes(l.source) && l.target === node.id) return 'cognitive_core';
+      }
+
+      // Visual Cortex (ReelDM Product & Media)
+      if (nid === 'reeldm' || grp === 'system' || nid.includes('reel') || nid.includes('instagram')) return 'visual_cortex';
+      for (let i = 0; i < links.length; i++) {
+        const l = links[i];
+        if ((l.source === 'ReelDM' || l.source === 'reeldm') && l.target === node.id) return 'visual_cortex';
+        if ((l.target === 'ReelDM' || l.target === 'reeldm') && l.source === node.id) return 'visual_cortex';
+      }
+
+      // Temporal Lobe (AI Swarms & Models)
+      if (grp === 'ai' || nid.includes('agent') || nid.includes('swarm') || nid.includes('hermes') || nid.includes('nous') || nid.includes('soul') || nid.includes('bedrock') || nid.includes('llm') || nid.includes('groq')) return 'temporal_ai';
+
+      // Parietal Lobe (Payments & Monetization)
+      if (grp === 'payments' || nid.includes('payment') || nid.includes('razorpay') || nid.includes('dodo') || nid.includes('stripe') || nid.includes('subscription')) return 'parietal_payments';
+
+      // Brainstem (Security & Defense)
+      if (grp === 'security' || nid.includes('security') || nid.includes('audit') || nid.includes('hardening') || nid.includes('leak') || nid.includes('policy') || nid.includes('verification')) return 'brainstem_security';
+
+      // Exocortex (Cloud & EC2)
+      if (grp === 'tech' || nid.includes('ec2') || nid.includes('aws') || nid.includes('docker') || nid.includes('infra') || nid.includes('cloud') || nid.includes('sqlite') || nid.includes('fastapi')) return 'exocortex_infra';
+      for (let i = 0; i < links.length; i++) {
+        const l = links[i];
+        if (['Infrastructure', 'Cloud Infra', 'AWS EC2', 'EC2 Instance'].includes(l.source) && l.target === node.id) return 'exocortex_infra';
+      }
+
+      return 'architecture_bridge';
     }
+
+    // Assign Deterministic 3D Coordinates (Zero Clump Galactic Constellations)
+    function calculateGalacticPositions(data) {
+      const groups = {
+        prefrontal: [],
+        cognitive_core: [],
+        visual_cortex: [],
+        temporal_ai: [],
+        parietal_payments: [],
+        brainstem_security: [],
+        exocortex_infra: [],
+        architecture_bridge: []
+      };
+
+      data.nodes.forEach(n => {
+        const lobe = classifyNodeLobe(n, data.links);
+        nodeLobeMap.set(n.id, lobe);
+        groups[lobe].push(n);
+      });
+
+      // 1. Prefrontal Cortex (Boss 👑 Sunflower Spiral Disc)
+      const pCenter = LOBE_CENTERS.prefrontal;
+      const pList = groups.prefrontal;
+      pList.forEach((n, i) => {
+        if (n.id === 'Boss') {
+          nodePosMap.set(n.id, pCenter.clone());
+        } else {
+          const theta = i * 2.3999632;
+          const r = 40 + Math.sqrt(i / (pList.length || 1)) * 190;
+          const x = pCenter.x + r * Math.cos(theta);
+          const y = pCenter.y + r * Math.sin(theta) * 0.85;
+          const z = pCenter.z + Math.sin(r * 0.05) * 35;
+          nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+        }
+      });
+
+      // 2. Cognitive Core (Friday ⚡ Toroid Double Helix)
+      const cCenter = LOBE_CENTERS.cognitive_core;
+      const cList = groups.cognitive_core;
+      cList.forEach((n, i) => {
+        if (n.id === 'FRIDAY' || n.id === 'Friday') {
+          nodePosMap.set(n.id, cCenter.clone().add(new THREE.Vector3(-45, 0, 0)));
+        } else if (n.id === "Friday's Brain" || n.id === 'FridaysBrain') {
+          nodePosMap.set(n.id, cCenter.clone().add(new THREE.Vector3(45, 0, 0)));
+        } else {
+          const phi = i * 0.15;
+          const theta = i * 2.3999632;
+          const rMajor = 50 + Math.sqrt(i / (cList.length || 1)) * 120;
+          const rMinor = 22 + Math.sin(i * 0.3) * 16;
+          const x = cCenter.x + (rMajor + rMinor * Math.cos(phi)) * Math.cos(theta);
+          const y = cCenter.y + rMinor * Math.sin(phi) * 1.4 + (i / cList.length - 0.5) * 60;
+          const z = cCenter.z + (rMajor + rMinor * Math.cos(phi)) * Math.sin(theta);
+          nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+        }
+      });
+
+      // 3. Visual Cortex (ReelDM 🔵 Expanded Parabolic Occipital Shell for 400+ nodes)
+      const vCenter = LOBE_CENTERS.visual_cortex;
+      const vList = groups.visual_cortex;
+      vList.forEach((n, i) => {
+        if (n.id === 'ReelDM' || n.id === 'reeldm') {
+          nodePosMap.set(n.id, vCenter.clone());
+        } else {
+          const phi = Math.acos(1 - 2 * (i + 0.5) / vList.length);
+          const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+          const r = 70 + Math.sqrt(i) * 15;
+          const x = vCenter.x + r * Math.sin(phi) * Math.cos(theta) * 1.35;
+          const y = vCenter.y + r * Math.cos(phi) * 0.85;
+          const z = vCenter.z - Math.abs(r * Math.sin(phi) * Math.sin(theta)) * 0.85;
+          nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+        }
+      });
+
+      // 4. Temporal Lobe (AI Swarms 🌹 Logarithmic Spiral Nebula)
+      const tCenter = LOBE_CENTERS.temporal_ai;
+      const tList = groups.temporal_ai;
+      tList.forEach((n, i) => {
+        if (n.id === 'AI_Agents_Intelligence') {
+          nodePosMap.set(n.id, tCenter.clone());
+        } else {
+          const theta = i * 0.75;
+          const r = 32 + i * 8.0;
+          const x = tCenter.x + r * Math.cos(theta);
+          const y = tCenter.y + Math.sin(i * 0.5) * 28;
+          const z = tCenter.z + r * Math.sin(theta) * 0.75;
+          nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+        }
+      });
+
+      // 5. Parietal Lobe (Payments 🟢 Accretion Disc)
+      const payCenter = LOBE_CENTERS.parietal_payments;
+      const payList = groups.parietal_payments;
+      payList.forEach((n, i) => {
+        if (n.id === 'Payments_and_Growth') {
+          nodePosMap.set(n.id, payCenter.clone());
+        } else {
+          const theta = i * 2.3999632;
+          const r = 35 + Math.sqrt(i / (payList.length || 1)) * 160;
+          const x = payCenter.x + r * Math.cos(theta);
+          const y = payCenter.y + Math.sin(r * 0.1) * 18;
+          const z = payCenter.z + r * Math.sin(theta);
+          nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+        }
+      });
+
+      // 6. Brainstem (Security 🔴 Hexagonal Defensive Grid)
+      const sCenter = LOBE_CENTERS.brainstem_security;
+      const sList = groups.brainstem_security;
+      sList.forEach((n, i) => {
+        if (n.id === 'Security_and_Hardening') {
+          nodePosMap.set(n.id, sCenter.clone());
+        } else {
+          const ring = Math.floor(Math.sqrt(i));
+          const ringIdx = i - ring * ring;
+          const totalInRing = Math.max(ring * 6, 1);
+          const theta = (ringIdx / totalInRing) * Math.PI * 2;
+          const r = 30 + ring * 36;
+          const x = sCenter.x + r * Math.cos(theta);
+          const y = sCenter.y - ring * 28;
+          const z = sCenter.z + r * Math.sin(theta);
+          nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+        }
+      });
+
+      // 7. Exocortex (Cloud & EC2 ☁️ High Orbital Belt)
+      const eList = groups.exocortex_infra;
+      eList.forEach((n, i) => {
+        if (n.id === 'Infrastructure' || n.id === 'Cloud Infra') {
+          nodePosMap.set(n.id, new THREE.Vector3(0, 160, -420));
+        } else {
+          const theta = (i / eList.length) * Math.PI * 2;
+          const r = 500 + (i % 5) * 20;
+          const x = r * Math.cos(theta);
+          const y = 20 + r * Math.sin(theta) * Math.sin(0.38) + ((i % 3) - 1) * 20;
+          const z = r * Math.sin(theta) * Math.cos(0.38);
+          nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+        }
+      });
+
+      // 8. Architecture Bridges (Intermediate Spherical Gyroscope)
+      const aCenter = LOBE_CENTERS.architecture_bridge;
+      const aList = groups.architecture_bridge;
+      aList.forEach((n, i) => {
+        const phi = Math.acos(1 - 2 * (i + 0.5) / aList.length);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+        const r = 180 + (i % 4) * 38;
+        const x = r * Math.sin(phi) * Math.cos(theta) * 1.1;
+        const y = aCenter.y + r * Math.cos(phi) * 0.85;
+        const z = aCenter.z + r * Math.sin(phi) * Math.sin(theta) * 0.9;
+        nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
+      });
+    }
+
+    // =========================================================================
+    // --- DATA LOADING & SCENE GENERATION ---
+    // =========================================================================
 
     async function loadData() {
       const t0 = performance.now();
@@ -983,78 +1481,41 @@
         document.getElementById('stat-nodes').innerText = data.nodes.length;
         document.getElementById('stat-edges').innerText = data.links.length;
 
-        // Degree Map
+        // Degree & Energy Calculation
         const degreeMap = {};
         data.links.forEach(l => {
           degreeMap[l.source] = (degreeMap[l.source] || 0) + 1;
           degreeMap[l.target] = (degreeMap[l.target] || 0) + 1;
         });
 
-        // 1. Assign 3D Coordinates
-        // Place Hubs
         data.nodes.forEach(n => {
           n.degree = degreeMap[n.id] || 1;
-        });
-        renderDynamicLobeBar(data);
-        data.nodes.forEach(n => {
-          if (cortexLobeMap[n.id]) {
-            nodePosMap.set(n.id, cortexLobeMap[n.id].clone());
+          if (n.energy_score === undefined) {
+            const isTop = ['boss', 'friday', 'brain'].includes((n.group || '').toLowerCase());
+            n.energy_score = isTop ? 1.0 : Math.round(Math.min(1.0, Math.max(0.35, 0.48 + (n.degree / 15.0) * 0.52)) * 100) / 100;
           }
         });
 
-        // Place ReelDM 325 children into an intricate Visual Cortex Neural Mesh
-        let reelChildIdx = 0;
-        data.nodes.forEach(n => {
-          if (!nodePosMap.has(n.id)) {
-            const isReel = data.links.some(l => 
-              (l.source === 'ReelDM' && l.target === n.id) || 
-              (l.target === 'ReelDM' && l.source === n.id)
-            );
-
-            if (isReel) {
-              const center = cortexLobeMap['ReelDM'];
-              // Distribute across Occipital & Visual Cortex surface
-              const phi = Math.acos(1 - 2 * (reelChildIdx + 0.5) / 330);
-              const theta = Math.PI * (1 + Math.sqrt(5)) * reelChildIdx;
-              const r = 70 + Math.sqrt(reelChildIdx) * 7.5;
-
-              const x = center.x + r * Math.sin(phi) * Math.cos(theta) * 1.3;
-              const y = center.y + r * Math.cos(phi) * 0.8;
-              const z = center.z - Math.abs(r * Math.sin(phi) * Math.sin(theta)); // curve backward
-
-              nodePosMap.set(n.id, new THREE.Vector3(x, y, z));
-              reelChildIdx++;
-            } else {
-              // Place into general cortical lobes based on degree & name
-              const side = Math.random() > 0.5 ? 1 : -1;
-              const u = Math.random() * Math.PI * 2;
-              const v = (Math.random() - 0.5) * Math.PI * 0.8;
-              const r = 160 + Math.random() * 60;
-
-              const pos = new THREE.Vector3(
-                side * (Math.cos(u) * Math.cos(v) * r * 1.1 + 20),
-                Math.sin(v) * r * 0.8 + 20,
-                Math.sin(u) * Math.cos(v) * r * 1.2
-              );
-              nodePosMap.set(n.id, pos);
-            }
-          }
-        });
+        // 1. Assign Deterministic Galactic 3D Coordinates
+        calculateGalacticPositions(data);
 
         // 2. Render Node Meshes
         const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
         data.nodes.forEach(n => {
           const pos = nodePosMap.get(n.id) || new THREE.Vector3(0,0,0);
-          const isHub = cortexLobeMap[n.id] !== undefined;
-          const scale = isHub ? 16 : Math.max(Math.sqrt(n.degree || 1) * 1.8, 3.2);
+          const isHub = LOBE_HUBS[n.id] !== undefined;
+          const energy = n.energy_score || 0.85;
+          const scale = isHub ? 18 : Math.max(Math.sqrt(n.degree || 1) * 1.9, 3.2);
           const colorHex = getNodeColorHex(n.id);
 
           const mat = new THREE.MeshStandardMaterial({
             color: colorHex,
             emissive: colorHex,
-            emissiveIntensity: isHub ? 0.95 : 0.5,
+            emissiveIntensity: isHub ? 0.95 : (energy >= 0.7 ? 0.65 : 0.25),
             roughness: 0.15,
-            metalness: 0.85
+            metalness: 0.85,
+            transparent: true,
+            opacity: 1.0
           });
 
           const mesh = new THREE.Mesh(sphereGeo, mat);
@@ -1064,19 +1525,19 @@
           scene.add(mesh);
           nodeMeshMap.set(n.id, mesh);
 
-          // Pure celestial planet atmosphere (zero rings, clean glowing orb)
+          // Celestial Corona for Hubs
           if (isHub) {
-            const coronaGeo = new THREE.SphereGeometry(scale * 1.25, 28, 28);
+            const coronaGeo = new THREE.SphereGeometry(scale * 1.35, 28, 28);
             const coronaMat = new THREE.MeshBasicMaterial({
               color: colorHex,
               transparent: true,
-              opacity: 0.16,
+              opacity: 0.2,
               blending: THREE.AdditiveBlending
             });
             const corona = new THREE.Mesh(coronaGeo, coronaMat);
             corona.position.copy(pos);
             scene.add(corona);
-            // Holographic Billboard Label
+
             const hubLabelMap = {
               'Boss': '👑 BOSS (Prefrontal)',
               'FRIDAY': '⚡ FRIDAY (Cognitive Core)',
@@ -1086,8 +1547,8 @@
               'AI_Agents_Intelligence': '🌹 AI SWARMS',
               'Payments_and_Growth': '🟢 PAYMENTS & COMMERCE',
               'Security_and_Hardening': '🔴 CYBERNETIC DEFENSE',
-              'Core_Architecture': '⚙️ ARCHITECTURE',
-              'Frontend_and_UI': '💎 FRONTEND & STUDIO'
+              'Infrastructure': '☁️ CLOUD INFRASTRUCTURE',
+              'Core_Architecture': '⚙️ ARCHITECTURE'
             };
             if (hubLabelMap[n.id]) {
               const sprite = createHubSprite(hubLabelMap[n.id], colorHex);
@@ -1095,12 +1556,11 @@
               scene.add(sprite);
               hubSpriteMap.set(n.id, sprite);
             }
-
           }
         });
 
         // 3. Render Synaptic Plasma Arcs (Lines)
-        const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.22 });
+        const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.20 });
         const lineGeo = new THREE.BufferGeometry();
         const lineCoords = [];
 
@@ -1111,7 +1571,7 @@
             lineCoords.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
 
             // Register Photon for Action Potential Pulses
-            if (Math.random() < 0.25 || l.source === 'Boss' || l.source === 'FRIDAY' || l.source === 'ReelDM') {
+            if (Math.random() < 0.28 || l.source === 'Boss' || l.source === 'FRIDAY' || l.source === 'ReelDM') {
               photonParticleList.push({
                 start: p1,
                 end: p2,
@@ -1131,6 +1591,7 @@
         initPhotonParticles();
 
         loadGlobalFacts();
+        loadCognitiveState();
       } catch (err) {
         console.error('Cortex data load error:', err);
         showToast('Network error loading cortex data', '⚠️');
@@ -1145,7 +1606,7 @@
       photonGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
       const photonMat = new THREE.PointsMaterial({
-        size: 4.5,
+        size: 4.8,
         color: 0x38bdf8,
         transparent: true,
         opacity: 0.9,
@@ -1159,20 +1620,114 @@
     function updatePhotonParticles() {
       if (!photonPoints || photonParticleList.length === 0) return;
       const posAttr = photonGeo.attributes.position;
+      const speedMultiplier = dreamWaveState.active ? 3.5 : 1.0;
 
       for (let i = 0; i < photonParticleList.length; i++) {
         const p = photonParticleList[i];
-        p.progress += p.speed;
+        p.progress += p.speed * speedMultiplier;
         if (p.progress > 1) p.progress = 0;
 
-        // Quadratic arc calculation for natural curved firing
         const x = p.start.x + (p.end.x - p.start.x) * p.progress;
-        const y = p.start.y + (p.end.y - p.start.y) * p.progress + Math.sin(p.progress * Math.PI) * 12;
+        const y = p.start.y + (p.end.y - p.start.y) * p.progress + Math.sin(p.progress * Math.PI) * 14;
         const z = p.start.z + (p.end.z - p.start.z) * p.progress;
 
         posAttr.setXYZ(i, x, y, z);
       }
       posAttr.needsUpdate = true;
+    }
+
+    // =========================================================================
+    // --- COGNITIVE STATE & 1-CLICK DREAM CYCLE ---
+    // =========================================================================
+
+    async function loadCognitiveState() {
+      try {
+        const res = await fetch('/state');
+        if (!res.ok) return;
+        const data = await res.json();
+        const mode = (data.current_mode || 'tactical_sprint').replace(/_/g, ' ').toUpperCase();
+        const urg = Number(data.urgency_level || 0.85).toFixed(2);
+        const stress = Number(data.stress_level || 0.20).toFixed(2);
+
+        document.getElementById('state-mode').innerText = `${mode} ⚡`;
+        document.getElementById('state-urgency').innerText = `URG: ${urg}`;
+        document.getElementById('state-stress').innerText = `STRESS: ${stress} 🟢`;
+      } catch (e) {
+        console.warn('Cognitive state fetch err:', e);
+      }
+    }
+
+    async function triggerDreamCycle() {
+      Sound.playDream();
+      showToast('Consolidating neural memories & pruning noise...', '🌙');
+      const dreamBtn = document.getElementById('btn-dream-cycle');
+      dreamBtn.classList.add('active-glow');
+
+      // Trigger Visual Consolidation Shockwave
+      dreamWaveState.active = true;
+      dreamWaveState.radius = 10;
+      dreamWaveState.progress = 0;
+      dreamWaveMesh.position.copy(LOBE_CENTERS.cognitive_core);
+
+      try {
+        const res = await fetch('/api/dream/trigger', { method: 'POST' });
+        const data = await res.json();
+        
+        setTimeout(() => {
+          dreamBtn.classList.remove('active-glow');
+          const pruned = data.pruned_ephemeral_count || 0;
+          const edges = data.new_graph_edges_count || 0;
+          showToast(`Consolidated ${edges} new synapses • Pruned ${pruned} ephemeral items!`, '✨');
+          loadData();
+        }, 1800);
+      } catch (err) {
+        console.error('Dream trigger error:', err);
+        showToast('Dream Cycle triggered locally', '🌙');
+        dreamBtn.classList.remove('active-glow');
+      }
+    }
+
+    // =========================================================================
+    // --- SYNAPTIC HEAT FILTER ---
+    // =========================================================================
+
+    function filterHeat(type, btn) {
+      Sound.playClick();
+      document.querySelectorAll('.heat-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      activeHeatFilter = type;
+
+      nodeMeshMap.forEach((mesh, id) => {
+        const node = mesh.userData.node;
+        const energy = (node && node.energy_score !== undefined) ? node.energy_score : 0.8;
+
+        if (type === 'all') {
+          mesh.material.opacity = 1.0;
+          mesh.material.emissiveIntensity = ['boss', 'friday', 'brain'].includes((node.group || '').toLowerCase()) ? 0.95 : (energy >= 0.7 ? 0.65 : 0.25);
+        } else if (type === 'hot') {
+          if (energy >= 0.7) {
+            mesh.material.opacity = 1.0;
+            mesh.material.emissiveIntensity = 0.9;
+          } else {
+            mesh.material.opacity = 0.08;
+            mesh.material.emissiveIntensity = 0.05;
+          }
+        } else if (type === 'cold') {
+          if (energy < 0.4) {
+            mesh.material.opacity = 1.0;
+            mesh.material.emissiveIntensity = 0.8;
+          } else {
+            mesh.material.opacity = 0.08;
+            mesh.material.emissiveIntensity = 0.05;
+          }
+        }
+      });
+
+      if (lineMesh && lineMesh.material) {
+        lineMesh.material.opacity = type === 'all' ? 0.20 : 0.06;
+      }
+
+      showToast(`Filter: ${type.toUpperCase()} Synaptic Pathways`, '⚡');
     }
 
     // =========================================================================
@@ -1200,8 +1755,9 @@
           tooltip.style.left = `${e.clientX}px`;
           tooltip.style.top = `${e.clientY}px`;
           document.getElementById('tt-title').innerText = (node.name || node.id || '').replace(/_/g, ' ');
-          document.getElementById('tt-tag').innerText = node.group || 'NEURAL SYNAPSE';
-          document.getElementById('tt-meta').innerText = `⚡ Connections: ${node.degree || 1}`;
+          document.getElementById('tt-tag').innerText = (node.group || 'NEURAL SYNAPSE').toUpperCase();
+          const energy = node.energy_score !== undefined ? node.energy_score : 1.0;
+          document.getElementById('tt-meta').innerText = `⚡ Synapses: ${node.degree || 1} • Heat: ${(energy * 100).toFixed(0)}%`;
 
           if (hoveredNode !== node) {
             Sound.playHover();
@@ -1240,7 +1796,7 @@
       const pos = nodePosMap.get(nodeId);
       if (!pos) return;
 
-      const targetPos = pos.clone().add(new THREE.Vector3(0, 40, 160));
+      const targetPos = pos.clone().add(new THREE.Vector3(0, 45, 170));
       const startCam = camera.position.clone();
       const startTarget = controls.target.clone();
       const t0 = performance.now();
@@ -1248,17 +1804,27 @@
 
       function stepFlight(now) {
         const progress = Math.min((now - t0) / duration, 1);
-        const ease = 0.5 - 0.5 * Math.cos(progress * Math.PI);
+        const ease = 1 - Math.pow(1 - progress, 3); // Cubic Ease-Out
 
         camera.position.lerpVectors(startCam, targetPos, ease);
         controls.target.lerpVectors(startTarget, pos, ease);
 
         if (progress < 1) {
           requestAnimationFrame(stepFlight);
+        } else {
+          controls.target.copy(pos);
         }
       }
       requestAnimationFrame(stepFlight);
     }
+
+    function flyToSelectedNode() {
+      if (selectedNode) flyCameraToNode(selectedNode.id);
+    }
+
+    // =========================================================================
+    // --- LOBE NAVIGATION & FOCUS ---
+    // =========================================================================
 
     function focusCortexHub(hubName, btn) {
       Sound.playWarp();
@@ -1280,8 +1846,7 @@
 
       nodeMeshMap.forEach((mesh, id) => {
         if (mesh.material) {
-          mesh.material.transparent = true;
-          mesh.material.opacity = neighborSet.has(id) ? 1.0 : 0.15;
+          mesh.material.opacity = neighborSet.has(id) ? 1.0 : 0.12;
         }
       });
       if (lineMesh && lineMesh.material) lineMesh.material.opacity = 0.08;
@@ -1296,12 +1861,9 @@
 
       if (lobeKey === 'all') {
         nodeMeshMap.forEach(mesh => {
-          if (mesh.material) {
-            mesh.material.transparent = false;
-            mesh.material.opacity = 1.0;
-          }
+          if (mesh.material) mesh.material.opacity = 1.0;
         });
-        if (lineMesh && lineMesh.material) lineMesh.material.opacity = 0.22;
+        if (lineMesh && lineMesh.material) lineMesh.material.opacity = 0.20;
         flyCameraToNode('FRIDAY');
         showToast('Full Neural Cortex Engaged', '🌐');
       }
@@ -1318,51 +1880,104 @@
 
       const tourStops = [
         { name: 'Boss', label: 'PREFRONTAL CORTEX: Executive Command (Boss)' },
-        { name: 'FRIDAY', label: 'CORPUS CALLOSUM: Friday Cognitive Engine' },
-        { name: 'ReelDM', label: 'VISUAL CORTEX: ReelDM Ingress (325 Neurons)' },
-        { name: 'AI_Agents_Intelligence', label: 'TEMPORAL LOBE: Autonomous Reasoning' },
-        { name: 'Payments_and_Growth', label: 'PARIETAL LOBE: Stripe & Razorpay Substrate' },
-        { name: 'Security_and_Hardening', label: 'BRAINSTEM: Cryptographic Defense System' }
+        { name: 'FRIDAY', label: 'COGNITIVE CORE: Friday Nexus & Memory' },
+        { name: 'ReelDM', label: 'VISUAL CORTEX: ReelDM Product & Media' },
+        { name: 'AI_Agents_Intelligence', label: 'TEMPORAL LOBE: AI Swarms & Reasoning' },
+        { name: 'Payments_and_Growth', label: 'PARIETAL LOBE: Subscriptions & Payments' },
+        { name: 'Security_and_Hardening', label: 'BRAINSTEM: Cybernetic Defense' },
+        { name: 'Infrastructure', label: 'EXOCORTEX: Cloud Infra & AWS EC2' }
       ];
 
-      for (const stop of tourStops) {
+      for (let i = 0; i < tourStops.length; i++) {
         if (!isTourRunning) break;
-        showToast(stop.label, '🧠');
-        Sound.playHover();
-        flyCameraToNode(stop.name);
-        await new Promise(r => setTimeout(r, 3000));
+        const stop = tourStops[i];
+        showToast(stop.label, '🛸');
+        focusCortexHub(stop.name);
+        await new Promise(r => setTimeout(r, 4200));
       }
 
-      flyCameraToNode('FRIDAY');
-      showToast('Cortex Scan Complete', '✅');
       tourBtn.classList.remove('active-glow');
       isTourRunning = false;
+      filterLobe('all');
+      showToast('Cortex Tour Complete', '🌌');
     }
 
-    // --- Export High-Res Snapshot ---
-    function exportSnapshot() {
-      Sound.playClick();
-      showToast('Capturing Hologram Snapshot...', '📸');
+    // =========================================================================
+    // --- INSPECTOR DRAWER & SYNAPTIC RETENTION METER ---
+    // =========================================================================
 
-      const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = canvas.width;
-      tempCanvas.height = canvas.height;
-      const tCtx = tempCanvas.getContext('2d');
+    function openDrawer(node) {
+      const drawer = document.getElementById('inspector-drawer');
+      document.getElementById('drawer-title').innerText = (node.name || node.id || '').replace(/_/g, ' ');
+      document.getElementById('drawer-tag').innerText = (node.group || 'NEURAL SYNAPSE').toUpperCase();
+      
+      // Retention Energy Meter
+      const energy = (node.energy_score !== undefined) ? node.energy_score : 1.0;
+      const energyPct = Math.round(energy * 100);
+      document.getElementById('drawer-energy-score').innerText = energy.toFixed(2);
+      document.getElementById('drawer-energy-bar').style.width = `${energyPct}%`;
+      document.getElementById('drawer-recall-count').innerText = `Recalls: ${node.recall_count || node.degree || 1}`;
 
-      tCtx.drawImage(canvas, 0, 0);
+      const stateTag = document.getElementById('drawer-retention-state');
+      if (energy >= 0.7) {
+        stateTag.innerText = 'PRIME SYNAPSE (Active)';
+        stateTag.className = 'retention-state-active';
+      } else if (energy >= 0.4) {
+        stateTag.innerText = 'DECAYING (Cooling)';
+        stateTag.className = 'retention-state-decay';
+      } else {
+        stateTag.innerText = 'DORMANT (Archived)';
+        stateTag.className = 'retention-state-dormant';
+      }
 
-      tCtx.font = "bold 22px 'Inter', sans-serif";
-      tCtx.fillStyle = '#38bdf8';
-      tCtx.fillText("FRIDAY SYNTHETIC NEURAL CORTEX // HOLOSPHERE 4.0", 40, tempCanvas.height - 50);
-      tCtx.font = "14px 'JetBrains Mono', monospace";
-      tCtx.fillStyle = '#94a3b8';
-      tCtx.fillText(`386 Neural Entities • 489 Synaptic Arcs • AWS EC2 (18.61.244.46) • ${new Date().toISOString().split('T')[0]}`, 40, tempCanvas.height - 24);
+      // Populate Connections
+      const connList = document.getElementById('conn-list');
+      connList.innerHTML = '';
+      const conns = graphData.links.filter(l => l.source === node.id || l.target === node.id);
+      document.getElementById('conn-count').innerText = conns.length;
 
-      const link = document.createElement('a');
-      link.download = `friday_synthetic_cortex_${Date.now()}.png`;
-      link.href = tempCanvas.toDataURL('image/png');
-      link.click();
-      showToast('Hologram Snapshot Saved!', '🎉');
+      conns.forEach(l => {
+        const otherId = l.source === node.id ? l.target : l.source;
+        const div = document.createElement('div');
+        div.className = 'conn-item';
+        div.innerHTML = `
+          <span><strong>${otherId.replace(/_/g, ' ')}</strong></span>
+          <span class="conn-label">${l.label || 'SYNAPSE'} ➔</span>
+        `;
+        div.onclick = () => {
+          Sound.playClick();
+          const targetNode = graphData.nodes.find(n => n.id === otherId);
+          if (targetNode) {
+            selectedNode = targetNode;
+            openDrawer(targetNode);
+            flyCameraToNode(otherId);
+          }
+        };
+        connList.appendChild(div);
+      });
+
+      renderNodeFacts(node);
+      drawer.classList.add('open');
+    }
+
+    function closeDrawer() {
+      document.getElementById('inspector-drawer').classList.remove('open');
+      selectedNode = null;
+    }
+
+    async function reinforceSelectedNode() {
+      if (!selectedNode) return;
+      Sound.playReinforce();
+      selectedNode.energy_score = 1.0;
+      selectedNode.recall_count = (selectedNode.recall_count || 1) + 1;
+      openDrawer(selectedNode);
+      showToast(`Potentiated ${selectedNode.name || selectedNode.id}! Heat: 100%`, '⚡');
+
+      try {
+        await fetch(`/api/synapse/reinforce/${encodeURIComponent(selectedNode.id)}`, { method: 'POST' });
+      } catch (e) {
+        console.warn('Reinforce sync err:', e);
+      }
     }
 
     // --- Facts Ledger ---
@@ -1373,114 +1988,52 @@
         allActiveFacts = data.facts || [];
         if (selectedNode) renderNodeFacts(selectedNode);
       } catch (err) {
-        console.warn('Facts error:', err);
+        console.error('Facts error:', err);
       }
-    }
-
-    // --- Inspector Drawer ---
-    function openDrawer(node) {
-      document.getElementById('drawer-title').innerText = (node.name || node.id || '').replace(/_/g, ' ');
-      document.getElementById('drawer-tag').innerText = node.group || 'NEURAL SYNAPSE';
-      document.getElementById('inspector-drawer').classList.add('open');
-
-      const connList = document.getElementById('conn-list');
-      connList.innerHTML = '';
-
-      const connections = [];
-      graphData.links.forEach(l => {
-        if (l.source === node.id) connections.push({ target: l.target, rel: l.label || 'CONNECTS_TO' });
-        else if (l.target === node.id) connections.push({ target: l.source, rel: l.label || 'CONNECTED_FROM' });
-      });
-
-      document.getElementById('conn-count').innerText = connections.length;
-
-      if (connections.length === 0) {
-        connList.innerHTML = '<div style="font-size: 11px; color: #64748b;">No active synapses.</div>';
-      } else {
-        connections.forEach(c => {
-          const item = document.createElement('div');
-          item.className = 'conn-item';
-          item.innerHTML = `
-            <span class="conn-name">${c.target.replace(/_/g, ' ')}</span>
-            <span class="conn-rel">${c.rel}</span>
-          `;
-          item.onclick = () => {
-            const targetNode = graphData.nodes.find(n => n.id === c.target);
-            if (targetNode) {
-              selectedNode = targetNode;
-              openDrawer(targetNode);
-              flyCameraToNode(targetNode.id);
-            }
-          };
-          connList.appendChild(item);
-        });
-      }
-
-      renderNodeFacts(node);
-    }
-
-    function getNodeKeywords(node) {
-      const raw = (node.name || node.id || '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[^a-zA-Z0-9]+/g, ' ').toLowerCase();
-      return raw.split(' ').filter(w => w.length > 2 && !['and', 'for', 'the', 'with', 'from', 'that', 'this'].includes(w));
     }
 
     function renderNodeFacts(node) {
-      const factsBox = document.getElementById('facts-list');
-      const keywords = getNodeKeywords(node);
+      const box = document.getElementById('facts-list');
+      const query = (node.name || node.id || '').toLowerCase();
+      const matched = allActiveFacts.filter(f => (f.content || '').toLowerCase().includes(query) || (f.id || '').toLowerCase().includes(query));
 
-      const scored = [];
-      allActiveFacts.forEach(f => {
-        const t = (f.content || '').toLowerCase();
-        let score = 0;
-        keywords.forEach(kw => {
-          if (t.includes(kw)) score += 1;
-        });
-        if (score > 0) {
-          scored.push({ fact: f, score: score });
-        }
-      });
-
-      scored.sort((a, b) => b.score - a.score);
-
-      if (scored.length === 0) {
-        factsBox.innerHTML = '<div style="font-size: 11px; color: #64748b; padding: 12px 0;">No discrete facts linked to this synapse.</div>';
-      } else {
-        factsBox.innerHTML = scored.slice(0, 15).map(item => `
-          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(56,189,248,0.2); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 11px; line-height: 1.55; color: #e2e8f0;">
-            <div style="color: #38bdf8; font-size: 9px; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.05em;">⚡ FACT #${item.fact.id || 'ACTIVE'}</div>
-            ${item.fact.content}
-          </div>
-        `).join('');
+      if (matched.length === 0) {
+        box.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); line-height: 1.5;">No discrete facts directly referencing "${node.name || node.id}". This node is structured in the Neo4j knowledge graph.</div>`;
+        return;
       }
+
+      box.innerHTML = matched.map(f => `
+        <div class="fact-card">
+          <div>${f.content}</div>
+          <div class="fact-meta">
+            <span>#${f.id}</span>
+            <span>⚡ ${(f.energy_score || 1.0).toFixed(2)}</span>
+            <span>v${f.version || 1}</span>
+          </div>
+        </div>
+      `).join('');
     }
 
-    function closeDrawer() {
-      document.getElementById('inspector-drawer').classList.remove('open');
-      selectedNode = null;
-    }
-
-    document.getElementById('btn-close-drawer').onclick = closeDrawer;
-
-    // Drawer Tabs
+    // --- Drawer Tabs ---
     document.querySelectorAll('.drawer-tab').forEach(tab => {
-      tab.onclick = () => {
+      tab.addEventListener('click', () => {
+        Sound.playClick();
         document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
         tab.classList.add('active');
-        const target = tab.getAttribute('data-tab');
-        document.getElementById('tab-relations').style.display = target === 'relations' ? 'block' : 'none';
-        document.getElementById('tab-facts').style.display = target === 'facts' ? 'block' : 'none';
-        document.getElementById('tab-vector').style.display = target === 'vector' ? 'block' : 'none';
-        if (target === 'vector' && selectedNode) {
-          fetchVectorContext(selectedNode);
-        }
-      };
+        const tabKey = tab.dataset.tab;
+        document.getElementById(`tab-${tabKey}`).style.display = 'block';
+      });
     });
 
-    // Query Vector Context
-    async function fetchVectorContext(node) {
+    // --- Semantic Search Context ---
+    document.getElementById('btn-fetch-vector').addEventListener('click', async () => {
+      Sound.playClick();
+      const node = selectedNode;
       if (!node) return;
       const box = document.getElementById('vector-content');
-      box.innerHTML = '<span style="color: #38bdf8;">Connecting to ChromaDB L3 Vector Store...</span>';
+      box.innerHTML = 'Searching ChromaDB semantic memory...';
+
       try {
         const cleanName = (node.name || node.id || '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[^a-zA-Z0-9]+/g, ' ').trim();
         const query = encodeURIComponent(cleanName);
@@ -1488,29 +2041,25 @@
         const data = await res.json();
         if (data.results && data.results.length > 0) {
           box.innerHTML = data.results.map((r, i) => `
-            <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(168,85,247,0.25); border-radius: 6px; font-size: 11px; line-height: 1.6; color: #cbd5e1;">
-              <div style="color: #a855f7; font-size: 9px; font-weight: 700; margin-bottom: 4px;">🧠 VECTOR CHUNK #${i+1}</div>
-              ${r}
+            <div style="background: rgba(15,23,42,0.6); padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.06);">
+              <div style="font-size: 11px; color: #fff;">${r.content || r.text || r}</div>
             </div>
           `).join('');
         } else {
-          box.innerHTML = '<span style="color: #94a3b8;">No specific vector memory chunk found for this entity.</span>';
+          box.innerHTML = `<span style="color: var(--text-muted);">No vector embeddings found for "${cleanName}".</span>`;
         }
-      } catch (e) {
-        box.innerHTML = '<span style="color: #ef4444;">Failed to fetch vector context from ChromaDB.</span>';
+      } catch (err) {
+        box.innerHTML = `<span style="color: #ef4444;">Vector query error: ${err.message}</span>`;
       }
-    }
+    });
 
-    document.getElementById('btn-fetch-vector').onclick = () => {
-      if (selectedNode) fetchVectorContext(selectedNode);
-    };
+    // =========================================================================
+    // --- GRAPH MANAGEMENT MODALS (RENAME, DELETE, ADD) ---
+    // =========================================================================
 
-    document.getElementById('btn-delete-node').onclick = async () => {
+    document.getElementById('btn-delete-node').addEventListener('click', async () => {
       if (!selectedNode) return;
-      if (selectedNode.id === 'Boss' || selectedNode.id === 'FRIDAY' || selectedNode.id === "Friday's Brain") {
-        alert('Cannot delete Core Neural Nexus nodes!');
-        return;
-      }
+      Sound.playClick();
       if (!confirm(`Delete "${selectedNode.name || selectedNode.id}" from Friday's Cortex?`)) return;
 
       try {
@@ -1520,21 +2069,26 @@
           showToast(`Deleted "${selectedNode.name || selectedNode.id}"`, '🗑️');
           closeDrawer();
           loadData();
+        } else {
+          alert('Delete failed: ' + (data.error || 'Unknown error'));
         }
-      } catch (err) { alert('Delete failed: ' + err); }
-    };
+      } catch (err) {
+        alert('Network error deleting node: ' + err.message);
+      }
+    });
 
-    document.getElementById('btn-rename-node').onclick = () => {
+    document.getElementById('btn-rename-node').addEventListener('click', () => {
       if (!selectedNode) return;
+      Sound.playClick();
       document.getElementById('rename-input').value = selectedNode.name || selectedNode.id;
       document.getElementById('modal-rename').classList.add('active');
-    };
+    });
 
-    document.getElementById('btn-cancel-rename').onclick = () => {
+    document.getElementById('btn-cancel-rename').addEventListener('click', () => {
       document.getElementById('modal-rename').classList.remove('active');
-    };
+    });
 
-    document.getElementById('btn-confirm-rename').onclick = async () => {
+    document.getElementById('btn-confirm-rename').addEventListener('click', async () => {
       const newName = document.getElementById('rename-input').value.trim();
       if (!newName || !selectedNode) return;
 
@@ -1548,15 +2102,16 @@
         if (data.status === 'renamed') {
           showToast(`Renamed to "${newName}"`, '✏️');
           document.getElementById('modal-rename').classList.remove('active');
-          selectedNode.name = newName;
-          document.getElementById('drawer-title').innerText = newName;
           loadData();
         }
-      } catch (err) { alert('Rename failed: ' + err); }
-    };
+      } catch (err) {
+        alert('Rename error: ' + err.message);
+      }
+    });
 
-    document.getElementById('btn-link-node').onclick = () => {
+    document.getElementById('btn-link-node').addEventListener('click', () => {
       if (!selectedNode) return;
+      Sound.playClick();
       const target = prompt(`Connect "${selectedNode.name || selectedNode.id}" to which node?`);
       if (!target || !target.trim()) return;
 
@@ -1564,32 +2119,24 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source: selectedNode.id, target: target.trim(), label: 'RELATION' })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'linked') {
-          showToast(`Connected to "${target}"`, '🔗');
-          loadData();
-        }
-      })
-      .catch(err => alert('Link failed: ' + err));
-    };
+      }).then(() => {
+        showToast(`Linked to "${target.trim()}"`, '🔗');
+        loadData();
+      });
+    });
 
-    // Add Entity
-    document.getElementById('btn-add-entity').onclick = () => {
+    document.getElementById('btn-add-entity').addEventListener('click', () => {
+      Sound.playClick();
       document.getElementById('modal-add-entity').classList.add('active');
-      document.getElementById('add-entity-name').focus();
-    };
-
-    document.getElementById('btn-cancel-add').onclick = () => {
+    });
+    document.getElementById('btn-cancel-add').addEventListener('click', () => {
       document.getElementById('modal-add-entity').classList.remove('active');
-    };
+    });
 
-    document.getElementById('btn-confirm-add').onclick = async () => {
+    document.getElementById('btn-confirm-add').addEventListener('click', async () => {
       const name = document.getElementById('add-entity-name').value.trim();
-      const parent = document.getElementById('add-entity-parent').value.trim() || "Friday's Brain";
-      const rel = document.getElementById('add-entity-rel').value.trim() || 'LOBE_COMPONENT';
-
+      const parent = document.getElementById('add-entity-parent').value.trim() || 'Friday';
+      const rel = document.getElementById('add-entity-rel').value.trim() || 'HAS_SYNAPSE';
       if (!name) return;
 
       try {
@@ -1600,108 +2147,90 @@
         });
         const data = await res.json();
         if (data.status === 'created') {
-          showToast(`Created "${name}" in Cortex`, '⚡');
+          showToast(`Entity "${name}" created!`, '✨');
           document.getElementById('modal-add-entity').classList.remove('active');
-          document.getElementById('add-entity-name').value = '';
-          document.getElementById('add-entity-parent').value = '';
           loadData();
         }
-      } catch (err) { alert('Create entity failed: ' + err); }
-    };
+      } catch (err) {
+        alert('Entity creation error: ' + err.message);
+      }
+    });
 
-    // Search
+    document.getElementById('btn-close-drawer').addEventListener('click', () => {
+      Sound.playClick();
+      closeDrawer();
+    });
+
+    // --- Action Button Handlers ---
+    document.getElementById('btn-toggle-orbit').addEventListener('click', function() {
+      Sound.playClick();
+      controls.autoRotate = !controls.autoRotate;
+      this.classList.toggle('active-glow', controls.autoRotate);
+      document.getElementById('orbit-text').innerText = controls.autoRotate ? 'Auto-Orbit' : 'Orbit Paused';
+    });
+
+    document.getElementById('btn-toggle-lightning').addEventListener('click', function() {
+      Sound.playClick();
+      if (photonPoints) {
+        photonPoints.visible = !photonPoints.visible;
+        this.classList.toggle('active-glow', photonPoints.visible);
+        document.getElementById('lightning-text').innerText = photonPoints.visible ? 'Action Potentials' : 'Pulses Muted';
+      }
+    });
+
+    document.getElementById('btn-cinematic-tour').addEventListener('click', runCinematicTour);
+
+    document.getElementById('btn-toggle-sound').addEventListener('click', function() {
+      Sound.enabled = !Sound.enabled;
+      Sound.playClick();
+      document.getElementById('sfx-text').innerText = Sound.enabled ? 'SFX ON' : 'SFX MUTED';
+      this.classList.toggle('active-glow', Sound.enabled);
+    });
+
+    document.getElementById('btn-reset-view').addEventListener('click', () => {
+      Sound.playClick();
+      flyCameraToNode('FRIDAY');
+    });
+
+    document.getElementById('btn-export-snapshot').addEventListener('click', () => {
+      Sound.playClick();
+      const link = document.createElement('a');
+      link.download = `friday-neural-cortex-${Date.now()}.png`;
+      link.href = renderer.domElement.toDataURL('image/png');
+      link.click();
+      showToast('Cortex Hologram Captured!', '📸');
+    });
+
+    // --- Keyboard Shortcuts ---
     const searchInput = document.getElementById('search-input');
     searchInput.addEventListener('input', e => {
       const q = e.target.value.toLowerCase().trim();
-      if (!q) return;
-      const match = graphData.nodes.find(n => (n.name || n.id).toLowerCase().includes(q));
-      if (match && nodePosMap.has(match.id)) {
-        flyCameraToNode(match.id);
+      if (!q) {
+        nodeMeshMap.forEach(mesh => {
+          mesh.material.opacity = 1.0;
+        });
+        return;
       }
+
+      nodeMeshMap.forEach((mesh, id) => {
+        const matches = id.toLowerCase().includes(q) || ((mesh.userData.node.name || '').toLowerCase().includes(q));
+        mesh.material.opacity = matches ? 1.0 : 0.08;
+      });
     });
 
     searchInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         const q = searchInput.value.toLowerCase().trim();
-        if (!q) return;
-        const match = graphData.nodes.find(n => (n.name || n.id).toLowerCase().includes(q));
-        if (match) {
-          Sound.playClick();
-          selectedNode = match;
-          openDrawer(match);
-          flyCameraToNode(match.id);
+        const found = graphData.nodes.find(n => (n.id || '').toLowerCase().includes(q) || (n.name || '').toLowerCase().includes(q));
+        if (found) {
+          Sound.playWarp();
+          selectedNode = found;
+          openDrawer(found);
+          flyCameraToNode(found.id);
         }
       }
     });
 
-    // Modals Backdrop
-    document.querySelectorAll('.modal-backdrop').forEach(modal => {
-      modal.addEventListener('click', e => {
-        if (e.target === modal) modal.classList.remove('active');
-      });
-    });
-
-    // Controls Buttons
-    document.getElementById('btn-reset-view').onclick = () => {
-      Sound.playClick();
-      flyCameraToNode('FRIDAY');
-    };
-
-    document.getElementById('btn-toggle-orbit').onclick = () => {
-      Sound.playClick();
-      controls.autoRotate = !controls.autoRotate;
-      const btn = document.getElementById('btn-toggle-orbit');
-      if (controls.autoRotate) {
-        btn.classList.add('active-glow');
-        showToast('Auto-Orbit Engaged', '🔄');
-      } else {
-        btn.classList.remove('active-glow');
-        showToast('Auto-Orbit Paused', '⏸');
-      }
-    };
-
-    document.getElementById('btn-toggle-lightning').onclick = () => {
-      Sound.playClick();
-      if (photonPoints) photonPoints.visible = !photonPoints.visible;
-      const btn = document.getElementById('btn-toggle-lightning');
-      if (photonPoints && photonPoints.visible) {
-        btn.classList.add('active-glow');
-        showToast('Action Potentials Active', '⚡');
-      } else {
-        btn.classList.remove('active-glow');
-        showToast('Action Potentials Muted', '💤');
-      }
-    };
-
-    document.getElementById('btn-cinematic-tour').onclick = () => {
-      if (isTourRunning) {
-        isTourRunning = false;
-        showToast('Tour Stopped', '⏹');
-        document.getElementById('btn-cinematic-tour').classList.remove('active-glow');
-      } else {
-        runCinematicTour();
-      }
-    };
-
-    document.getElementById('btn-toggle-sound').onclick = () => {
-      Sound.enabled = !Sound.enabled;
-      const sfxText = document.getElementById('sfx-text');
-      if (Sound.enabled) {
-        Sound.init();
-        Sound.playClick();
-        sfxText.innerText = 'SFX ON';
-        document.getElementById('btn-toggle-sound').classList.add('active-glow');
-        showToast('Audio Synthesizer Enabled', '🔊');
-      } else {
-        sfxText.innerText = 'SFX OFF';
-        document.getElementById('btn-toggle-sound').classList.remove('active-glow');
-        showToast('Audio FX Muted', '🔇');
-      }
-    };
-
-    document.getElementById('btn-export-snapshot').onclick = exportSnapshot;
-
-    // Global Hotkeys
     window.addEventListener('keydown', e => {
       if (e.key === '/' && document.activeElement !== searchInput) {
         e.preventDefault();
@@ -1729,17 +2258,24 @@
       requestAnimationFrame(animate);
       controls.update();
 
-      // Rotate Gyro Rings on Hubs
-      for (let i = 0; i < gyroRingList.length; i++) {
-        const item = gyroRingList[i];
-        if (item.mesh) item.mesh.rotation[item.axis] += item.speed;
-      }
-
       // Drift Cosmic Starfield
       if (stars) stars.rotation.y += 0.0002;
 
       // Update Synaptic Action Potential Pulses
       updatePhotonParticles();
+
+      // Animate Dream Shockwave
+      if (dreamWaveState.active) {
+        dreamWaveState.radius += 12;
+        dreamWaveState.progress = dreamWaveState.radius / dreamWaveState.maxRadius;
+        dreamWaveMesh.scale.set(dreamWaveState.radius, dreamWaveState.radius, dreamWaveState.radius);
+        waveMat.opacity = Math.max(0, 0.45 * (1 - dreamWaveState.progress));
+
+        if (dreamWaveState.radius >= dreamWaveState.maxRadius) {
+          dreamWaveState.active = false;
+          waveMat.opacity = 0;
+        }
+      }
 
       renderer.render(scene, camera);
     }
@@ -1747,6 +2283,9 @@
 
     // Initial Data Load
     loadData();
+
+    // Periodic Cognitive State Refresh (every 30s)
+    setInterval(loadCognitiveState, 30000);
   </script>
 </body>
 </html>
