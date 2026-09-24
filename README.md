@@ -134,6 +134,65 @@ Friday runs as a self-hosted background service providing a structured, four-tie
 
 ---
 
+## Dual-Cortex Architecture: Why the Subconscious Mind Has Its Own API
+
+A foundational question developers ask when exploring Friday is:
+> *"Why does Friday maintain an internal background LLM (like Groq, DeepSeek, or local Ollama) on the server, completely separate from the frontier model I use in my terminal or Cursor?"*
+
+The answer lies in biological cognitive partitioning. Just as the human brain divides labor between the **Conscious Mind** (deliberate action, focus, reasoning) and the **Subconscious Mind** (sensory processing, memory consolidation, autonomic reflexes), Friday enforces a **Dual-Cortex Cognitive Architecture**:
+
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                        THE DUAL-CORTEX COGNITIVE MODEL                                 │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                        │
+│   CONSCIOUS MIND (The Frontline Architect)    SUBCONSCIOUS MIND (The Autonomic Cortex) │
+│   ┌─────────────────────────────────────┐     ┌─────────────────────────────────────┐  │
+│   │ Client: Cursor / Claude / Antigravity│     │ Engine: Self-Hosted Friday Server   │  │
+│   │ Model: Frontier (Claude 3.5 / GPT-4o)│     │ Model: Fast Worker (Groq / Ollama)  │  │
+│   │ Role: Complex code generation       │     │ Role: Real-time graph extraction    │  │
+│   │ Context: Lean, task-specific prompt │     │ Role: Conflict detection & decay    │  │
+│   │ State: Ephemeral session lifetime   │     │ State: 24/7 background persistent   │  │
+│   └──────────────────┬──────────────────┘     └──────────────────▲──────────────────┘  │
+│                      │                                           │                     │
+│                      │ 1. MCP Tools (memory_search, add_memory)  │ 2. Microsecond      │
+│                      ▼                                           │    Async Parsing    │
+│   ┌──────────────────────────────────────────────────────────────┴──────────────────┐  │
+│   │                        FRIDAY PERSISTENT COGNITIVE SUBSTRATE                    │  │
+│   │                                                                                 │  │
+│   │   Layer 1: Facts Ledger (Deterministic S3-style Hash Table)                     │  │
+│   │   Layer 2: Episodic Memory (Mem0 Conversational Thread History)                 │  │
+│   │   Layer 3: Vector Embeddings (ChromaDB Semantic Chunks)                         │  │
+│   │   Layer 4: Property Knowledge Graph (Neo4j Directed Topology)                   │  │
+│   │   Cognitive Dynamics: Synaptic Decay ($E(t)$) & Nightly Dream Cycle (03:00 UTC) │  │
+│   └─────────────────────────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Why Decoupling the Subconscious API is Non-Negotiable:
+
+#### 1. ⚡ Zero-Latency IDE Execution (Non-Blocking Decoupling)
+When you type in Cursor or Claude Code and an agent records a major decision via `add_memory`, the Conscious model cannot pause for 4–6 seconds while an LLM parses semantic entities, identifies foreign keys, and runs Cypher mutations.
+- With Friday's decoupled Subconscious worker, the MCP call responds in **< 40ms**.
+- The Subconscious engine (e.g. Groq running Llama-3 at **500+ tokens/sec**) consumes the event asynchronously, wiring graph nodes and relations in the background without stealing a single millisecond of developer flow.
+
+#### 2. 💰 95%+ Economic Token Arbitrage
+Frontier reasoning models (Claude 3.5 Sonnet, GPT-4o) cost **$3.00 to $15.00 per million tokens**. Using these expensive models for routine structural maintenance—such as extracting triples (`Entity A` $\longrightarrow$ `RELATION` $\longrightarrow$ `Entity B`), verifying fact hashes, or applying synaptic decay—wastes massive token budgets.
+- Friday offloads structural chores to ultra-fast, ultra-cheap background APIs (Groq, DeepSeek Flash) or completely free self-hosted models (Ollama, vLLM).
+- Your frontier model only spends tokens on what matters: solving complex engineering problems.
+
+#### 3. 🌙 The Subconscious Never Sleeps (Autonomous 24/7 Consolidation)
+Your coding session ends when you close your IDE or put your laptop to sleep. But memory evolution cannot stop when the laptop closes:
+- Friday's Subconscious engine lives on your cloud or local server 24/7.
+- At **03:00 UTC every night**, while you are asleep, the Subconscious wakes up to run the **Dream Cycle**: calculating synaptic decay, pruning low-energy noise, distilling daily episodic learnings into permanent strategic facts, and committing encrypted snapshots to Git.
+
+#### 4. 🛡️ Hallucination & Context Pollution Defense
+Dumping a monolithic 500-node graph or 100 historical decisions directly into your editor's prompt causes **Instruction Dilution**: the LLM becomes confused, forgets recent constraints, and hallucinates outdated patterns.
+- The Subconscious acts as an intelligent firewall.
+- It digests raw context, resolves contradictions, calculates energy decay ($E(t)$), and serves only the top crystallized, high-energy facts directly relevant to your active task (~280 tokens instead of 5,000).
+
+---
+
 ## Cognitive Core 2.0 (Biological Memory Architecture)
 
 Friday incorporates biologically-inspired memory mechanics to ensure AI agents maintain pristine context without bloat, stale instruction interference, or communication misalignment:
