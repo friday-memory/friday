@@ -42,7 +42,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 <br><br>
 
-<img src="docs/assets/synthetic_neural_cortex.png" alt="Friday Neural Studio — Interactive Knowledge Graph" width="100%" style="border-radius: 8px; border: 1px solid #1e293b;" />
+<img src="docs/assets/holosphere_4_galactic_cortex.png" alt="Friday Neural Studio — Interactive Knowledge Graph" width="100%" style="border-radius: 8px; border: 1px solid #1e293b;" />
 
 <br>
 <sub><i>Friday Neural Studio (Holosphere 4.0) — Real-time WebGL synthetic cortex visualizer rendering galactic lobe constellations, dynamic synaptic energy heatmaps, and autonomous dream cycle consolidation.</i></sub>
