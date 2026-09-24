@@ -29,12 +29,13 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 <table>
   <tr>
-    <td align="center"><a href="#the-problem-session-amnesia"><b>Overview</b></a></td>
+    <td align="center"><a href="#the-problem-session-amnesia"><b>The Problem</b></a></td>
+    <td align="center"><a href="#architecture-multi-layer-cognitive-substrate"><b>Architecture</b></a></td>
+    <td align="center"><a href="#dual-cortex-architecture-why-the-subconscious-mind-has-its-own-api"><b>Dual-Cortex</b></a></td>
+    <td align="center"><a href="#cognitive-core-20-biological-memory-architecture"><b>Cognitive Core 2.0</b></a></td>
     <td align="center"><a href="#quickstart"><b>Quickstart</b></a></td>
     <td align="center"><a href="#python-sdk-friday-memory"><b>Python SDK</b></a></td>
-    <td align="center"><a href="#client-setup-mcp"><b>Client Setup (MCP)</b></a></td>
-    <td align="center"><a href="#architecture"><b>Architecture</b></a></td>
-    <td align="center"><a href="#deepeval-benchmarks"><b>Benchmarks</b></a></td>
+    <td align="center"><a href="#client-setup-mcp"><b>MCP Setup</b></a></td>
     <td align="center"><a href="#api-reference"><b>API Reference</b></a></td>
   </tr>
 </table>
@@ -56,7 +57,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 Modern AI coding agents (Cursor, Claude Code, Antigravity, VS Code) excel at isolated code generation. However, in continuous engineering workflows, developers encounter a structural limitation: **Session Amnesia**.
 
-Current workarounds fall into two flawed patterns:
+Current workarounds fall into three deeply flawed patterns:
 
 ```
                   ┌─────────────────────────────────────────────────────────┐
@@ -103,17 +104,29 @@ Friday runs as a self-hosted background service providing a structured, four-tie
 │                                                                                        │
 │   Layer 1: Facts Ledger         Layer 2: Episodic Memory       Layer 3: Graph Topology │
 │  ┌─────────────────────────┐   ┌───────────────────────────┐  ┌──────────────────────┐ │
-│  │ Versioned SQLite        │   │ Mem0 + ChromaDB           │  │ Neo4j Property Graph │ │
+│  │ Versioned Facts Ledger  │   │ Mem0 Conversational       │  │ Neo4j Property Graph │ │
 │  │ • Deterministic truths  │   │ • Semantic decisions      │  │ • Directed call-trees│ │
-│  │ • Conflict detection    │   │ • Vector similarity       │  │ • Schema blast-radius│ │
+│  │ • Conflict detection    │   │ • User preferences        │  │ • Schema blast-radius│ │
 │  │ • Zero prompt overhead  │   │ • Sub-100ms retrieval     │  │ • Entity dependencies│ │
 │  └─────────────────────────┘   └───────────────────────────┘  └──────────────────────┘ │
 │                                                                                        │
-│   • Auto-Graph Pipeline: LLM extraction wires entities into Neo4j automatically.       │
+│   Layer 4: Cognitive Dynamics Engine                                                   │
+│   • Synaptic Energy Decay: E(t) = E₀ · 2^(-Δt / 14d) automatically evicts stale clutter│
+│   • Nightly Dream Cycle (03:00 UTC): Prunes noise, crystallizes graph insights & backups│
+│   • Empathy State Tracking: Adapts agent brevity and tone to developer urgency & mood  │
 │   • Neural Studio: WebGL-based 3D graph visualizer for human and agent state auditing. │
 │   • Persona Synchronization: /export/persona compiles canonical rules on-demand.       │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+### The 4 Memory Layers Explained:
+
+| Layer | Technology | Primary Role | Retrieval Speed | Why It Matters |
+| :--- | :--- | :--- | :---: | :--- |
+| **Layer 1: Facts Ledger** | S3-Style Versioned JSON / SQLite | Immutable ground-truths (ports, endpoints, schemas, business invariants). | `< 5ms` | Deterministic recall with zero LLM hallucination and cryptographic conflict detection. |
+| **Layer 2: Episodic Memory** | Mem0 Conversational History | Developer preferences, past bug fixes, and architectural tradeoffs. | `< 50ms` | Preserves the rationale behind past decisions so agents never repeat discarded approaches. |
+| **Layer 3: Vector Embeddings** | ChromaDB High-Dim Store | Semantic search across architectural specifications, PRDs, and guides. | `< 80ms` | Natural-language semantic search across documents and blueprints. |
+| **Layer 4: Relational Graph** | Neo4j 5.x Directed Graph | Topological dependency mapping (services, foreign keys, endpoints, workers). | `< 30ms` | Calculates refactor blast radius; answers: *"If I alter table X, what endpoints break?"* |
 
 ---
 
@@ -126,11 +139,9 @@ Friday runs as a self-hosted background service providing a structured, four-tie
 | **Token Efficiency** | Burns 2,000–5,000 tokens/turn | Unfiltered chunk dumps | Targeted queries (~280 tokens/turn) |
 | **Toolchain Synchronization** | Isolated per editor config | Disconnected silos | Unified MCP across Cursor, Claude, CLI |
 | **Conflict Resolution** | Manual file editing required | Ingests conflicting chunks | Versioned Fact Ledger with status flags |
+| **Memory Life-Cycle** | Static forever (bloats) | Flat chunk retention | Synaptic Decay + Nightly Dream Consolidation |
 | **Topology Auditing** | None | None | Neural Studio 3D interactive viewer |
 | **Deployment Model** | Local flat files | Cloud SaaS vendor lock-in | 100% Self-Hosted Docker Compose |
-
----
-
 
 ---
 
@@ -164,7 +175,7 @@ The answer lies in biological cognitive partitioning. Just as the human brain di
 │   │   Layer 2: Episodic Memory (Mem0 Conversational Thread History)                 │  │
 │   │   Layer 3: Vector Embeddings (ChromaDB Semantic Chunks)                         │  │
 │   │   Layer 4: Property Knowledge Graph (Neo4j Directed Topology)                   │  │
-│   │   Cognitive Dynamics: Synaptic Decay ($E(t)$) & Nightly Dream Cycle (03:00 UTC) │  │
+│   │   Cognitive Dynamics: Synaptic Decay (E(t)) & Nightly Dream Cycle (03:00 UTC)   │  │
 │   └─────────────────────────────────────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -223,10 +234,10 @@ Friday incorporates biologically-inspired memory mechanics to ensure AI agents m
 ### 1. 🔥 Dynamic Memory Heat & Decay
 Memories and verified facts are not static text—they have energy. Active, frequently recalled directives remain bright ($E > 1.0$). Irrelevant or outdated details experience exponential half-life decay ($T_{half} = 14\text{ days}$):
 $$E(t) = E_0 \times 2^{-\frac{\Delta t}{T_{half}}}$$
-When a memory is queried during coding, it receives a recall potentiation boost ($+0.25$), preventing stale knowledge from cluttering the agent prompt while preserving core architectural invariants.
+When a memory is queried during coding, it receives a recall potentiation boost ($+0.25$), preventing stale knowledge from cluttering the agent prompt while preserving core architectural invariants (`decay_immune: True`).
 
 ### 2. 🌙 The Dream Cycle
-Every night at 03:00 UTC (or on-demand), Friday enters the **Dream Cycle**:
+Every night at 03:00 UTC (or on-demand via `client.run_dream_cycle()`), Friday enters the **Dream Cycle**:
 - **Synaptic Pruning**: Identifies cold/stale facts and transitions them to archived storage.
 - **Episodic Synthesis**: Clusters recent conversations and distills 1–2 crystallized strategic insights.
 - **Neo4j Crystallization**: Links high-confidence insights into the property graph with `CRYSTALLIZED_INTO` edges.
@@ -267,65 +278,68 @@ python benchmarks/benchmark_deepeval.py
 
 ### Option A: One-Command Installation (Recommended)
 
-Run the automated installer to check dependencies, generate configuration keys, and boot the stack:
+Run the self-contained installation script:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/friday-memory/friday/main/install.sh | bash
 ```
 
----
+The script verifies Docker availability, allocates required ports (8000, 7474, 7687), generates secure random API secrets, writes a validated `.env`, and launches Friday via Docker Compose.
 
 ### Option B: Manual Setup via Docker Compose
 
-**1. Clone the repository**
-```bash
-git clone https://github.com/friday-memory/friday.git
-cd friday
-cp .env.example .env
-```
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/friday-memory/friday.git
+   cd friday
+   ```
 
-**2. Configure environment (`.env`)**
-```env
-# Master API key for endpoint security
-FRIDAY_API_KEY=choose_a_strong_password
+2. **Configure Environment (`.env`)**:
+   ```bash
+   cp .env.example .env
+   ```
 
-# LLM provider for automated graph extraction (DeepSeek or Groq)
-DEEPSEEK_API_KEY=your_api_key_here
-DEEPSEEK_BASE_URL=https://api.deepseek.com
+   ```ini
+   # Master API key for endpoint security
+   BRAIN_API_KEY=choose_a_strong_secret_key
 
-# Mem0 key for vector memory
-MEM0_API_KEY=your_mem0_key_here
+   # Fast Subconscious LLM provider (Groq or DeepSeek)
+   DEEPSEEK_API_KEY=your_key_here
+   DEEPSEEK_BASE_URL=https://api.deepseek.com
+   DEEPSEEK_MODEL=deepseek-chat
 
-# Neo4j database credentials
-NEO4J_PASSWORD=choose_a_secure_db_password
-```
+   # Mem0 key for vector memory (optional)
+   MEM0_API_KEY=your_mem0_key_here
 
-**3. Launch services**
-```bash
-make docker-up
-# or: docker compose up -d
-```
+   # Neo4j database credentials
+   NEO4J_URI=bolt://neo4j:7687
+   NEO4J_USER=neo4j
+   NEO4J_PASSWORD=choose_a_strong_password
+   ```
 
-Services initialized:
-- **Friday Gateway API**: `http://localhost:80` (or `http://localhost:8000`)
-- **Neo4j Browser**: `http://localhost:7474`
-- **Neural Studio UI**: `http://localhost/`
+3. **Start the Stack**:
+   ```bash
+   make up
+   # or: docker compose up -d
+   ```
 
-**4. Verify health**
-```bash
-curl http://localhost/health
-```
-
-**5. Persist initial context**
-```bash
-curl -X POST http://localhost/add \
-  -H "X-Brain-Key: your_strong_password" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "content": "Authentication uses JWT access tokens (15m expiration) with httpOnly refresh cookies. Implementation in gateway/auth.py.",
-    "project": "CoreApp"
-  }'
-```
+4. **Verify Health**:
+   ```bash
+   curl http://localhost:8000/health
+   ```
+   ```json
+   {
+     "status": "healthy",
+     "service": "friday-cognitive-substrate",
+     "version": "1.3.0",
+     "layers": {
+       "L1_core": "healthy",
+       "L2_mem0": "healthy",
+       "L3_chromadb": "healthy",
+       "L4_neo4j": "healthy"
+     }
+   }
+   ```
 
 ---
 
@@ -334,7 +348,7 @@ curl -X POST http://localhost/add \
 The official Python client for Friday is available on PyPI as [**`friday-memory`**](https://pypi.org/project/friday-memory/). Connect your agentic workflows, LangChain pipelines, or autonomous scripts directly to Friday with zero boilerplate:
 
 ```bash
-pip install friday-memory
+pip install --upgrade friday-memory
 ```
 
 ### Synchronous Client
@@ -380,14 +394,12 @@ with Friday(api_key="your_secret_key", base_url="http://localhost:8000") as clie
 import asyncio
 from friday import AsyncFriday
 
-
 async def main():
     async with AsyncFriday(api_key="your_secret_key") as client:
         # Commit context concurrently
         await client.add_memory("Redis cluster deployed for token bucket rate limiting")
-        facts = await client.get_facts()
-        print(f"Verified facts count: {len(facts)}")
-
+        facts = await client.get_facts(min_energy=0.5)
+        print(f"Verified high-energy facts: {len(facts)}")
 
 asyncio.run(main())
 ```
@@ -401,6 +413,7 @@ pip install "friday-memory[langchain]"
 ```python
 from friday.integrations.langchain import FridayRetriever
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
 
 retriever = FridayRetriever(
@@ -410,10 +423,9 @@ retriever = FridayRetriever(
 )
 
 # Connect directly to LCEL chains
-prompt = ChatPromptTemplate.from_template("""Answer using verified system memory:
-{context}
-
-Question: {question}""")
+prompt = ChatPromptTemplate.from_template(
+    "Answer using verified system memory:\n{context}\n\nQuestion: {question}"
+)
 
 chain = {"context": retriever, "question": RunnablePassthrough()} | prompt | ChatOpenAI()
 ```
@@ -435,7 +447,10 @@ Friday provides an official Model Context Protocol (MCP) server over `stdio` or 
  │    Antigravity IDE    │──┤
  └───────────────────────┘  │
  ┌───────────────────────┐  │
- │  Windsurf / VS Code   │──┘
+ │  Windsurf / VS Code   │──┤
+ └───────────────────────┘  │
+ ┌───────────────────────┐  │
+ │       Codex CLI       │──┘
  └───────────────────────┘
                             ▼
              ┌──────────────────────────────┐
@@ -446,10 +461,11 @@ Friday provides an official Model Context Protocol (MCP) server over `stdio` or 
 ```
 
 <details>
-<summary><b>Cursor</b></summary>
+<summary><b>1. Cursor (Local or Remote)</b></summary>
 
 Add to `.cursor/mcp.json` in your project or globally in **Cursor Settings → MCP**:
 
+**Local Docker Setup:**
 ```json
 {
   "mcpServers": {
@@ -465,10 +481,27 @@ Add to `.cursor/mcp.json` in your project or globally in **Cursor Settings → M
   }
 }
 ```
+
+**Remote Cloud VM Setup (via SSH Tunnel):**
+```json
+{
+  "mcpServers": {
+    "friday": {
+      "command": "ssh",
+      "args": [
+        "-i", "/path/to/ssh_key.pem",
+        "-o", "StrictHostKeyChecking=no",
+        "ubuntu@YOUR_SERVER_IP",
+        "docker exec -i fridays-brain-app python /app/mcp_server/server.py"
+      ]
+    }
+  }
+}
+```
 </details>
 
 <details>
-<summary><b>Claude Code CLI</b></summary>
+<summary><b>2. Claude Code CLI</b></summary>
 
 Register Friday directly via CLI:
 
@@ -481,7 +514,7 @@ claude mcp add friday \
 </details>
 
 <details>
-<summary><b>Antigravity IDE</b></summary>
+<summary><b>3. Antigravity IDE</b></summary>
 
 Add to `~/.gemini/config/mcp_config.json`:
 
@@ -503,7 +536,24 @@ Add to `~/.gemini/config/mcp_config.json`:
 </details>
 
 <details>
-<summary><b>VS Code (Cline / Roo Code)</b></summary>
+<summary><b>4. Codex CLI</b></summary>
+
+Add to `~/.codex/config.toml`:
+
+```toml
+[mcp.servers.friday]
+command = "python"
+args = ["-m", "mcp.server"]
+cwd = "/path/to/friday"
+
+[mcp.servers.friday.env]
+FRIDAY_URL = "http://localhost:8000"
+BRAIN_API_KEY = "your_secret_key"
+```
+</details>
+
+<details>
+<summary><b>5. VS Code (Cline / Roo Code / Continue)</b></summary>
 
 Add to your VS Code MCP configuration:
 
@@ -532,10 +582,27 @@ Connected agents automatically access four core MCP primitives:
 
 | Primitive | Purpose | Trigger Phase |
 | :--- | :--- | :--- |
-| `get_context` | Ingests active verified facts and recent context. | Session initialization. |
-| `memory_search` | Queries vector and graph indices for architectural decisions. | Prior to answering technical questions. |
-| `add_memory` | Records implementation details, rationale, and tradeoffs. | Post-implementation or bug resolution. |
-| `add_fact` | Commits versioned, immutable ground truths (ports, stack, schemas). | Architectural declarations. |
+| `get_context` | Ingests active verified facts and recent context with cognitive state directives. | Session initialization. |
+| `memory_search` | Queries vector and graph indices for architectural decisions and system dependencies. | Prior to answering technical questions or planning refactors. |
+| `add_memory` | Records implementation details, rationale, and tradeoffs; triggers background graph extraction. | Post-implementation or bug resolution. |
+| `add_fact` | Commits versioned, immutable ground truths (ports, stack, schemas, business invariants). | Architectural declarations. |
+
+---
+
+## Environment Variables Reference
+
+| Variable | Default Value | Description |
+| :--- | :--- | :--- |
+| `BRAIN_API_KEY` / `FRIDAY_API_KEY` | *(Required)* | Master authentication secret for write and administrative endpoints. |
+| `FACTS_PATH` | `/app/facts/facts.json` | Local filesystem path to the versioned JSON facts ledger. |
+| `NEO4J_URI` | `bolt://neo4j:7687` | Bolt connection URI for the Layer 4 Neo4j instance. |
+| `NEO4J_USER` | `neo4j` | Neo4j database username. |
+| `NEO4J_PASSWORD` | *(Required)* | Neo4j database password. |
+| `DEEPSEEK_API_KEY` / `GROQ_API_KEY` | `""` | API key for the Subconscious background LLM parser. |
+| `DEEPSEEK_BASE_URL` | `https://api.deepseek.com` | Base URL for the OpenAI-compatible Subconscious provider. |
+| `DEEPSEEK_MODEL` | `deepseek-chat` | Model name for automated graph extraction and conflict detection. |
+| `MEM0_API_KEY` | `""` | Optional API key for Mem0 managed episodic memory layer. |
+| `COGNITIVE_STATE_PATH` | `/app/core/cognitive_state.json` | Path to persistent developer cognitive and emotional calibration state. |
 
 ---
 
@@ -545,11 +612,11 @@ Friday can compile stored facts and architectural constraints into synchronized 
 
 ```bash
 # Export canonical AGENTS.md
-curl -s "http://localhost/export/persona?target=agents" \
+curl -s "http://localhost:8000/export/persona?target=agents" \
   -H "X-Brain-Key: your_key" > AGENTS.md
 
 # Export Cursor .cursorrules
-curl -s "http://localhost/export/persona?target=cursor" \
+curl -s "http://localhost:8000/export/persona?target=cursor" \
   -H "X-Brain-Key: your_key" > .cursorrules
 ```
 
@@ -558,7 +625,7 @@ curl -s "http://localhost/export/persona?target=cursor" \
 ## Features
 
 ### 1. Automated Knowledge Graph Extraction
-Every memory written via `add_memory` is analyzed asynchronously. Entities and typed relations are automatically wired into Neo4j without manual schema definitions:
+Every memory written via `add_memory` is analyzed asynchronously by the Subconscious worker. Entities and typed relations are automatically wired into Neo4j without manual schema definitions:
 
 ```
 Input:
@@ -597,13 +664,13 @@ POST /facts -> {"content": "Migrated database to Aurora PostgreSQL on port 5432"
 friday/
 ├── friday/                  # Official Python SDK (client, types, LangChain retriever)
 ├── gateway/                 # FastAPI REST application & routing
-├── layers/                  # Pluggable storage adapters (SQLite, ChromaDB, Neo4j)
-├── pipelines/               # Background entity extraction & fact pipelines
-├── orchestrator/            # Multi-layer retrieval router
+├── layers/                  # Pluggable storage adapters (SQLite, ChromaDB, Neo4j, Decay)
+├── pipelines/               # Background entity extraction, Dream Cycle & fact pipelines
+├── orchestrator/            # Multi-layer retrieval router & cognitive state engine
 ├── mcp/                     # Model Context Protocol stdio server
 ├── studio/                  # Three.js Neural Studio visualizer
 ├── benchmarks/              # DeepEval evaluation suite
-├── tests/                   # Pytest test suite
+├── tests/                   # Pytest test suite (100% green)
 ├── docker-compose.yml       # Production container definition
 ├── Makefile                 # Developer task automation
 └── pyproject.toml           # Tooling & packaging configuration
@@ -621,7 +688,7 @@ All authenticated endpoints require the `X-Brain-Key` request header.
 | `GET` | `/health` | No | Layered health status check. |
 | `POST` | `/add` | Yes | Ingest memory and trigger background graph extraction. |
 | `POST` | `/facts` | Yes | Record or update a versioned fact. |
-| `GET` | `/facts` | No | List active ground-truth facts. |
+| `GET` | `/facts` | No | List active ground-truth facts (supports `min_energy`). |
 | `POST` | `/search` | Yes | Semantic search across vector stores. |
 | `POST` | `/ingest` | Yes | Batch ingest architectural specifications. |
 | `GET` | `/export/persona` | Yes | Export synchronized IDE rules (`agents` or `cursor`). |
