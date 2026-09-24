@@ -636,12 +636,14 @@ Extracted Graph Nodes & Edges:
   (:API {name: "Stripe"}) -[:DISPATCHES_TO]-> (:Endpoint {path: "/api/webhooks/stripe"})
 ```
 
-### 2. Neural Studio (3D Topology Visualizer)
-A browser-based WebGL graph explorer (Three.js) for auditing agent memory:
-- **Cluster Topologies**: Visualizes architectural components as a 3D force-directed graph.
-- **Entity Inspector**: Inspect node connections, versioned facts, and raw vector chunks.
-- **Live CRUD**: Create, rename, or link entities directly within the visual interface.
-- **High-Resolution Export**: Export topology diagrams for technical documentation.
+### 2. Neural Studio (Holosphere 4.0 — 3D Synthetic Cortex Visualizer)
+A browser-based 3D WebGL neural visualizer powered by Three.js for real-time memory exploration and cognitive telemetry:
+- **Galactic Lobe Constellations**: Eliminates node clumping by distributing 1,000+ entities across 8 deterministic anatomical star systems (Prefrontal, Cognitive Core, Visual Cortex, Temporal AI, Parietal, Brainstem, Exocortex, and Architecture Bridges).
+- **Dynamic Synaptic Heatmap**: Visualizes memory retention energy in real time with interactive filtering (`All`, `Hot ≥ 0.7`, `Decayed < 0.4`). Active pathways radiate vibrant neon bioluminescence, while cooling memories transition gracefully to stardust.
+- **1-Click Dream Cycle Engine**: Dispatches autonomous neural consolidation directly from the HUD with a real-time consolidation shockwave animation, synthesizing episodic insights and crystallizing Neo4j edges.
+- **Live Cognitive State HUD**: Telemetry pill streaming active mode (`Tactical Sprint ⚡`), urgency, and stress metrics updated dynamically every 30 seconds.
+- **Holographic Node Inspector**: Inspects synaptic retention meters, executes instant memory potentiation (`⚡ Reinforce +0.25`), provides clickable connection jumps, and smooth camera flight warp.
+- **Live CRUD & Topology Capture**: Create, rename, or link entities interactively, and export high-resolution screenshots for system documentation.
 
 ### 3. Versioned Facts Ledger
 Deterministic project constants are recorded with immutable version history. Outdated statements are superseded rather than overwritten, preserving an audit trail:
