@@ -771,6 +771,17 @@ Review [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines, commit co
 
 ---
 
+## Contributors
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/itskie"><img src="https://github.com/itskie.png" width="80" style="border-radius:50%;" alt="Shobhit Singh"/><br /><sub><b>Shobhit Singh</b></sub></a><br /><sub>Creator & Maintainer</sub></td>
+    <td align="center"><a href="https://github.com/strongdan"><img src="https://github.com/strongdan.png" width="80" style="border-radius:50%;" alt="Dan Strong"/><br /><sub><b>Dan Strong</b></sub></a><br /><sub>Serverless Migration & Storage Abstraction</sub></td>
+  </tr>
+</table>
+
+---
+
 ## License
 
 Friday is licensed under the [MIT License](LICENSE).
