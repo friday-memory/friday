@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import subprocess
 import time
 import uuid
 from pathlib import Path
@@ -21,8 +22,24 @@ def main():
         raise SystemExit("Requires qualification database")
     os.umask(0o077)
     headers = {"X-Friday-Key": os.environ["FRIDAY_API_KEY"]}
+    iam = {}
+    if os.getenv("FRIDAY_GCP_IAM") == "true":
+        token = subprocess.check_output(
+            [os.getenv("FRIDAY_GCLOUD", "gcloud"), "auth", "print-identity-token"],
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=30,
+        ).strip()
+        iam = {"X-Serverless-Authorization": "Bearer " + token}
+        headers.update(iam)
     paths = ["/facts", "/state", "/blueprints", "/api/graph-data", "/context"]
     with httpx.Client(base_url=os.environ["FRIDAY_URL"], timeout=30) as c:
+        if iam:
+            assert c.get("/health").status_code in (401, 403)
+            assert c.get(
+                "/facts", headers={"X-Friday-Key": os.environ["FRIDAY_API_KEY"]}
+            ).status_code in (401, 403)
+        c.headers.update(iam)
         for attempt in range(30):
             try:
                 if c.get("/health").status_code == 200:
@@ -42,6 +59,8 @@ def main():
         ):
             assert c.get(endpoint).status_code in (401, 403)
             assert c.post(endpoint, json={}).status_code in (401, 403)
+            assert c.get(endpoint, headers={"X-Friday-Key": "invalid"}).status_code == 401
+            assert c.get(endpoint, params={"api_key": "invalid"}).status_code == 401
         c.headers.update(headers)
         if args.verify:
             evidence = json.loads(args.evidence.read_text())
@@ -74,7 +93,7 @@ def main():
         if not args.verify:
             with args.evidence.open("x") as f:
                 json.dump(evidence, f)
-    print("AUTH_NEGATIVE_TESTS=PASS\nCANDIDATE_HTTP=PASS")
+    print("CLOUD_RUN_HEALTH=PASS\nAUTH_NEGATIVE_TESTS=PASS\nCANDIDATE_HTTP=PASS")
     print("RESTART_PERSISTENCE=PASS" if args.verify else "PERSISTENCE_BASELINE=CAPTURED")
 
 
