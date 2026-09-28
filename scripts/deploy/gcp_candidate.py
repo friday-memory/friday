@@ -6,6 +6,7 @@ import os
 import stat
 import subprocess
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 PROJECT = "gen-lang-client-0381797315"
@@ -235,7 +236,19 @@ def main():
     os.umask(0o077)
     p = argparse.ArgumentParser()
     p.add_argument(
-        "action", choices=["provision", "build", "build-status", "deploy", "replace", "scheduler"]
+        "action",
+        choices=[
+            "provision",
+            "build",
+            "build-status",
+            "deploy",
+            "replace",
+            "scheduler",
+            "scheduler-run",
+            "scheduler-status",
+            "scheduler-target",
+            "inspect",
+        ],
     )
     p.add_argument("--source", choices=["test", "prod"], default="test")
     args = p.parse_args()
@@ -248,6 +261,87 @@ def main():
         build_status(state)
     elif args.action in ("deploy", "replace"):
         deploy(state, args.source, args.action == "replace")
+    elif args.action == "scheduler-run":
+        state["scheduler_attempt"] = datetime.now(timezone.utc).isoformat()
+        save(state)
+        gc("scheduler", "jobs", "run", "friday-daily-consolidation-preview", "--location", REGION)
+        print("SCHEDULER_TRIGGER=ACCEPTED")
+    elif args.action == "scheduler-status":
+        schedule = gc(
+            "scheduler",
+            "jobs",
+            "describe",
+            "friday-daily-consolidation-preview",
+            "--location",
+            REGION,
+        )
+        executions = gc(
+            "run",
+            "jobs",
+            "executions",
+            "list",
+            "--job",
+            "friday-consolidation-preview",
+            "--region",
+            REGION,
+        )
+        attempt = datetime.fromisoformat(state["scheduler_attempt"])
+        recent = [
+            e
+            for e in executions
+            if datetime.fromisoformat(e["metadata"]["creationTimestamp"].replace("Z", "+00:00"))
+            >= attempt
+        ]
+        success = [
+            e
+            for e in recent
+            if any(
+                c["type"] == "Completed" and c["status"] == "True"
+                for c in e.get("status", {}).get("conditions", [])
+            )
+        ]
+        print("CLOUD_SCHEDULER_STATE=" + schedule["state"])
+        print("SCHEDULER_STATUS_CODE=" + str(schedule.get("status", {}).get("code", 0)))
+        print("CONSOLIDATION_JOB=" + ("PASS" if success else "PENDING_OR_FAILED"))
+        if success:
+            state["scheduler_execution"] = success[0]["metadata"]["name"]
+            save(state)
+            print("EXECUTION=" + state["scheduler_execution"])
+    elif args.action == "scheduler-target":
+        if not state.get("scheduler_execution"):
+            raise ValueError("Qualification execution required")
+        env = environment(state, args.source)
+        gc(
+            "run",
+            "jobs",
+            "update",
+            "friday-consolidation-preview",
+            "--region",
+            REGION,
+            "--set-env-vars",
+            f"FRIDAY_STORAGE_BACKEND=turso,TURSO_DATABASE_URL={env['TURSO_DATABASE_URL']}",
+            "--set-secrets",
+            f"TURSO_AUTH_TOKEN={env['TURSO_TOKEN_SECRET']}",
+            timeout=180,
+        )
+        print("SCHEDULER_TARGET=" + args.source)
+    elif args.action == "inspect":
+        service = gc("run", "services", "describe", SERVICE, "--region", REGION)
+        template = service["spec"]["template"]
+        print(
+            json.dumps(
+                {
+                    "service": SERVICE,
+                    "revision": service["status"]["latestReadyRevisionName"],
+                    "url": service["status"]["url"],
+                    "annotations": service["metadata"].get("annotations"),
+                    "revision_annotations": template["metadata"].get("annotations"),
+                    "volumes": template["spec"].get("volumes", []),
+                    "traffic": service["status"].get("traffic"),
+                }
+            )
+        )
+        print(json.dumps(gc("run", "services", "get-iam-policy", SERVICE, "--region", REGION)))
     else:
         subprocess.run(
             ["bash", "scripts/deploy/cloud-scheduler.sh", "deploy-new"],
