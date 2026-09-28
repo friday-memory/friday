@@ -732,6 +732,277 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+  
+    /* --- Holosphere 4.0 Enhanced Drawer & HUD Styles --- */
+    .api-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 9999px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .api-pill:hover {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      color: #fff;
+    }
+    .api-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .api-dot.offline {
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+    }
+
+    /* Facts Panel Controls */
+    .facts-panel-header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 12px;
+      position: sticky;
+      top: 0;
+      background: rgba(8, 12, 22, 0.96);
+      padding-bottom: 8px;
+      z-index: 5;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .facts-scope-bar {
+      display: flex;
+      background: rgba(15, 23, 42, 0.8);
+      border-radius: 8px;
+      padding: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 4px;
+    }
+    .facts-scope-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .facts-scope-btn:hover {
+      color: #fff;
+    }
+    .facts-scope-btn.active {
+      background: rgba(56, 189, 248, 0.22);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .facts-tools-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .facts-search-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+    .facts-search-box input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 11px;
+    }
+    .btn-sm-action {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-sm-action:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+    }
+    .btn-sm-action.primary {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(56, 189, 248, 0.3));
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+    }
+    .btn-sm-action.primary:hover {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(56, 189, 248, 0.45));
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+    }
+    .fact-card {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 11px 13px;
+      margin-bottom: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+    .fact-card:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      background: rgba(15, 23, 42, 0.85);
+    }
+    .fact-card-body {
+      font-size: 11.5px;
+      color: #e2e8f0;
+      line-height: 1.55;
+    }
+    .fact-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 9.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 6px;
+      margin-top: 2px;
+    }
+    .fact-tags {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fact-tag {
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .fact-tag.hot {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .fact-tag.prime {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .fact-tag.decayed {
+      background: rgba(148, 163, 184, 0.1);
+      color: #94a3b8;
+    }
+    .fact-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .fact-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      font-size: 9.5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .fact-btn:hover {
+      color: #38bdf8;
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    /* Vector Semantic Context Styles */
+    .vector-header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .vector-search-row {
+      display: flex;
+      gap: 6px;
+    }
+    .vector-search-row input {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 11px;
+      outline: none;
+    }
+    .vector-search-row input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+    .vector-quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .vchip {
+      font-size: 9.5px;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .vchip:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .vector-card {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+    .vector-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .vector-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #38bdf8;
+    }
+    .vector-body {
+      font-size: 11.5px;
+      color: #e2e8f0;
+      line-height: 1.55;
+    }
+
   </style>
 </head>
 <body>
@@ -776,9 +1047,23 @@
         <input type="text" id="search-input" placeholder="Search neural cortex..." autocomplete="off">
         <span class="kbd">/</span>
       </div>
+
+      <!-- Live API Endpoint Pill -->
+      <div class="api-pill" id="api-pill" title="Brain Backend Endpoint (Click to change/verify)">
+        <span class="api-dot" id="api-dot"></span>
+        <span id="api-label">BRAIN API</span>
+      </div>
     </div>
 
     <div class="hud-right">
+      <!-- Direct Access to Facts & Neural Memory -->
+      <button class="btn-action" id="btn-open-facts" title="Open Global Facts Ledger">
+        <span>📚</span> <span>Fact Ledger</span>
+      </button>
+
+      <button class="btn-action" id="btn-open-vector" title="Deep Semantic Context & ChromaDB Search">
+        <span>🧠</span> <span>Neural Context</span>
+      </button>
       <!-- Synaptic Heat Filter Pill -->
       <div class="heat-filter-pill" id="heat-filter-pill">
         <span class="heat-tag">⚡ SYNAPSE HEAT:</span>
@@ -875,19 +1160,50 @@
     </div>
 
     <div class="drawer-body">
+      <!-- Connections Tab -->
       <div id="tab-relations" class="tab-content">
         <div class="conn-list" id="conn-list"></div>
       </div>
+
+      <!-- Facts Ledger Tab -->
       <div id="tab-facts" class="tab-content" style="display: none;">
+        <div class="facts-panel-header">
+          <div class="facts-scope-bar">
+            <button class="facts-scope-btn active" id="btn-scope-node" onclick="setFactsScope('node')">Matched to Node</button>
+            <button class="facts-scope-btn" id="btn-scope-all" onclick="setFactsScope('all')">All System Facts (<span id="all-facts-badge">0</span>)</button>
+          </div>
+          <div class="facts-tools-row">
+            <div class="facts-search-box">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="facts-filter-input" placeholder="Filter facts..." oninput="filterFactsList()">
+            </div>
+            <button class="btn-sm-action primary" id="btn-new-fact" onclick="openAddFactModal()">+ Add Fact</button>
+            <button class="btn-sm-action" id="btn-reload-facts" onclick="loadGlobalFacts(true)" title="Reload Facts">↻</button>
+          </div>
+        </div>
         <div id="facts-list">Loading active facts...</div>
       </div>
+
+      <!-- Neural Context (ChromaDB) Tab -->
       <div id="tab-vector" class="tab-content" style="display: none;">
-        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;" id="vector-content">
-          Click "Query Memory" to retrieve deep semantic context.
+        <div class="vector-header">
+          <div class="vector-search-row">
+            <input type="text" id="vector-search-input" placeholder="Query ChromaDB semantic context...">
+            <button class="btn-action primary" id="btn-fetch-vector">🧠 Query</button>
+          </div>
+          <div class="vector-quick-chips">
+            <span class="vchip" onclick="queryVectorQuick('ReelDM Production Architecture')">ReelDM Prod</span>
+            <span class="vchip" onclick="queryVectorQuick('Friday Brain Memory System')">Friday Core</span>
+            <span class="vchip" onclick="queryVectorQuick('Tony Stark F.R.I.D.A.Y. Persona')">Persona</span>
+            <span class="vchip" onclick="queryVectorQuick('AWS EC2 13.200.195.74')">AWS EC2</span>
+            <span class="vchip" onclick="queryVectorQuick('Neo4j Knowledge Graph')">Knowledge Graph</span>
+          </div>
         </div>
-        <button class="btn-action primary" id="btn-fetch-vector" style="width: 100%; justify-content: center; margin-top: 14px;">
-          🧠 Query ChromaDB
-        </button>
+        <div id="vector-content" class="vector-results-list">
+          <div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 20px 0;">
+            Click "Query" or choose a chip above to retrieve semantic memory embeddings from ChromaDB.
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -930,6 +1246,56 @@
     </div>
   </div>
 
+    <!-- Link Entity Modal (Replaces browser prompt) -->
+  <div class="modal-backdrop" id="modal-link-entity">
+    <div class="modal-card">
+      <h3>🔗 Create Synaptic Link</h3>
+      <div class="form-group">
+        <label>Source Node</label>
+        <input type="text" id="link-source-input" readonly style="opacity: 0.8; background: rgba(15,23,42,0.8);">
+      </div>
+      <div class="form-group">
+        <label>Target Node</label>
+        <input type="text" id="link-target-input" list="node-suggestions" placeholder="Choose or type target node...">
+        <datalist id="node-suggestions"></datalist>
+      </div>
+      <div class="form-group">
+        <label>Synapse / Relationship Type</label>
+        <select id="link-rel-select" style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 10px;">
+          <option value="CONNECTS_TO">CONNECTS_TO</option>
+          <option value="HAS_SYNAPSE" selected>HAS_SYNAPSE</option>
+          <option value="DEPENDS_ON">DEPENDS_ON</option>
+          <option value="LOBE_COMPONENT">LOBE_COMPONENT</option>
+          <option value="INTEGRATES_WITH">INTEGRATES_WITH</option>
+          <option value="MANAGES">MANAGES</option>
+        </select>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-modal secondary" id="btn-cancel-link">Cancel</button>
+        <button class="btn-modal primary" id="btn-confirm-link">Create Synapse</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Fact Modal -->
+  <div class="modal-backdrop" id="modal-add-fact">
+    <div class="modal-card">
+      <h3>+ Add Verified Fact to Friday's Ledger</h3>
+      <div class="form-group">
+        <label>Verified Fact Content</label>
+        <textarea id="add-fact-content" rows="4" placeholder="Enter discrete verified fact to store permanently in Friday's Brain..." style="width: 100%; background: #0f172a; color: #fff; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 10px; font-family: inherit; font-size: 11.5px; resize: vertical;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Source Identifier</label>
+        <input type="text" id="add-fact-source" value="studio_cortex" placeholder="e.g. studio_cortex, boss_directive">
+      </div>
+      <div class="modal-btns">
+        <button class="btn-modal secondary" id="btn-cancel-add-fact">Cancel</button>
+        <button class="btn-modal primary" id="btn-confirm-add-fact">Save Fact</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Message -->
   <div class="toast-msg" id="toast-msg">
     <span id="toast-icon">✨</span>
@@ -937,7 +1303,14 @@
   </div>
 
   <script>
-    // --- Global State ---
+    // --- Global State & Dynamic Brain API Config ---
+    let BRAIN_API = (window.BRAIN_API_URL !== undefined)
+      ? window.BRAIN_API_URL
+      : ((window.location.protocol === 'file:' || (window.location.hostname !== '13.200.195.74' && window.location.port !== '8000'))
+          ? 'http://13.200.195.74:8000'
+          : '');
+    const BRAIN_KEY = window.BRAIN_API_KEY || 'friday_brain_secret_key_2026';
+
     let graphData = { nodes: [], links: [] };
     let selectedNode = null;
     let hoveredNode = null;
@@ -945,11 +1318,12 @@
     let activeHeatFilter = 'all';
     let isTourRunning = false;
     let allActiveFacts = [];
+    let currentFactsScope = 'node'; // 'node' or 'all'
     const nodeMeshMap = new Map();
     const nodePosMap = new Map();
     const nodeLobeMap = new Map();
     const linkLineList = [];
-    const photonParticleList = [];
+    let photonParticleList = [];
     const gyroRingList = [];
     const hubSpriteMap = new Map();
     let lineMesh = null;
@@ -1475,7 +1849,41 @@
     async function loadData() {
       const t0 = performance.now();
       try {
-        const res = await fetch('/api/graph-data');
+        // --- Clean up existing Three.js scene meshes to prevent memory leaks ---
+        nodeMeshMap.forEach(mesh => {
+          scene.remove(mesh);
+          if (mesh.geometry) mesh.geometry.dispose();
+          if (mesh.material) {
+            if (Array.isArray(mesh.material)) mesh.material.forEach(m => m.dispose());
+            else mesh.material.dispose();
+          }
+        });
+        nodeMeshMap.clear();
+
+        hubSpriteMap.forEach(sprite => {
+          scene.remove(sprite);
+          if (sprite.material) sprite.material.dispose();
+        });
+        hubSpriteMap.clear();
+
+        if (lineMesh) {
+          scene.remove(lineMesh);
+          if (lineMesh.geometry) lineMesh.geometry.dispose();
+          if (lineMesh.material) lineMesh.material.dispose();
+          lineMesh = null;
+        }
+
+        if (photonPoints) {
+          scene.remove(photonPoints);
+          if (photonPoints.geometry) photonPoints.geometry.dispose();
+          if (photonPoints.material) photonPoints.material.dispose();
+          photonPoints = null;
+        }
+        photonParticleList = [];
+        nodePosMap.clear();
+
+        // --- Fetch Graph Data ---
+        const res = await fetch(`${BRAIN_API}/api/graph-data`);
         const data = await res.json();
         const pingMs = Math.round(performance.now() - t0);
         document.getElementById('stat-ping').innerText = `${pingMs}ms`;
@@ -1483,6 +1891,9 @@
         graphData = data;
         document.getElementById('stat-nodes').innerText = data.nodes.length;
         document.getElementById('stat-edges').innerText = data.links.length;
+
+        // Populate Node Suggestions for Linking
+        updateNodeDatalist();
 
         // Degree & Energy Calculation
         const degreeMap = {};
@@ -1593,6 +2004,7 @@
         // 4. Action Potential Photon Particles Mesh
         initPhotonParticles();
 
+        updateApiStatus(true);
         loadGlobalFacts();
         loadCognitiveState();
       } catch (err) {
@@ -1645,7 +2057,7 @@
 
     async function loadCognitiveState() {
       try {
-        const res = await fetch('/state');
+        const res = await fetch(`${BRAIN_API}/state`);
         if (!res.ok) return;
         const data = await res.json();
         const mode = (data.current_mode || 'tactical_sprint').replace(/_/g, ' ').toUpperCase();
@@ -1673,7 +2085,7 @@
       dreamWaveMesh.position.copy(LOBE_CENTERS.cognitive_core);
 
       try {
-        const res = await fetch('/api/dream/trigger', { method: 'POST' });
+        const res = await fetch(`${BRAIN_API}/api/dream/trigger`, { method: 'POST' });
         const data = await res.json();
         
         setTimeout(() => {
@@ -1959,7 +2371,28 @@
         connList.appendChild(div);
       });
 
-      renderNodeFacts(node);
+      if (conns.length === 0) {
+        connList.innerHTML = `
+          <div style="font-size: 11px; color: var(--text-muted); padding: 14px 0; text-align: center;">
+            No direct synaptic links recorded for this entity.
+            <div style="margin-top: 8px;">
+              <button class="btn-sm-action primary" onclick="document.getElementById('btn-link-node').click()">+ Connect Synapse</button>
+            </div>
+          </div>
+        `;
+      }
+
+      currentFactsScope = 'node';
+      renderFactsList();
+      const vectorInput = document.getElementById('vector-search-input');
+      if (vectorInput) vectorInput.value = (node.name || node.id || '').replace(/_/g, ' ').trim();
+
+      // If active tab is vector, trigger vector search
+      const activeTab = document.querySelector('.drawer-tab.active');
+      if (activeTab && activeTab.dataset.tab === 'vector') {
+        queryVector(vectorInput.value);
+      }
+
       drawer.classList.add('open');
     }
 
@@ -1977,87 +2410,291 @@
       showToast(`Potentiated ${selectedNode.name || selectedNode.id}! Heat: 100%`, '⚡');
 
       try {
-        await fetch(`/api/synapse/reinforce/${encodeURIComponent(selectedNode.id)}`, { method: 'POST' });
+        await fetch(`${BRAIN_API}/api/synapse/reinforce/${encodeURIComponent(selectedNode.id)}`, { method: 'POST' });
       } catch (e) {
         console.warn('Reinforce sync err:', e);
       }
     }
 
-    // --- Facts Ledger ---
-    async function loadGlobalFacts() {
+    // --- Facts Ledger (Smart Fuzzy Matching, Filtering, Add & Reinforce) ---
+    async function loadGlobalFacts(manualRefresh = false) {
       try {
-        const res = await fetch('/facts?include_superseded=false');
+        const res = await fetch(`${BRAIN_API}/facts?include_superseded=false`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         allActiveFacts = data.facts || [];
-        if (selectedNode) renderNodeFacts(selectedNode);
+        document.getElementById('all-facts-badge').innerText = allActiveFacts.length;
+
+        if (manualRefresh) showToast(`Loaded ${allActiveFacts.length} verified facts`, '📚');
+        renderFactsList();
       } catch (err) {
         console.error('Facts error:', err);
+        const box = document.getElementById('facts-list');
+        if (box) box.innerHTML = `<div style="font-size: 11px; color: #ef4444; padding: 12px 0;">Error fetching facts ledger from ${BRAIN_API || 'origin'}: ${err.message}</div>`;
       }
     }
 
-    function renderNodeFacts(node) {
-      const box = document.getElementById('facts-list');
-      const query = (node.name || node.id || '').toLowerCase();
-      const matched = allActiveFacts.filter(f => (f.content || '').toLowerCase().includes(query) || (f.id || '').toLowerCase().includes(query));
+    function setFactsScope(scope) {
+      currentFactsScope = scope;
+      document.getElementById('btn-scope-node').classList.toggle('active', scope === 'node');
+      document.getElementById('btn-scope-all').classList.toggle('active', scope === 'all');
+      renderFactsList();
+    }
 
-      if (matched.length === 0) {
-        box.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); line-height: 1.5;">No discrete facts directly referencing "${node.name || node.id}". This node is structured in the Neo4j knowledge graph.</div>`;
+    function filterFactsList() {
+      renderFactsList();
+    }
+
+    function renderFactsList() {
+      const box = document.getElementById('facts-list');
+      if (!box) return;
+
+      const filterText = (document.getElementById('facts-filter-input')?.value || '').toLowerCase().trim();
+      let factsToDisplay = [];
+
+      if (currentFactsScope === 'node' && selectedNode) {
+        // Smart fuzzy token matching
+        const cleanName = (selectedNode.name || selectedNode.id || '').replace(/_/g, ' ').toLowerCase();
+        const tokens = cleanName.split(/\s+/).filter(t => t.length >= 2);
+
+        factsToDisplay = allActiveFacts.filter(f => {
+          const content = (f.content || '').toLowerCase();
+          const fid = (f.id || '').toLowerCase();
+          if (content.includes(cleanName) || fid.includes(cleanName)) return true;
+          return tokens.some(tok => content.includes(tok));
+        });
+
+        if (factsToDisplay.length === 0) {
+          box.innerHTML = `
+            <div style="background: rgba(15,23,42,0.6); border: 1px dashed rgba(56,189,248,0.25); border-radius: 8px; padding: 14px; text-align: center; margin-bottom: 12px;">
+              <div style="font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">
+                No discrete facts directly tagged to <strong>${selectedNode.name || selectedNode.id}</strong>.
+              </div>
+              <div style="display: flex; gap: 8px; justify-content: center;">
+                <button class="btn-sm-action primary" onclick="setFactsScope('all')">View All ${allActiveFacts.length} System Facts</button>
+                <button class="btn-sm-action" onclick="openAddFactModal('${(selectedNode.name || selectedNode.id).replace(/'/g, "\\'")}')">+ Add Fact for Node</button>
+              </div>
+            </div>
+          `;
+          return;
+        }
+      } else {
+        factsToDisplay = allActiveFacts;
+      }
+
+      if (filterText) {
+        factsToDisplay = factsToDisplay.filter(f =>
+          (f.content || '').toLowerCase().includes(filterText) ||
+          (f.id || '').toLowerCase().includes(filterText) ||
+          (f.source || '').toLowerCase().includes(filterText)
+        );
+      }
+
+      if (factsToDisplay.length === 0) {
+        box.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 20px 0;">No facts matched query "${filterText}".</div>`;
         return;
       }
 
-      box.innerHTML = matched.map(f => `
-        <div class="fact-card">
-          <div>${f.content}</div>
-          <div class="fact-meta">
-            <span>#${f.id}</span>
-            <span>⚡ ${(f.energy_score || 1.0).toFixed(2)}</span>
-            <span>v${f.version || 1}</span>
+      box.innerHTML = factsToDisplay.map(f => {
+        const energy = Number(f.energy_score || 1.0);
+        const tagClass = energy >= 0.7 ? 'prime' : (energy >= 0.4 ? 'hot' : 'decayed');
+        const tagLabel = energy >= 0.7 ? '⚡ PRIME' : (energy >= 0.4 ? '🔥 HOT' : '❄️ DECAYED');
+        const escapedContent = (f.content || '').replace(/"/g, '&quot;');
+
+        return `
+          <div class="fact-card">
+            <div class="fact-card-body">${f.content}</div>
+            <div class="fact-meta">
+              <div class="fact-tags">
+                <span class="fact-tag ${tagClass}">${tagLabel} (${energy.toFixed(2)})</span>
+                <span class="fact-tag">#${f.id}</span>
+                <span>v${f.version || 1}</span>
+                <span>👁 ${f.recall_count || 1}</span>
+              </div>
+              <div class="fact-actions">
+                <button class="fact-btn" onclick="reinforceFactById('${f.id}')" title="Boost Fact Energy (+0.25)">⚡ Boost</button>
+                <button class="fact-btn" onclick="copyFactText(this, '${escapedContent}')" title="Copy Content">📋 Copy</button>
+              </div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    // --- Drawer Tabs ---
+    async function reinforceFactById(factId) {
+      Sound.playReinforce();
+      showToast(`Potentiating fact ${factId}...`, '⚡');
+      try {
+        await fetch(`${BRAIN_API}/api/synapse/reinforce/${encodeURIComponent(factId)}`, { method: 'POST' });
+        loadGlobalFacts();
+      } catch (e) {
+        console.warn('Fact reinforce err:', e);
+      }
+    }
+
+    function copyFactText(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        Sound.playClick();
+        showToast('Fact copied to clipboard!', '📋');
+      });
+    }
+
+    // --- Drawer Tabs Management ---
     document.querySelectorAll('.drawer-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         Sound.playClick();
-        document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-        tab.classList.add('active');
-        const tabKey = tab.dataset.tab;
-        document.getElementById(`tab-${tabKey}`).style.display = 'block';
+        switchDrawerTab(tab.dataset.tab);
       });
     });
 
-    // --- Semantic Search Context ---
-    document.getElementById('btn-fetch-vector').addEventListener('click', async () => {
-      Sound.playClick();
-      const node = selectedNode;
-      if (!node) return;
+    function switchDrawerTab(tabKey) {
+      document.querySelectorAll('.drawer-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+      const targetTab = document.querySelector(`.drawer-tab[data-tab="${tabKey}"]`);
+      if (targetTab) targetTab.classList.add('active');
+      const targetContent = document.getElementById(`tab-${tabKey}`);
+      if (targetContent) targetContent.style.display = 'block';
+
+      if (tabKey === 'facts') {
+        renderFactsList();
+      } else if (tabKey === 'vector') {
+        if (selectedNode) {
+          const cleanName = (selectedNode.name || selectedNode.id || '').replace(/_/g, ' ').trim();
+          const input = document.getElementById('vector-search-input');
+          if (input && !input.value) input.value = cleanName;
+          queryVector(input.value || cleanName);
+        }
+      }
+    }
+
+    // --- Neural Semantic Context (ChromaDB Vector Retrieval) ---
+    async function queryVector(customQuery) {
+      const q = (customQuery !== undefined ? customQuery : document.getElementById('vector-search-input').value).trim();
       const box = document.getElementById('vector-content');
-      box.innerHTML = 'Searching ChromaDB semantic memory...';
+      if (!q) {
+        box.innerHTML = `<span style="color: var(--text-muted); font-size: 11px;">Please enter a search query or click a quick chip above.</span>`;
+        return;
+      }
+
+      Sound.playClick();
+      box.innerHTML = `<div style="font-size: 11px; color: #38bdf8; text-align: center; padding: 20px 0;"><span class="pulse-dot"></span> Searching ChromaDB vector space for "${q}"...</div>`;
 
       try {
-        const cleanName = (node.name || node.id || '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[^a-zA-Z0-9]+/g, ' ').trim();
-        const query = encodeURIComponent(cleanName);
-        const res = await fetch('/api/search-quick?q=' + query);
+        const res = await fetch(`${BRAIN_API}/api/search-quick?q=` + encodeURIComponent(q));
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        if (data.results && data.results.length > 0) {
-          box.innerHTML = data.results.map((r, i) => `
-            <div style="background: rgba(15,23,42,0.6); padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.06);">
-              <div style="font-size: 11px; color: #fff;">${r.content || r.text || r}</div>
+        const results = data.results || [];
+
+        if (results.length === 0) {
+          box.innerHTML = `
+            <div style="background: rgba(15,23,42,0.6); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; padding: 16px; text-align: center;">
+              <span style="color: var(--text-muted); font-size: 11px;">No semantic vector embeddings matched "${q}".</span>
             </div>
-          `).join('');
-        } else {
-          box.innerHTML = `<span style="color: var(--text-muted);">No vector embeddings found for "${cleanName}".</span>`;
+          `;
+          return;
         }
+
+        box.innerHTML = results.map((r, i) => {
+          const content = typeof r === 'string' ? r : (r.content || r.text || JSON.stringify(r));
+          const escaped = content.replace(/"/g, '&quot;');
+          return `
+            <div class="vector-card">
+              <div class="vector-meta">
+                <span>#${i + 1} SEMANTIC CHUNK MATCH</span>
+                <button class="fact-btn" onclick="copyFactText(this, '${escaped}')">📋 Copy</button>
+              </div>
+              <div class="vector-body">${content}</div>
+            </div>
+          `;
+        }).join('');
       } catch (err) {
-        box.innerHTML = `<span style="color: #ef4444;">Vector query error: ${err.message}</span>`;
+        box.innerHTML = `<span style="color: #ef4444; font-size: 11px;">ChromaDB query error (${BRAIN_API || 'origin'}): ${err.message}</span>`;
+      }
+    }
+
+    function queryVectorQuick(q) {
+      const input = document.getElementById('vector-search-input');
+      if (input) input.value = q;
+      queryVector(q);
+    }
+
+    document.getElementById('btn-fetch-vector').addEventListener('click', () => {
+      const input = document.getElementById('vector-search-input');
+      queryVector(input ? input.value : '');
+    });
+
+    document.getElementById('vector-search-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        queryVector(e.target.value);
       }
     });
 
+    // --- Direct HUD Open Handlers ---
+    document.getElementById('btn-open-facts').addEventListener('click', () => {
+      Sound.playClick();
+      currentFactsScope = selectedNode ? 'node' : 'all';
+      if (!document.getElementById('inspector-drawer').classList.contains('open')) {
+        openGlobalDrawer('facts');
+      } else {
+        switchDrawerTab('facts');
+      }
+    });
+
+    document.getElementById('btn-open-vector').addEventListener('click', () => {
+      Sound.playClick();
+      if (!document.getElementById('inspector-drawer').classList.contains('open')) {
+        openGlobalDrawer('vector');
+      } else {
+        switchDrawerTab('vector');
+      }
+    });
+
+    function openGlobalDrawer(defaultTab = 'facts') {
+      const drawer = document.getElementById('inspector-drawer');
+      document.getElementById('drawer-title').innerText = selectedNode ? (selectedNode.name || selectedNode.id).replace(/_/g, ' ') : "Friday's Brain Cortex";
+      document.getElementById('drawer-tag').innerText = selectedNode ? (selectedNode.group || 'NEURAL SYNAPSE').toUpperCase() : "CENTRAL KNOWLEDGE LEDGER";
+
+      const energy = selectedNode ? (selectedNode.energy_score || 1.0) : 1.0;
+      document.getElementById('drawer-energy-score').innerText = energy.toFixed(2);
+      document.getElementById('drawer-energy-bar').style.width = `${Math.round(energy * 100)}%`;
+      document.getElementById('drawer-recall-count').innerText = selectedNode ? `Recalls: ${selectedNode.recall_count || 1}` : `Active Facts: ${allActiveFacts.length}`;
+
+      switchDrawerTab(defaultTab);
+      drawer.classList.add('open');
+    }
+
+    // --- API Status & Node Suggestions Helpers ---
+    function updateApiStatus(online) {
+      const dot = document.getElementById('api-dot');
+      const label = document.getElementById('api-label');
+      if (online) {
+        dot.className = 'api-dot';
+        label.innerText = `API: ${BRAIN_API ? '13.200.195.74' : 'LOCAL'}`;
+      } else {
+        dot.className = 'api-dot offline';
+        label.innerText = 'API: OFFLINE';
+      }
+    }
+
+    document.getElementById('api-pill').addEventListener('click', () => {
+      Sound.playClick();
+      const current = BRAIN_API || window.location.origin;
+      const custom = prompt('Friday Brain API Endpoint:', current);
+      if (custom !== null && custom.trim() !== '') {
+        BRAIN_API = custom.trim();
+        showToast(`Connected to ${BRAIN_API}`, '⚡');
+        loadData();
+      }
+    });
+
+    function updateNodeDatalist() {
+      const dl = document.getElementById('node-suggestions');
+      if (!dl) return;
+      dl.innerHTML = graphData.nodes.map(n => `<option value="${n.id}">`).join('');
+    }
+
     // =========================================================================
-    // --- GRAPH MANAGEMENT MODALS (RENAME, DELETE, ADD) ---
+    // --- GRAPH MANAGEMENT MODALS (RENAME, DELETE, ADD, LINK, FACT) ---
     // =========================================================================
 
     document.getElementById('btn-delete-node').addEventListener('click', async () => {
@@ -2066,7 +2703,7 @@
       if (!confirm(`Delete "${selectedNode.name || selectedNode.id}" from Friday's Cortex?`)) return;
 
       try {
-        const res = await fetch(`/api/node/${encodeURIComponent(selectedNode.id)}`, { method: 'DELETE' });
+        const res = await fetch(`${BRAIN_API}/api/node/${encodeURIComponent(selectedNode.id)}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.status === 'deleted') {
           showToast(`Deleted "${selectedNode.name || selectedNode.id}"`, '🗑️');
@@ -2096,7 +2733,7 @@
       if (!newName || !selectedNode) return;
 
       try {
-        const res = await fetch('/api/node/rename', {
+        const res = await fetch(`${BRAIN_API}/api/node/rename`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ old_name: selectedNode.id, new_name: newName })
@@ -2112,20 +2749,37 @@
       }
     });
 
+    // --- Link Entity Modal Flow (Replaces browser prompt) ---
     document.getElementById('btn-link-node').addEventListener('click', () => {
       if (!selectedNode) return;
       Sound.playClick();
-      const target = prompt(`Connect "${selectedNode.name || selectedNode.id}" to which node?`);
-      if (!target || !target.trim()) return;
+      document.getElementById('link-source-input').value = selectedNode.name || selectedNode.id;
+      document.getElementById('link-target-input').value = '';
+      document.getElementById('modal-link-entity').classList.add('active');
+    });
 
-      fetch('/api/link/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: selectedNode.id, target: target.trim(), label: 'RELATION' })
-      }).then(() => {
-        showToast(`Linked to "${target.trim()}"`, '🔗');
+    document.getElementById('btn-cancel-link').addEventListener('click', () => {
+      document.getElementById('modal-link-entity').classList.remove('active');
+    });
+
+    document.getElementById('btn-confirm-link').addEventListener('click', async () => {
+      const target = document.getElementById('link-target-input').value.trim();
+      const label = document.getElementById('link-rel-select').value;
+      if (!target || !selectedNode) return;
+
+      try {
+        const res = await fetch(`${BRAIN_API}/api/link/create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source: selectedNode.id, target: target, label: label })
+        });
+        const data = await res.json();
+        showToast(`Linked "${selectedNode.name || selectedNode.id}" ➔ "${target}"`, '🔗');
+        document.getElementById('modal-link-entity').classList.remove('active');
         loadData();
-      });
+      } catch (err) {
+        alert('Linking error: ' + err.message);
+      }
     });
 
     document.getElementById('btn-add-entity').addEventListener('click', () => {
@@ -2143,7 +2797,7 @@
       if (!name) return;
 
       try {
-        const res = await fetch('/api/node/create', {
+        const res = await fetch(`${BRAIN_API}/api/node/create`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, parent_id: parent, relation: rel })
@@ -2156,6 +2810,42 @@
         }
       } catch (err) {
         alert('Entity creation error: ' + err.message);
+      }
+    });
+
+    // --- Add Fact Modal Flow ---
+    function openAddFactModal(prefillTopic = '') {
+      Sound.playClick();
+      const contentArea = document.getElementById('add-fact-content');
+      contentArea.value = prefillTopic ? `${prefillTopic}: ` : '';
+      document.getElementById('modal-add-fact').classList.add('active');
+      contentArea.focus();
+    }
+
+    document.getElementById('btn-cancel-add-fact').addEventListener('click', () => {
+      document.getElementById('modal-add-fact').classList.remove('active');
+    });
+
+    document.getElementById('btn-confirm-add-fact').addEventListener('click', async () => {
+      const content = document.getElementById('add-fact-content').value.trim();
+      const source = document.getElementById('add-fact-source').value.trim() || 'studio_cortex';
+      if (!content) return;
+
+      try {
+        const res = await fetch(`${BRAIN_API}/facts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Brain-Key': BRAIN_KEY
+          },
+          body: JSON.stringify({ content, source })
+        });
+        const data = await res.json();
+        showToast('Verified fact stored in Friday\'s Brain!', '📚');
+        document.getElementById('modal-add-fact').classList.remove('active');
+        loadGlobalFacts();
+      } catch (err) {
+        alert('Error saving fact: ' + err.message);
       }
     });
 
