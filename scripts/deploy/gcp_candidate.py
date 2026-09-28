@@ -120,7 +120,8 @@ def build(state):
     # Only tracked files enter Cloud Build. Private files and local environments cannot enter the archive.
     with tempfile.TemporaryDirectory() as temp:
         archive = subprocess.check_output(["git", "archive", "HEAD"], cwd=ROOT)
-        subprocess.run(["tar", "-x", "-C", temp], input=archive, check=True)
+        # Preserve Git modes despite the private credentials umask used by this process.
+        subprocess.run(["tar", "-xp", "-C", temp], input=archive, check=True)
         spec = {
             "steps": [
                 {
@@ -134,7 +135,20 @@ def build(state):
                         image,
                         ".",
                     ],
-                }
+                },
+                {
+                    "name": "gcr.io/cloud-builders/docker",
+                    "args": [
+                        "run",
+                        "--rm",
+                        "--read-only",
+                        "--network=none",
+                        "--entrypoint=python",
+                        image,
+                        "-c",
+                        "from gateway.serverless import create_app; from scripts.deploy.consolidate import main; print('AMD64_IMPORT_SMOKE=PASS')",
+                    ],
+                },
             ],
             "images": [image],
             "timeout": "1800s",

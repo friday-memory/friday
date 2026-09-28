@@ -19,6 +19,7 @@ COPY layers /app/layers
 COPY orchestrator /app/orchestrator
 COPY pipelines /app/pipelines
 COPY scripts /app/scripts
+RUN chmod -R a+rX /app
 USER 10001
 ENV PORT=8080
 EXPOSE 8080
