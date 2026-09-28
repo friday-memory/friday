@@ -16,7 +16,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 <p align="center">
   <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat&color=334155&label=Stars" alt="GitHub Stars"/></a>
-  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.3.0-334155?style=flat" alt="Release"/></a>
+  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.4.0-334155?style=flat" alt="Release"/></a>
   <a href="https://pypi.org/project/friday-memory/"><img src="https://img.shields.io/pypi/v/friday-memory?style=flat&color=334155&label=PyPI" alt="PyPI Package"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-334155?style=flat" alt="MIT License"/></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-334155?style=flat" alt="Python 3.11+"/></a>
@@ -36,6 +36,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
     <td align="center"><a href="#quickstart"><b>Quickstart</b></a></td>
     <td align="center"><a href="#python-sdk-friday-memory"><b>Python SDK</b></a></td>
     <td align="center"><a href="#client-setup-mcp"><b>MCP Setup</b></a></td>
+    <td align="center"><a href="#deployment-modes"><b>Deployment</b></a></td>
     <td align="center"><a href="#api-reference"><b>API Reference</b></a></td>
   </tr>
 </table>
@@ -665,18 +666,59 @@ POST /facts -> {"content": "Migrated database to Aurora PostgreSQL on port 5432"
 ```
 friday/
 ├── friday/                  # Official Python SDK (client, types, LangChain retriever)
-├── gateway/                 # FastAPI REST application & routing
-├── layers/                  # Pluggable storage adapters (SQLite, ChromaDB, Neo4j, Decay)
+├── gateway/
+│   ├── main.py              # Flagship FastAPI gateway (Neo4j + ChromaDB + Mem0)
+│   └── serverless.py        # Opt-in serverless gateway (libSQL / Turso)
+├── storage/                 # Backend-agnostic storage abstraction
+│   ├── base.py              # Protocol contract (Storage interface)
+│   ├── models.py            # Canonical Record dataclass
+│   ├── local.py             # SQLite / local filesystem adapter
+│   └── turso.py             # Turso libSQL remote adapter
+├── layers/                  # Pluggable cognitive adapters (ChromaDB, Neo4j, Decay)
 ├── pipelines/               # Background entity extraction, Dream Cycle & fact pipelines
 ├── orchestrator/            # Multi-layer retrieval router & cognitive state engine
-├── mcp/                     # Model Context Protocol stdio server
-├── studio/                  # Three.js Neural Studio visualizer
+├── mcp/                     # Model Context Protocol stdio server (dual-backend aware)
+├── studio/                  # Three.js Neural Studio visualizer (Holosphere 4.0)
+├── migrations/              # SQL schema migrations for libSQL backend
+├── scripts/
+│   ├── deploy/              # Cloud Run & Cloud Scheduler deployment scripts
+│   ├── migration/           # Data export/import tooling (Neo4j ↔ libSQL)
+│   └── qualification/       # Parity tests & candidate validation suite
 ├── benchmarks/              # DeepEval evaluation suite
 ├── tests/                   # Pytest test suite (100% green)
-├── docker-compose.yml       # Production container definition
+├── docker-compose.yml       # Flagship production container stack
+├── Dockerfile.serverless    # Serverless candidate container image
 ├── Makefile                 # Developer task automation
 └── pyproject.toml           # Tooling & packaging configuration
 ```
+
+---
+
+## Deployment Modes
+
+Friday supports two deployment architectures. Both expose the same MCP tool interface — connected agents work identically regardless of backend.
+
+| | **Flagship** (Default) | **Serverless** (Opt-in) |
+| :--- | :--- | :--- |
+| **Gateway** | `gateway/main.py` | `gateway/serverless.py` |
+| **Storage** | Neo4j + ChromaDB + SQLite | Turso (libSQL) on Cloud Run |
+| **Graph** | Full Neo4j knowledge graph | Planned (libSQL FTS5 interim) |
+| **Deployment** | Docker Compose / VM | Cloud Run + Cloud Scheduler |
+| **Best for** | Full-featured self-hosted | Lightweight cloud-native / edge |
+
+<details>
+<summary><b>Serverless Quick Deploy (Cloud Run)</b></summary>
+
+```bash
+# Build & deploy the serverless candidate
+./scripts/deploy/cloud-run.sh
+
+# Schedule periodic consolidation
+./scripts/deploy/cloud-scheduler.sh
+```
+
+Full migration runbook, data export/import tooling, and qualification test procedures are documented in the **[Serverless Migration Guide](docs/serverless-migration.md)**.
+</details>
 
 ---
 
@@ -732,10 +774,3 @@ Review [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines, commit co
 ## License
 
 Friday is licensed under the [MIT License](LICENSE).
-
-### Parallel serverless candidate
-
-An opt-in SQLite/libSQL gateway, private export/import tools, and Cloud Run/Scheduler
-preview scripts are documented in [the migration runbook](docs/serverless-migration.md).
-This candidate requires explicit project namespaces and authenticated reads. It does
-not change the default Compose installation or authorize a client cutover.
