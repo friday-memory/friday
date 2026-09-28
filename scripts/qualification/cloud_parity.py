@@ -11,6 +11,7 @@ from pathlib import Path
 import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from scripts.migration.export_current_state import READER
 from scripts.migration.import_to_turso import read_snapshot
 from scripts.qualification.compare_backends import equivalent_cutoff_ties
 from storage import from_environment
@@ -24,6 +25,15 @@ def main():
     if not source_key:
         raise ValueError("Oracle key unavailable")
     records = read_snapshot(Path.home() / "friday-migration-data")
+    live_snapshot = json.loads(
+        subprocess.check_output(
+            ["docker", "exec", "-i", "friday-brain", "python", "-c", READER],
+            stderr=subprocess.PIPE,
+            timeout=30,
+        )
+    )
+    saved_snapshot = json.loads((Path.home() / "friday-migration-data/snapshot.json").read_text())
+    assert live_snapshot == saved_snapshot, "Oracle writes since snapshot require reconciliation"
     db = from_environment()
     queries = exact = tied = 0
     with (
