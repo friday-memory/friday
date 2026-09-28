@@ -36,6 +36,27 @@ def main():
     assert live_snapshot == saved_snapshot, "Oracle writes since snapshot require reconciliation"
     db = from_environment()
     queries = exact = tied = 0
+    with httpx.Client(base_url=os.environ["FRIDAY_URL"], timeout=60) as unauthenticated:
+        assert unauthenticated.get("/health").status_code in (401, 403)
+        assert unauthenticated.get(
+            "/facts", headers={"X-Friday-Key": os.environ["FRIDAY_API_KEY"]}
+        ).status_code in (401, 403)
+        for endpoint in (
+            "/facts",
+            "/search",
+            "/state",
+            "/api/graph-data",
+            "/api/search-quick",
+            "/export/persona",
+        ):
+            iam = {"X-Serverless-Authorization": "Bearer " + token}
+            assert unauthenticated.get(endpoint, headers=iam).status_code == 401
+            assert (
+                unauthenticated.post(
+                    endpoint, headers=dict(iam, **{"X-Friday-Key": "invalid"}), json={}
+                ).status_code
+                == 401
+            )
     with (
         httpx.Client(
             base_url=os.environ["FRIDAY_URL"],
