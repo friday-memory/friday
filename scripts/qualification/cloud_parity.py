@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 
 import httpx
-from dotenv import dotenv_values
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.migration.import_to_turso import read_snapshot
@@ -21,8 +20,7 @@ def main():
     token = subprocess.check_output(
         ["gcloud", "auth", "print-identity-token"], text=True, timeout=30
     ).strip()
-    key = dotenv_values(Path.home() / "friday-oracle-ops/secrets/friday.env")
-    source_key = key.get("FRIDAY_API_KEY") or key.get("BRAIN_API_KEY")
+    source_key = (Path.home() / "friday-oracle-ops/secrets/friday_api_key").read_text().strip()
     if not source_key:
         raise ValueError("Oracle key unavailable")
     records = read_snapshot(Path.home() / "friday-migration-data")
