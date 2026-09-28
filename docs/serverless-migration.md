@@ -169,8 +169,60 @@ ordering for ties; the live service uses implicit insertion order. The compariso
 tool separately verifies equivalent scores and that no better result was omitted.
 This evidence does not establish semantic retrieval or exact tied-ID ordering.
 
-Cloud Run, Scheduler, and Cloud Run scale-to-zero qualification are blocked. The
-installed GCP CLI has no active account, project, or region. Place Signals contains
-a project reference, but that alone does not authorize Friday resources there.
-No cloud resources were created in GCP, no client was repointed, and cutover is
-not ready. A Cloud Run-compatible amd64 image also remains to be built and tested.
+## GCP continuation (2026-09-28)
+
+The prior authentication blocker was stale. Bounded CLI checks confirm the
+existing owner session, project `gen-lang-client-0381797315` (Friday Memory),
+region `us-west1`, and enabled billing. Turso and GitHub sessions also pass.
+Draft PR: https://github.com/friday-memory/friday/pull/6.
+
+The owner explicitly authorized registry provisioning, Secret Manager, Cloud Run
+and authenticated Scheduler in this project. `scripts/deploy/gcp_candidate.py`
+implements that continuation. It uploads only a Git archive, builds linux/amd64,
+smokes imports as the image's non-root user on a read-only filesystem, and deploys
+an immutable digest. Secrets are read from private 0600 config files and sent to
+Secret Manager over stdin; logs contain no secret values. Private resumable state
+is kept at `~/.config/friday-migration/cloud.json`.
+
+Commands (from the migration checkout):
+
+```bash
+python3 scripts/deploy/gcp_candidate.py provision
+python3 scripts/deploy/gcp_candidate.py build
+python3 scripts/deploy/gcp_candidate.py build-status
+python3 scripts/deploy/gcp_candidate.py deploy --source test
+.venv-migration/bin/python scripts/migration/with_config.py ~/.config/friday-migration/cloud-test.json .venv-migration/bin/python scripts/qualification/candidate_http.py --evidence ~/friday-migration-data/cloud-persistence.json
+.venv-migration/bin/python scripts/migration/with_config.py ~/.config/friday-migration/cloud-test.json .venv-migration/bin/python scripts/qualification/mcp_e2e.py
+python3 scripts/deploy/gcp_candidate.py replace --source test
+.venv-migration/bin/python scripts/migration/with_config.py ~/.config/friday-migration/cloud-test.json .venv-migration/bin/python scripts/qualification/candidate_http.py --evidence ~/friday-migration-data/cloud-persistence.json --verify
+python3 scripts/deploy/gcp_candidate.py replace --source prod
+.venv-migration/bin/python scripts/migration/with_config.py ~/.config/friday-migration/cloud-prod.json .venv-migration/bin/python scripts/qualification/cloud_parity.py
+```
+
+Only after smoke/security/persistence checks pass, create the schedule using the
+test database, trigger it via Cloud Scheduler, verify successful execution and
+its durable consolidation results, then select the production database:
+
+```bash
+python3 scripts/deploy/gcp_candidate.py scheduler --source test
+python3 scripts/deploy/gcp_candidate.py scheduler-run
+python3 scripts/deploy/gcp_candidate.py scheduler-status
+python3 scripts/deploy/gcp_candidate.py scheduler-target --source prod
+python3 scripts/deploy/gcp_candidate.py inspect
+```
+
+A fresh revision provides a new container filesystem; compare saved API response
+hashes across distinct ready revision names and read the same records directly
+from remote Turso. This proves independence from the previous instance filesystem;
+it does not claim an observed idle scale-to-zero event. Cloud Run has min 0,
+max 2, request-based billing, no volume mounts and IAM invocation enforced.
+
+Pricing references reviewed: [Cloud Run](https://cloud.google.com/run/pricing),
+[Artifact Registry](https://cloud.google.com/artifact-registry/pricing),
+[Secret Manager](https://cloud.google.com/secret-manager/pricing), and
+[Cloud Build](https://cloud.google.com/build/pricing). Account-wide remaining
+free allowances are not measurable from these deployment checks; no zero-cost
+claim or spending cap is implied by the configured limits.
+
+No client cutover or Oracle decommission is authorized by these commands.
+Check for source writes again immediately before an owner-approved cutover.
