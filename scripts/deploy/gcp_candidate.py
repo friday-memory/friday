@@ -236,14 +236,21 @@ def deploy(state, source, replace=False):
         source=source,
     )
     save(state)
+    write_client_config(state, source)
+    print("CLOUD_RUN_REVISION=" + state["revision"] + "\nCLOUD_RUN_URL=" + state["url"])
+
+
+def write_client_config(state, source):
     values = config(source)
     values.update(
-        FRIDAY_URL=state["url"], FRIDAY_GCP_IAM="true", CLOUDSDK_PYTHON="/usr/bin/python3"
+        FRIDAY_URL=state["url"],
+        FRIDAY_GCP_IAM="true",
+        CLOUDSDK_PYTHON=str((ROOT / ".venv-migration/bin/python").resolve()),
+        FRIDAY_GCLOUD="/usr/bin/gcloud",
     )
     path = PRIVATE / f"cloud-{source}.json"
     path.write_text(json.dumps(values))
     path.chmod(0o600)
-    print("CLOUD_RUN_REVISION=" + state["revision"] + "\nCLOUD_RUN_URL=" + state["url"])
 
 
 def main():
@@ -262,12 +269,15 @@ def main():
             "scheduler-status",
             "scheduler-target",
             "inspect",
+            "client-config",
         ],
     )
     p.add_argument("--source", choices=["test", "prod"], default="test")
     args = p.parse_args()
     state = json.loads(STATE.read_text()) if STATE.exists() else {}
-    if args.action == "provision":
+    if args.action == "client-config":
+        write_client_config(state, args.source)
+    elif args.action == "provision":
         provision(state)
     elif args.action == "build":
         build(state)
