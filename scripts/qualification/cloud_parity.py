@@ -21,7 +21,12 @@ def main():
     token = subprocess.check_output(
         ["gcloud", "auth", "print-identity-token"], text=True, timeout=30
     ).strip()
-    source_key = (Path.home() / "friday-oracle-ops/secrets/friday_api_key").read_text().strip()
+    # Read the running service's actual credential in memory; operational files may be stale.
+    container = json.loads(
+        subprocess.check_output(["docker", "inspect", "friday-brain"], timeout=30)
+    )[0]
+    live_env = dict(item.split("=", 1) for item in container["Config"]["Env"])
+    source_key = live_env.get("FRIDAY_API_KEY") or live_env.get("BRAIN_API_KEY")
     if not source_key:
         raise ValueError("Oracle key unavailable")
     records = read_snapshot(Path.home() / "friday-migration-data")
