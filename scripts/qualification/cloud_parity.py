@@ -129,4 +129,8 @@ if __name__ == "__main__":
         main()
     except Exception as exc:
         print("CLOUD_PARITY=FAIL\nERROR_CLASS=" + type(exc).__name__)
+        if isinstance(exc, httpx.HTTPStatusError):
+            print(
+                f"HTTP_STATUS={exc.response.status_code}\nHOST={exc.request.url.host}\nPATH={exc.request.url.path}"
+            )
         raise SystemExit(1) from None
