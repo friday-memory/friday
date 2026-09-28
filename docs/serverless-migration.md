@@ -226,3 +226,46 @@ claim or spending cap is implied by the configured limits.
 
 No client cutover or Oracle decommission is authorized by these commands.
 Check for source writes again immediately before an owner-approved cutover.
+
+### Completed cloud qualification
+
+Cloud Build `a3e4068a-e56f-40ef-90ce-b00719f95c13` built runtime commit
+`627d79750ae65af22e1478bd3df512b224c37bde` for linux/amd64. Image digest:
+`sha256:56dcd3db408f207a20bd1d2f1181c15bdd3af8b11ae6c9a7ab5c2bf470f2ff03`.
+Subsequent commits change qualification/deployment tooling and documentation only.
+
+- Cloud Run service: `friday-serverless-preview`; final ready revision
+  `friday-serverless-preview-00004-9j2`, 100% traffic, connected to `friday-prod`.
+- URL: https://friday-serverless-preview-rlemy2keiq-uw.a.run.app
+- IAM rejection, missing/wrong API-key rejection, HTTP writes/search, graph,
+  state, blueprint and four real MCP tools passed from Oracle against Cloud Run
+  using the dedicated test database. MCP writes were independently read in Turso.
+- API hashes survived replacement from `00002-z52` to `00003-zjn`, with no
+  mounted volumes. This is new-instance persistence evidence, not an observed
+  idle scale-to-zero event.
+- The final production-copy revision passed health and authentication checks.
+  Read-only search matched Turso and the existing live Oracle service on 70
+  queries: 67 exact top-five result sets and 3 rank-equivalent cutoff ties.
+  Imported facts and blueprints matched their remote database payloads.
+  A read-only source check found no Oracle drift from the established snapshot.
+- `friday-daily-consolidation-preview` invoked
+  `friday-consolidation-preview` through OAuth. Successful executions included
+  `friday-consolidation-preview-r88gb`. Fact decay, synthesized memories and
+  graph edges were verified directly in the test database. The qualified job
+  now targets `friday-prod`; the next normal schedule is 03:00 UTC daily.
+- `scripts/qualification/cloud_configuration.py` passes for the final production
+  settings: min 0, max 2, request-based CPU, pinned Secret Manager versions,
+  immutable image, private invocation, no volumes and authenticated schedule.
+- Oracle container `43b2996494cc` remains healthy with its original
+  `2026-09-22T23:15:16.661434585Z` start time and unchanged working-tree status.
+
+The first image failed due to source archive permissions; preserving Git file
+modes, making application files readable and adding a non-root image smoke
+check resolved it. A local gcloud Python mismatch and a stale Oracle credential
+file affected qualification tooling only and were corrected without changing
+Oracle or reauthenticating the owner.
+
+`CUTOVER_READY=true` at this checkpoint. No clients were changed. Oracle, source
+data, volumes and rollback resources remain intact. Owner approval and a fresh
+source-drift check are required immediately before client cutover.
+`ORACLE_DECOMMISSION_READY=false`.
