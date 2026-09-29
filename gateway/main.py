@@ -74,13 +74,14 @@ app.add_middleware(
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
 def verify_key(request: Request):
+    expected_key = os.getenv("FRIDAY_API_KEY") or os.getenv("BRAIN_API_KEY") or FRIDAY_API_KEY
     key = (
         request.headers.get("X-Friday-Key")
         or request.headers.get("X-Brain-Key")
         or request.headers.get("Authorization", "").replace("Bearer ", "")
         or request.query_params.get("key")
     )
-    if key != FRIDAY_API_KEY:
+    if not key or key != expected_key:
         raise HTTPException(status_code=401, detail="Invalid Friday Server Secret Key.")
     return key
 
@@ -115,6 +116,11 @@ class MemoryPayload(BaseModel):
 
 class FactPayload(BaseModel):
     content: str = Field(..., description="A discrete, versioned fact.")
+    project: str = Field(
+        "global", description="Project namespace (e.g. 'reeldm', 'friday', 'global')."
+    )
+    supersedes: Optional[str] = Field(None, description="Explicit fact ID to supersede.")
+    decay_immune: bool = Field(False, description="Immunity against half-life decay.")
 
 
 class CognitiveStatePayload(BaseModel):
@@ -148,8 +154,11 @@ class SearchPayload(BaseModel):
 
 # ── Facts File (S3-style versioned ledger) ─────────────────────────────────────
 def _load_facts() -> dict:
-    p = Path(FACTS_PATH)
-    p.parent.mkdir(parents=True, exist_ok=True)
+    p = Path(os.getenv("FACTS_PATH", FACTS_PATH))
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
     if p.exists():
         try:
             return json.loads(p.read_text())
@@ -159,7 +168,15 @@ def _load_facts() -> dict:
 
 
 def _save_facts(data: dict):
-    Path(FACTS_PATH).write_text(json.dumps(data, indent=2, ensure_ascii=False))
+    p = Path(os.getenv("FACTS_PATH", FACTS_PATH))
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+    try:
+        p.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+    except Exception as e:
+        logger.error(f"Failed to save facts to {p}: {e}")
 
 
 # ── Routes ─────────────────────────────────────────────────────────────────────
@@ -248,35 +265,85 @@ async def add_memory(
 
 @app.post("/facts")
 async def add_fact(payload: FactPayload, _key=Depends(verify_key)):
-    """Add a discrete, versioned fact to the ledger."""
+    """Add a discrete, versioned fact to the ledger with conflict resolution and auto-supersede."""
     data = _load_facts()
     fact_id = hashlib.sha256(payload.content.encode()).hexdigest()[:12]
     now = datetime.now(timezone.utc).isoformat()
+    project = payload.project.strip().lower() if payload.project else "global"
 
-    # Supersede duplicates
-    for f in data["facts"]:
-        if f.get("content") == payload.content:
-            return {"status": "duplicate", "fact_id": fact_id}
+    # Exact duplicate check within the same project or global
+    for f in data.get("facts", []):
+        if (
+            f.get("content") == payload.content
+            and f.get("project", "global") == project
+            and not f.get("superseded", False)
+        ):
+            return {"status": "duplicate", "fact_id": f.get("id", fact_id), "project": project}
 
-    data["facts"].append(
-        {
-            "id": fact_id,
-            "content": payload.content,
-            "created_at": now,
-            "superseded": False,
-            "energy_score": 1.0,
-            "recall_count": 0,
-            "last_recalled_at": now,
-            "status": "active",
-        }
-    )
+    superseded_ids = []
+
+    # 1. Explicit supersede if requested
+    if payload.supersedes:
+        for f in data.get("facts", []):
+            if f.get("id") == payload.supersedes and not f.get("superseded", False):
+                f["superseded"] = True
+                f["superseded_by"] = fact_id
+                f["superseded_at"] = now
+                f["status"] = "superseded"
+                superseded_ids.append(f.get("id"))
+
+    # 2. Key-based / Topic-based auto-supersede within same project
+    key_sep = None
+    if ":" in payload.content:
+        key_sep = ":"
+    elif "=" in payload.content:
+        key_sep = "="
+
+    if key_sep:
+        fact_key = payload.content.split(key_sep, 1)[0].strip().lower()
+        if len(fact_key) >= 3:
+            for f in data.get("facts", []):
+                if not f.get("superseded", False) and f.get("project", "global") == project:
+                    existing_content = f.get("content", "")
+                    if key_sep in existing_content:
+                        existing_key = existing_content.split(key_sep, 1)[0].strip().lower()
+                        if existing_key == fact_key and f.get("id") != fact_id:
+                            f["superseded"] = True
+                            f["superseded_by"] = fact_id
+                            f["superseded_at"] = now
+                            f["status"] = "superseded"
+                            superseded_ids.append(f.get("id"))
+
+    new_fact = {
+        "id": fact_id,
+        "content": payload.content,
+        "project": project,
+        "created_at": now,
+        "superseded": False,
+        "superseded_by": None,
+        "superseded_at": None,
+        "energy_score": 1.0,
+        "decay_immune": payload.decay_immune,
+        "recall_count": 0,
+        "last_recalled_at": now,
+        "status": "active",
+    }
+    data.setdefault("facts", []).append(new_fact)
     _save_facts(data)
-    return {"status": "added", "fact_id": fact_id}
+
+    res = {"status": "added", "fact_id": fact_id, "project": project}
+    if superseded_ids:
+        res["superseded"] = superseded_ids
+    return res
 
 
 @app.get("/facts")
-async def get_facts(include_superseded: bool = False, min_energy: float = 0.0):
-    """Retrieve the active facts ledger. Public endpoint — no auth required."""
+async def get_facts(
+    include_superseded: bool = False,
+    min_energy: float = 0.0,
+    project: Optional[str] = None,
+):
+    """Retrieve the active facts ledger filtered by project and energy score."""
     data = _load_facts()
     facts = data.get("facts", [])
     if not include_superseded:
@@ -285,6 +352,9 @@ async def get_facts(include_superseded: bool = False, min_energy: float = 0.0):
             for f in facts
             if not f.get("superseded", False) and f.get("status", "active") != "decayed"
         ]
+    if project:
+        proj_norm = project.strip().lower()
+        facts = [f for f in facts if f.get("project", "global").lower() in [proj_norm, "global"]]
     if min_energy > 0.0:
         facts = [f for f in facts if f.get("energy_score", 1.0) >= min_energy]
     facts.sort(key=lambda x: x.get("energy_score", 1.0), reverse=True)
@@ -378,6 +448,79 @@ async def graph_data():
     except Exception as e:
         logger.error(f"Graph data error: {e}")
         return {"nodes": [], "links": [], "error": str(e)}
+    finally:
+        driver.close()
+
+
+@app.get("/graph/blast-radius")
+async def get_blast_radius(
+    entity: str,
+    depth: int = 2,
+    project: Optional[str] = None,
+    _key=Depends(verify_key),
+):
+    """
+    Query multi-hop knowledge graph dependency blast radius for a given entity.
+    Returns directly impacted components, depth distances, and relationship paths.
+    """
+    depth = max(1, min(depth, 4))
+    driver = get_neo4j_driver()
+    if not driver:
+        return {
+            "entity": entity,
+            "depth": depth,
+            "impacted_nodes": [],
+            "relationships": [],
+            "total_impacted": 0,
+            "status": "neo4j_unavailable",
+        }
+    try:
+        with driver.session() as s:
+            cypher = (
+                f"MATCH (start:Entity) WHERE toLower(start.name) = toLower() "
+                f"OPTIONAL MATCH path = (start)-[*1..{depth}]-(connected:Entity) "
+                f"RETURN start.name AS root, "
+                f"connected.name AS target, "
+                f"length(path) AS distance, "
+                f"[r IN relationships(path) | {{source: startNode(r).name, target: endNode(r).name, type: type(r)}}] AS edges "
+                f"LIMIT 300"
+            )
+            res = s.run(cypher, entity=entity)
+            impacted = {}
+            edges_seen = set()
+            relationships = []
+
+            for row in res:
+                target = row.get("target")
+                dist = row.get("distance")
+                if target and target.lower() != entity.lower():
+                    if target not in impacted or dist < impacted[target]["distance"]:
+                        impacted[target] = {"name": target, "distance": dist}
+                for edge in row.get("edges") or []:
+                    key = (edge.get("source"), edge.get("target"), edge.get("type"))
+                    if key not in edges_seen:
+                        edges_seen.add(key)
+                        relationships.append(edge)
+
+            sorted_impacted = sorted(impacted.values(), key=lambda x: (x["distance"], x["name"]))
+            return {
+                "entity": entity,
+                "depth": depth,
+                "impacted_nodes": sorted_impacted,
+                "relationships": relationships,
+                "total_impacted": len(sorted_impacted),
+                "status": "ok",
+            }
+    except Exception as e:
+        logger.error(f"Blast radius query error: {e}")
+        return {
+            "entity": entity,
+            "depth": depth,
+            "impacted_nodes": [],
+            "relationships": [],
+            "total_impacted": 0,
+            "status": f"error: {e}",
+        }
     finally:
         driver.close()
 
@@ -480,15 +623,25 @@ async def search_quick(q: str = ""):
 
 
 @app.get("/export/persona")
-async def export_persona(target: str = "agents", _key=Depends(verify_key)):
+async def export_persona(
+    target: str = "agents",
+    project: Optional[str] = None,
+    _key=Depends(verify_key),
+):
     """
     Export synchronized agent persona & architectural directives.
     Targets: 'agents' (AGENTS.md / GEMINI.md), 'cursor' (.cursorrules), 'soul' (SOUL.md for chat agents).
     """
     facts_data = _load_facts()
-    active_facts = [
-        f["content"] for f in facts_data.get("facts", []) if f.get("status", "active") == "active"
+    facts = [
+        f
+        for f in facts_data.get("facts", [])
+        if not f.get("superseded", False) and f.get("status", "active") == "active"
     ]
+    if project:
+        proj_norm = project.strip().lower()
+        facts = [f for f in facts if f.get("project", "global").lower() in [proj_norm, "global"]]
+    active_facts = [f["content"] for f in facts]
 
     if target == "soul":
         lines = [

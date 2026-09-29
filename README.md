@@ -369,10 +369,17 @@ with Friday(api_key="your_secret_key", base_url="http://localhost:8000") as clie
         project="backend-api",
     )
 
-    # 3. Commit immutable ground-truth fact
-    client.add_fact("Production database endpoint is db.internal.net:5432")
+    # 3. Commit scoped ground-truth fact with auto-conflict resolution
+    client.add_fact("Production database endpoint is db.internal.net:5432", project="backend-api")
 
-    # 4. Multi-layer search (L2 Facts + L3 ChromaDB + L4 Knowledge Graph)
+    # 4. Query multi-hop dependency blast radius before refactoring
+    blast = client.get_blast_radius(entity="OrdersTable", depth=2, project="backend-api")
+    print(
+        f"Impacted components ({blast['total_impacted']}):",
+        [n["name"] for n in blast["impacted_nodes"]],
+    )
+
+    # 5. Multi-layer search (L2 Facts + L3 ChromaDB + L4 Knowledge Graph)
     context = client.search("database connection configuration", project="backend-api")
     print(context["results"])
 
@@ -395,12 +402,14 @@ with Friday(api_key="your_secret_key", base_url="http://localhost:8000") as clie
 import asyncio
 from friday import AsyncFriday
 
+
 async def main():
     async with AsyncFriday(api_key="your_secret_key") as client:
         # Commit context concurrently
         await client.add_memory("Redis cluster deployed for token bucket rate limiting")
         facts = await client.get_facts(min_energy=0.5)
         print(f"Verified high-energy facts: {len(facts)}")
+
 
 asyncio.run(main())
 ```
@@ -583,10 +592,11 @@ Connected agents automatically access four core MCP primitives:
 
 | Primitive | Purpose | Trigger Phase |
 | :--- | :--- | :--- |
-| `get_context` | Ingests active verified facts and recent context with cognitive state directives. | Session initialization. |
+| `get_context` | Ingests active verified facts and recent context filtered by project namespace. | Session initialization. |
 | `memory_search` | Queries vector and graph indices for architectural decisions and system dependencies. | Prior to answering technical questions or planning refactors. |
+| `get_blast_radius`| Computes multi-hop transitive dependency blast radius for a service or entity. | Prior to refactoring schemas or modifying critical APIs. |
 | `add_memory` | Records implementation details, rationale, and tradeoffs; triggers background graph extraction. | Post-implementation or bug resolution. |
-| `add_fact` | Commits versioned, immutable ground truths (ports, stack, schemas, business invariants). | Architectural declarations. |
+| `add_fact` | Commits versioned ground truths with automatic key conflict resolution and project isolation. | Architectural declarations or configuration changes. |
 
 ---
 
@@ -695,17 +705,26 @@ A browser-based 3D WebGL visualizer powered by Three.js for real-time knowledge 
 - **Interactive Node Inspector**: Inspect metadata, reinforce priority weights (`+0.25`), trace bidirectional relationship chains, and smoothly focus the 3D camera on target nodes.
 - **Live CRUD & Topology Export**: Create, rename, or link entities interactively, and export high-resolution canvas snapshots for system documentation.
 
-### 3. Versioned Facts Ledger
-Deterministic project constants are recorded with immutable version history. Outdated statements are superseded rather than overwritten, preserving an audit trail:
+### 3. Versioned Facts Ledger & Smart Conflict Resolution
+Deterministic project constants are recorded with immutable version history and project isolation (`reeldm`, `friday`, `global`). Conflicting keys (`Key: Value`) automatically supersede older versions within the same project namespace:
 
 ```bash
-# Add initial constraint
-POST /facts -> {"content": "PostgreSQL 16 running on port 5432"}
+# Add initial constraint (project-scoped)
+POST /facts -> {"content": "Payment Gateway: Stripe", "project": "billing"}
 # Recorded: id="c41b8a9", superseded=false
 
-# Update constraint
-POST /facts -> {"content": "Migrated database to Aurora PostgreSQL on port 5432"}
-# Prior fact marked superseded=true; active fact updated.
+# Update constraint — automatically detects conflicting key 'Payment Gateway'
+POST /facts -> {"content": "Payment Gateway: DodoPayments", "project": "billing"}
+# Prior fact marked superseded=true; active fact updated without hallucination.
+```
+
+### 4. Dependency Blast-Radius Analysis
+Before modifying database schemas, refactoring shared middleware, or removing endpoints, agents query `get_blast_radius` to compute downstream transitive impacts up to 4 hops away across Layer 4:
+
+```bash
+# Query blast radius for a service or entity
+GET /graph/blast-radius?entity=UserSession&depth=2&project=backend-api
+# Returns: directly impacted services, traversal distance, and edge relationship types.
 ```
 
 ---

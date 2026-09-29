@@ -15,7 +15,16 @@ from friday.rules import (
 
 def test_get_supported_agents():
     agents = get_supported_agents()
-    expected_keys = {"agents", "claude", "cursor", "gemini", "copilot", "windsurf", "continue", "aider"}
+    expected_keys = {
+        "agents",
+        "claude",
+        "cursor",
+        "gemini",
+        "copilot",
+        "windsurf",
+        "continue",
+        "aider",
+    }
     assert expected_keys.issubset(set(agents.keys()))
     assert isinstance(agents["claude"], AgentTarget)
     assert agents["claude"].default_filename == "CLAUDE.md"
@@ -112,14 +121,20 @@ def test_cli_rules_generate_all(tmp_path):
 
 def test_cli_rules_custom(tmp_path):
     out_file = tmp_path / ".custom" / "instructions.txt"
-    ret = main([
-        "rules",
-        "custom",
-        "--key", "myagent",
-        "--name", "My Special Agent",
-        "--file", ".custom/instructions.txt",
-        "--output", str(out_file),
-    ])
+    ret = main(
+        [
+            "rules",
+            "custom",
+            "--key",
+            "myagent",
+            "--name",
+            "My Special Agent",
+            "--file",
+            ".custom/instructions.txt",
+            "--output",
+            str(out_file),
+        ]
+    )
     assert ret == 0
     assert out_file.exists()
     assert "My Special Agent" in out_file.read_text(encoding="utf-8")

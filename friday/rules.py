@@ -147,14 +147,16 @@ def render_rule(
     ]
 
     if custom_instructions and custom_instructions.strip():
-        sections.extend([
-            "",
-            "---",
-            "",
-            "## 3. Project-Specific Directives",
-            "",
-            custom_instructions.strip(),
-        ])
+        sections.extend(
+            [
+                "",
+                "---",
+                "",
+                "## 3. Project-Specific Directives",
+                "",
+                custom_instructions.strip(),
+            ]
+        )
 
     sections.append("")
     return "\n".join(sections)

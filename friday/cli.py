@@ -48,7 +48,10 @@ def _cmd_rules_generate(args: argparse.Namespace) -> int:
             return 1
 
     if not args.target:
-        print("Error: Specify --target <agent_key> or use --all to generate all formats.", file=sys.stderr)
+        print(
+            "Error: Specify --target <agent_key> or use --all to generate all formats.",
+            file=sys.stderr,
+        )
         return 1
 
     try:
@@ -105,20 +108,34 @@ def main(argv: list[str] | None = None) -> int:
 
     # `friday rules generate`
     gen_p = rules_sub.add_parser("generate", help="Generate zero-amnesia rule files")
-    gen_p.add_argument("--target", "-t", help="Agent target key (e.g. claude, cursor, gemini, copilot)")
-    gen_p.add_argument("--all", "-a", action="store_true", help="Generate rules for all supported agents")
+    gen_p.add_argument(
+        "--target", "-t", help="Agent target key (e.g. claude, cursor, gemini, copilot)"
+    )
+    gen_p.add_argument(
+        "--all", "-a", action="store_true", help="Generate rules for all supported agents"
+    )
     gen_p.add_argument("--output", "-o", help="Custom output path for the rule file")
-    gen_p.add_argument("--output-dir", default=".", help="Directory to output files when using --all (default: .)")
+    gen_p.add_argument(
+        "--output-dir", default=".", help="Directory to output files when using --all (default: .)"
+    )
     gen_p.add_argument("--project", "-p", default="", help="Project name to include in header")
-    gen_p.add_argument("--mcp", "-m", default="friday", help="MCP server name identifier (default: friday)")
+    gen_p.add_argument(
+        "--mcp", "-m", default="friday", help="MCP server name identifier (default: friday)"
+    )
     gen_p.add_argument("--force", "-f", action="store_true", help="Overwrite existing files")
     gen_p.set_defaults(func=_cmd_rules_generate)
 
     # `friday rules custom`
     cust_p = rules_sub.add_parser("custom", help="Generate rules for an arbitrary custom tool")
-    cust_p.add_argument("--key", "-k", required=True, help="Unique identifier key (e.g. devin, mybot)")
-    cust_p.add_argument("--name", "-n", required=True, help="Display name for the agent (e.g. 'Devin AI')")
-    cust_p.add_argument("--file", required=True, help="Default rule filename (e.g. .devin/rules.md)")
+    cust_p.add_argument(
+        "--key", "-k", required=True, help="Unique identifier key (e.g. devin, mybot)"
+    )
+    cust_p.add_argument(
+        "--name", "-n", required=True, help="Display name for the agent (e.g. 'Devin AI')"
+    )
+    cust_p.add_argument(
+        "--file", required=True, help="Default rule filename (e.g. .devin/rules.md)"
+    )
     cust_p.add_argument("--desc", default="", help="Short description of the custom tool")
     cust_p.add_argument("--output", "-o", help="Custom output path")
     cust_p.add_argument("--project", "-p", default="", help="Project name")

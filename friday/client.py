@@ -16,6 +16,7 @@ from .exceptions import (
     FridayNotFoundError,
 )
 from .types import (
+    BlastRadiusResult,
     CognitiveState,
     DreamReport,
     Fact,
@@ -122,27 +123,61 @@ class Friday:
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error executing search: {e}") from e
 
-    def add_fact(self, content: str) -> Dict[str, Any]:
+    def add_fact(
+        self,
+        content: str,
+        project: str = "global",
+        supersedes: Optional[str] = None,
+        decay_immune: bool = False,
+    ) -> Dict[str, Any]:
         """Record an immutable, discrete, version-tracked verified fact."""
         try:
-            r = self.client.post("/facts", json={"content": content})
+            payload: Dict[str, Any] = {
+                "content": content,
+                "project": project,
+                "decay_immune": decay_immune,
+            }
+            if supersedes:
+                payload["supersedes"] = supersedes
+            r = self.client.post("/facts", json=payload)
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error adding fact: {e}") from e
 
-    def get_facts(self, include_superseded: bool = False, min_energy: float = 0.0) -> List[Fact]:
-        """Fetch the active facts ledger, filtered by minimum energy score."""
+    def get_facts(
+        self,
+        include_superseded: bool = False,
+        min_energy: float = 0.0,
+        project: Optional[str] = None,
+    ) -> List[Fact]:
+        """Fetch the active facts ledger, filtered by project and minimum energy score."""
         try:
             params: Dict[str, Any] = {"include_superseded": include_superseded}
             if min_energy > 0.0:
                 params["min_energy"] = min_energy
+            if project:
+                params["project"] = project
             r = self.client.get("/facts", params=params)
             _handle_response_error(r)
             data = r.json()
             return data.get("facts", [])
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error retrieving facts: {e}") from e
+
+    def get_blast_radius(
+        self, entity: str, depth: int = 2, project: Optional[str] = None
+    ) -> BlastRadiusResult:
+        """Analyze multi-hop dependency blast radius for an entity across Layer 4 graph."""
+        try:
+            params: Dict[str, Any] = {"entity": entity, "depth": depth}
+            if project:
+                params["project"] = project
+            r = self.client.get("/graph/blast-radius", params=params)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error retrieving blast radius: {e}") from e
 
     def get_context(self, query: Optional[str] = None, target: str = "agents") -> str:
         """Retrieve pre-compiled markdown context tailored for specific agent targets."""
@@ -314,29 +349,61 @@ class AsyncFriday:
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error executing search: {e}") from e
 
-    async def add_fact(self, content: str) -> Dict[str, Any]:
+    async def add_fact(
+        self,
+        content: str,
+        project: str = "global",
+        supersedes: Optional[str] = None,
+        decay_immune: bool = False,
+    ) -> Dict[str, Any]:
         """Record an immutable, discrete, version-tracked verified fact."""
         try:
-            r = await self.client.post("/facts", json={"content": content})
+            payload: Dict[str, Any] = {
+                "content": content,
+                "project": project,
+                "decay_immune": decay_immune,
+            }
+            if supersedes:
+                payload["supersedes"] = supersedes
+            r = await self.client.post("/facts", json=payload)
             _handle_response_error(r)
             return r.json()
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error adding fact: {e}") from e
 
     async def get_facts(
-        self, include_superseded: bool = False, min_energy: float = 0.0
+        self,
+        include_superseded: bool = False,
+        min_energy: float = 0.0,
+        project: Optional[str] = None,
     ) -> List[Fact]:
-        """Fetch the active facts ledger, filtered by minimum energy score."""
+        """Fetch the active facts ledger, filtered by project and minimum energy score."""
         try:
             params: Dict[str, Any] = {"include_superseded": include_superseded}
             if min_energy > 0.0:
                 params["min_energy"] = min_energy
+            if project:
+                params["project"] = project
             r = await self.client.get("/facts", params=params)
             _handle_response_error(r)
             data = r.json()
             return data.get("facts", [])
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error retrieving facts: {e}") from e
+
+    async def get_blast_radius(
+        self, entity: str, depth: int = 2, project: Optional[str] = None
+    ) -> BlastRadiusResult:
+        """Analyze multi-hop dependency blast radius for an entity across Layer 4 graph."""
+        try:
+            params: Dict[str, Any] = {"entity": entity, "depth": depth}
+            if project:
+                params["project"] = project
+            r = await self.client.get("/graph/blast-radius", params=params)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error retrieving blast radius: {e}") from e
 
     async def get_context(self, query: Optional[str] = None, target: str = "agents") -> str:
         """Retrieve pre-compiled markdown context tailored for specific agent targets."""

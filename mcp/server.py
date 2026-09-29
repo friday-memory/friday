@@ -79,13 +79,23 @@ TOOLS = [
     },
     {
         "name": "add_fact",
-        "description": "Store a discrete, versioned fact (user preference, constant, rule). Facts persist forever and are deduplicated.",
+        "description": "Store a discrete, versioned fact (user preference, constant, rule). Facts persist forever and are deduplicated with auto-conflict resolution.",
         "inputSchema": {
             "type": "object",
             "properties": {
                 "content": {
                     "type": "string",
                     "description": "The fact to store. Keep it short and atomic.",
+                },
+                "project": {
+                    "type": "string",
+                    "description": "Project namespace (e.g. 'reeldm', 'friday', 'global').",
+                    "default": "global",
+                },
+                "supersedes": {
+                    "type": "string",
+                    "description": "Optional fact ID to explicitly supersede.",
+                    "default": "",
                 },
             },
             "required": ["content"],
@@ -114,10 +124,40 @@ TOOLS = [
     },
     {
         "name": "get_context",
-        "description": "Get full Friday context: all active facts + recent memories. Call at session start for maximum intelligence.",
+        "description": "Get full Friday context: all active facts + recent memories filtered by project. Call at session start for maximum intelligence.",
         "inputSchema": {
             "type": "object",
-            "properties": {},
+            "properties": {
+                "project": {
+                    "type": "string",
+                    "description": "Optional project namespace filter.",
+                    "default": "",
+                },
+            },
+        },
+    },
+    {
+        "name": "get_blast_radius",
+        "description": "Analyze the blast radius of modifying a service, table, or component across the knowledge graph.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "entity": {
+                    "type": "string",
+                    "description": "The name of the entity/component to analyze (e.g. 'StripeWebhook', 'UserTable').",
+                },
+                "depth": {
+                    "type": "integer",
+                    "description": "Traversal depth (hops 1-4). Default 2.",
+                    "default": 2,
+                },
+                "project": {
+                    "type": "string",
+                    "description": "Optional project namespace filter.",
+                    "default": "",
+                },
+            },
+            "required": ["entity"],
         },
     },
 ]
@@ -140,10 +180,23 @@ async def add_memory(args: dict) -> dict:
 
 
 async def add_fact(args: dict) -> dict:
+    payload = {"content": args["content"]}
+    if args.get("project"):
+        payload["project"] = args["project"]
+    if args.get("supersedes"):
+        payload["supersedes"] = args["supersedes"]
     async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.post(
-            f"{FRIDAY_URL}/facts", headers=HEADERS, json={"content": args["content"]}
-        )
+        r = await client.post(f"{FRIDAY_URL}/facts", headers=HEADERS, json=payload)
+        r.raise_for_status()
+        return r.json()
+
+
+async def get_blast_radius(args: dict) -> dict:
+    params = {"entity": args["entity"], "depth": args.get("depth", 2)}
+    if args.get("project"):
+        params["project"] = args["project"]
+    async with httpx.AsyncClient(timeout=30) as client:
+        r = await client.get(f"{FRIDAY_URL}/graph/blast-radius", headers=HEADERS, params=params)
         r.raise_for_status()
         return r.json()
 
@@ -164,8 +217,11 @@ async def memory_search(args: dict) -> dict:
 
 
 async def get_context(args: dict) -> dict:
+    params = {}
+    if args.get("project"):
+        params["project"] = args["project"]
     async with httpx.AsyncClient(timeout=30) as client:
-        facts_r = await client.get(f"{FRIDAY_URL}/facts")
+        facts_r = await client.get(f"{FRIDAY_URL}/facts", params=params)
         facts = facts_r.json().get("facts", []) if facts_r.is_success else []
         return {
             "facts": facts,
@@ -178,6 +234,7 @@ TOOL_HANDLERS = {
     "add_fact": add_fact,
     "memory_search": memory_search,
     "get_context": get_context,
+    "get_blast_radius": get_blast_radius,
 }
 
 

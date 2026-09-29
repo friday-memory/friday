@@ -8,16 +8,40 @@ from typing_extensions import TypedDict
 class Fact(TypedDict, total=False):
     id: str
     content: str
+    project: Optional[str]
     created_at: str
     updated_at: str
     version: int
     status: str
     source: str
+    superseded: Optional[bool]
+    superseded_by: Optional[str]
+    superseded_at: Optional[str]
     replaces: Optional[str]
     energy_score: Optional[float]
     last_recalled_at: Optional[str]
     recall_count: Optional[int]
     decay_immune: Optional[bool]
+
+
+class BlastRadiusNode(TypedDict, total=False):
+    name: str
+    distance: int
+
+
+class BlastRadiusEdge(TypedDict, total=False):
+    source: str
+    target: str
+    type: str
+
+
+class BlastRadiusResult(TypedDict, total=False):
+    entity: str
+    depth: int
+    impacted_nodes: List[BlastRadiusNode]
+    relationships: List[BlastRadiusEdge]
+    total_impacted: int
+    status: str
 
 
 class MemoryResult(TypedDict, total=False):

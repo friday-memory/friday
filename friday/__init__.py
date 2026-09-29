@@ -20,6 +20,7 @@ from .rules import (
     render_rule,
 )
 from .types import (
+    BlastRadiusResult,
     CognitiveState,
     DreamReport,
     Fact,
@@ -30,7 +31,7 @@ from .types import (
     SearchResult,
 )
 
-__version__ = "1.4.4"
+__version__ = "1.4.5"
 
 __all__ = [
     "Friday",
@@ -41,6 +42,7 @@ __all__ = [
     "FridayNotFoundError",
     "FridayAPIError",
     "Fact",
+    "BlastRadiusResult",
     "MemoryResult",
     "SearchResult",
     "HealthStatus",
