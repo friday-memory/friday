@@ -519,7 +519,8 @@ async def get_blast_radius(
             "impacted_nodes": [],
             "relationships": [],
             "total_impacted": 0,
-            "status": f"error: {e}",
+            "status": "neo4j_unavailable",
+            "error": str(e),
         }
     finally:
         driver.close()
