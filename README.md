@@ -794,6 +794,18 @@ make dev
 
 ---
 
+## Optional Serverless Storage (libSQL / Turso & Cloud Run)
+
+Friday supports an opt-in serverless execution model backed by remote libSQL (Turso) or local SQLite transactions, ideal for ephemeral environments like Google Cloud Run.
+
+- **Dual-Storage Boundary**: Transactional SQLite for local single-node deployments; remote libSQL driver for distributed serverless instances with zero local state dependency.
+- **Serverless FastAPI Gateway**: `gateway.serverless:create_app` exposes all core memory, fact, graph, and blueprint endpoints with project-scoped isolation and authenticated reads.
+- **Migration & Qualification Runbook**: Private export/import scripts, schema migrations, and qualification checks are documented in [docs/serverless-migration.md](docs/serverless-migration.md).
+
+> **Note**: Serverless storage is completely opt-in and does not alter the default Docker Compose deployment or client routing.
+
+---
+
 ## Contributing
 
 Review [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines, commit conventions, and architectural standards.
@@ -814,10 +826,3 @@ Review [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines, commit co
 ## License
 
 Friday is licensed under the [MIT License](LICENSE).
-
-### Parallel serverless candidate
-
-An opt-in SQLite/libSQL gateway, private export/import tools, and Cloud Run/Scheduler
-preview scripts are documented in [the migration runbook](docs/serverless-migration.md).
-This candidate requires explicit project namespaces and authenticated reads. It does
-not change the default Compose installation or authorize a client cutover.
