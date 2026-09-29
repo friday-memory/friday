@@ -61,25 +61,62 @@
       z-index: 0;
     }
 
-    /* Top Navigation HUD (Single Clean Row, Zero Wrap Overlap) */
+    /* Top Navigation HUD (Streamlined, Calm & Zero Overflow) */
     .top-hud {
       position: absolute;
-      top: 12px;
-      left: 16px;
-      right: 16px;
+      top: 14px;
+      left: 18px;
+      right: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       pointer-events: none;
       z-index: 20;
     }
-    .hud-left, .hud-right {
+    .hud-left {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       pointer-events: auto;
-      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+    .hud-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      flex: 1;
+      max-width: 440px;
+    }
+    .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+      flex-shrink: 0;
+    }
+    .memory-btn {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2)) !important;
+      border: 1px solid rgba(56, 189, 248, 0.45) !important;
+      color: #f0f9ff !important;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.25) !important;
+    }
+    .memory-btn:hover {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.35), rgba(99, 102, 241, 0.35)) !important;
+      border-color: #38bdf8 !important;
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.5) !important;
+      transform: translateY(-1px);
+    }
+    .badge-count {
+      background: rgba(56, 189, 248, 0.25);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      color: #38bdf8;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .brand-pill {
@@ -177,12 +214,13 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      width: 200px;
+      width: 100%;
+      max-width: 380px;
       transition: all 0.25s ease;
       box-shadow: var(--hud-glow);
     }
     .search-box:focus-within {
-      width: 260px;
+      max-width: 440px;
       border-color: var(--accent-cyan);
       box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
     }
@@ -300,29 +338,44 @@
       50% { box-shadow: 0 0 24px rgba(6, 182, 212, 0.6); border-color: rgba(6, 182, 212, 0.8); }
     }
 
-    /* Anatomical Lobe Flight Bar (Clean Floating Capsule) */
-    .lobe-bar {
+    /* Floating Bottom Command Deck (Cortex Lobes + 3D Flight Deck) */
+    .bottom-deck {
       position: absolute;
-      top: 62px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 25;
+      pointer-events: none;
+      max-width: 96vw;
+    }
+    .lobe-bar, .flight-bar {
+      pointer-events: auto;
       background: rgba(8, 12, 22, 0.94);
       border: 1px solid rgba(56, 189, 248, 0.35);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border-radius: 24px;
-      padding: 4px 8px;
+      padding: 4px 10px;
       display: flex;
       align-items: center;
-      gap: 5px;
-      z-index: 15;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 24px rgba(56, 189, 248, 0.25);
+      gap: 6px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7), 0 0 24px rgba(56, 189, 248, 0.2);
       flex-wrap: nowrap;
       white-space: nowrap;
       overflow-x: auto;
-      max-width: 96vw;
+      max-width: 100%;
     }
-    .lobe-bar::-webkit-scrollbar { display: none; }
+    .lobe-bar::-webkit-scrollbar, .flight-bar::-webkit-scrollbar { display: none; }
+    .flight-divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(255, 255, 255, 0.15);
+      margin: 0 4px;
+    }
     .lobe-tag {
       font-size: 10px;
       font-weight: 800;
@@ -337,7 +390,7 @@
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--text-muted);
       border-radius: 16px;
-      padding: 5px 11px;
+      padding: 4px 10px;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
@@ -396,8 +449,8 @@
       top: 20px;
       right: 20px;
       bottom: 20px;
-      width: 400px;
-      max-width: calc(100vw - 40px);
+      width: 520px;
+      max-width: calc(100vw - 32px);
       background: rgba(8, 12, 22, 0.96);
       border: 1px solid rgba(56, 189, 248, 0.35);
       backdrop-filter: blur(32px);
@@ -620,6 +673,35 @@
       font-size: 12px;
       line-height: 1.5;
     }
+    
+    /* Project Filter Chips for Facts */
+    .facts-filter-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .facts-filter-chips::-webkit-scrollbar { display: none; }
+    .chip-btn {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      border-radius: 14px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .chip-btn:hover, .chip-btn.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: rgba(56, 189, 248, 0.6);
+      color: #fff;
+    }
+
     .fact-meta {
       display: flex;
       justify-content: space-between;
@@ -874,6 +956,35 @@
       color: #e2e8f0;
       line-height: 1.55;
     }
+    
+    /* Project Filter Chips for Facts */
+    .facts-filter-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .facts-filter-chips::-webkit-scrollbar { display: none; }
+    .chip-btn {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      border-radius: 14px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    .chip-btn:hover, .chip-btn.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: rgba(56, 189, 248, 0.6);
+      color: #fff;
+    }
+
     .fact-meta {
       display: flex;
       align-items: center;
@@ -1017,8 +1128,8 @@
     <div class="tooltip-meta" id="tt-meta">⚡ Connections: 5</div>
   </div>
 
-  <!-- Top Navigation HUD -->
-  <div class="top-hud">
+  <!-- Top Navigation HUD (Streamlined & Calm) -->
+  <header class="top-hud">
     <div class="hud-left">
       <div class="brand-pill">
         <div class="brand-title">
@@ -1042,40 +1153,68 @@
         <span class="state-stress" id="state-stress">STRESS: 0.20 🟢</span>
       </div>
 
-      <div class="search-box">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="text" id="search-input" placeholder="Search neural cortex..." autocomplete="off">
-        <span class="kbd">/</span>
-      </div>
-
       <!-- Live API Endpoint Pill -->
       <div class="api-pill" id="api-pill" title="Brain Backend Endpoint (Click to change/verify)">
         <span class="api-dot" id="api-dot"></span>
-        <span id="api-label">BRAIN API</span>
+        <span id="api-label">API: LOCAL</span>
       </div>
     </div>
 
+    <!-- Center Search Bar -->
+    <div class="hud-center">
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="search-input" placeholder="Search neural memories, facts, nodes..." autocomplete="off">
+        <span class="kbd">/</span>
+      </div>
+    </div>
+
+    <!-- Right Primary Operations Hub (Zero overflow / Never clipped) -->
     <div class="hud-right">
-      <!-- Direct Access to Facts & Neural Memory -->
-      <button class="btn-action" id="btn-open-facts" title="Open Global Facts Ledger">
-        <span>📚</span> <span>Fact Ledger</span>
+      <button class="btn-action memory-btn" id="btn-open-facts" title="Open Global Facts Ledger">
+        <span>📚</span> <span>Fact Ledger</span> <span class="badge-count" id="top-facts-count">--</span>
       </button>
 
-      <button class="btn-action" id="btn-open-vector" title="Deep Semantic Context & ChromaDB Search">
+      <button class="btn-action memory-btn" id="btn-open-vector" title="Deep Semantic Context & ChromaDB Search">
         <span>🧠</span> <span>Neural Context</span>
       </button>
+
+      <button class="btn-action dream-btn" id="btn-dream-cycle" onclick="triggerDreamCycle()" title="Trigger Autonomous Dream Cycle & Synaptic Consolidation">
+        <span class="dream-icon">🌙</span> <span id="dream-text">Dream Cycle</span>
+      </button>
+
+      <button class="btn-action primary" id="btn-new-fact-top" onclick="openAddFactModal()" title="Add Verified Fact to Central Brain">
+        <span>+ Add Fact</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Floating Bottom Command Deck (Cortex Lobes + 3D Flight Controls) -->
+  <div class="bottom-deck" id="bottom-deck">
+    <!-- Tier 1: Anatomical Cortex Lobes -->
+    <div class="lobe-bar" id="lobe-bar">
+      <span class="lobe-tag">LOBES:</span>
+      <button class="lobe-btn active" onclick="filterLobe('all', this)">🌐 Full Cortex</button>
+      <button class="lobe-btn" onclick="focusCortexHub('Boss', this)">👑 Prefrontal</button>
+      <button class="lobe-btn" onclick="focusCortexHub('FRIDAY', this)">⚡ Cognitive Core</button>
+      <button class="lobe-btn" onclick="focusCortexHub('ReelDM', this)">🔵 Visual Cortex</button>
+      <button class="lobe-btn" onclick="focusCortexHub('AI_Agents_Intelligence', this)">🌹 Temporal AI</button>
+      <button class="lobe-btn" onclick="focusCortexHub('Payments_and_Growth', this)">🟢 Parietal</button>
+      <button class="lobe-btn" onclick="focusCortexHub('Security_and_Hardening', this)">🔴 Brainstem</button>
+      <button class="lobe-btn" onclick="focusCortexHub('Infrastructure', this)">☁️ Exocortex</button>
+    </div>
+
+    <!-- Tier 2: 3D Flight & Simulation Deck -->
+    <div class="flight-bar" id="flight-bar">
       <!-- Synaptic Heat Filter Pill -->
       <div class="heat-filter-pill" id="heat-filter-pill">
-        <span class="heat-tag">⚡ SYNAPSE HEAT:</span>
+        <span class="heat-tag">HEAT:</span>
         <button class="heat-btn active" id="heat-all" onclick="filterHeat('all', this)">All</button>
         <button class="heat-btn" id="heat-hot" onclick="filterHeat('hot', this)">🔥 Hot (≥0.7)</button>
         <button class="heat-btn" id="heat-cold" onclick="filterHeat('cold', this)">❄️ Decayed (&lt;0.4)</button>
       </div>
 
-      <!-- 1-Click Dream Cycle Button -->
-      <button class="btn-action dream-btn" id="btn-dream-cycle" onclick="triggerDreamCycle()" title="Trigger Autonomous Dream Cycle & Synaptic Consolidation">
-        <span class="dream-icon">🌙</span> <span id="dream-text">Dream Cycle</span>
-      </button>
+      <div class="flight-divider"></div>
 
       <button class="btn-action active-glow" id="btn-toggle-orbit" title="Toggle Cinematic Auto-Orbit">
         <span>🔄</span> <span id="orbit-text">Auto-Orbit</span>
@@ -1097,27 +1236,14 @@
         <span>📸</span> <span>Capture</span>
       </button>
 
-      <button class="btn-action primary" id="btn-add-entity">
+      <button class="btn-action" id="btn-add-entity" title="Create New 3D Neural Node">
         <span>+ Add Entity</span>
       </button>
 
       <button class="btn-action" id="btn-reset-view" title="Reset View [F]">
-        <span>Reset View</span>
+        <span>⟲ Reset</span>
       </button>
     </div>
-  </div>
-
-  <!-- Anatomical Cortex Lobe Flight Bar -->
-  <div class="lobe-bar" id="lobe-bar">
-    <span class="lobe-tag">LOBES:</span>
-    <button class="lobe-btn active" onclick="filterLobe('all', this)">🌐 Full Cortex</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Boss', this)">👑 Prefrontal</button>
-    <button class="lobe-btn" onclick="focusCortexHub('FRIDAY', this)">⚡ Cognitive Core</button>
-    <button class="lobe-btn" onclick="focusCortexHub('ReelDM', this)">🔵 Visual Cortex</button>
-    <button class="lobe-btn" onclick="focusCortexHub('AI_Agents_Intelligence', this)">🌹 Temporal AI</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Payments_and_Growth', this)">🟢 Parietal</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Security_and_Hardening', this)">🔴 Brainstem</button>
-    <button class="lobe-btn" onclick="focusCortexHub('Infrastructure', this)">☁️ Exocortex</button>
   </div>
 
   <!-- Detail Inspector Drawer -->
@@ -1171,6 +1297,14 @@
           <div class="facts-scope-bar">
             <button class="facts-scope-btn active" id="btn-scope-node" onclick="setFactsScope('node')">Matched to Node</button>
             <button class="facts-scope-btn" id="btn-scope-all" onclick="setFactsScope('all')">All System Facts (<span id="all-facts-badge">0</span>)</button>
+          </div>
+          <div class="facts-filter-chips">
+            <button class="chip-btn active" id="chip-all" onclick="setQuickFactCategory('all', this)">All (<span id="chip-count-all">0</span>)</button>
+            <button class="chip-btn" id="chip-reeldm" onclick="setQuickFactCategory('reeldm', this)">ReelDM</button>
+            <button class="chip-btn" id="chip-friday" onclick="setQuickFactCategory('friday', this)">Friday</button>
+            <button class="chip-btn" id="chip-ec2" onclick="setQuickFactCategory('ec2', this)">AWS EC2</button>
+            <button class="chip-btn" id="chip-security" onclick="setQuickFactCategory('security', this)">Security</button>
+            <button class="chip-btn" id="chip-prime" onclick="setQuickFactCategory('prime', this)">⚡ Prime</button>
           </div>
           <div class="facts-tools-row">
             <div class="facts-search-box">
@@ -2187,7 +2321,7 @@
     });
 
     window.addEventListener('click', e => {
-      if (e.target.closest('.top-hud') || e.target.closest('.lobe-bar') || e.target.closest('.inspector-drawer') || e.target.closest('.modal-backdrop')) return;
+      if (e.target.closest('.top-hud') || e.target.closest('.bottom-deck') || e.target.closest('.lobe-bar') || e.target.closest('.inspector-drawer') || e.target.closest('.modal-backdrop')) return;
 
       raycaster.setFromCamera(mouse, camera);
       const meshes = Array.from(nodeMeshMap.values());
@@ -2424,6 +2558,10 @@
         const data = await res.json();
         allActiveFacts = data.facts || [];
         document.getElementById('all-facts-badge').innerText = allActiveFacts.length;
+        const topCount = document.getElementById('top-facts-count');
+        if (topCount) topCount.innerText = allActiveFacts.length;
+        const chipCount = document.getElementById('chip-count-all');
+        if (chipCount) chipCount.innerText = allActiveFacts.length;
 
         if (manualRefresh) showToast(`Loaded ${allActiveFacts.length} verified facts`, '📚');
         renderFactsList();
@@ -2432,6 +2570,16 @@
         const box = document.getElementById('facts-list');
         if (box) box.innerHTML = `<div style="font-size: 11px; color: #ef4444; padding: 12px 0;">Error fetching facts ledger from ${BRAIN_API || 'origin'}: ${err.message}</div>`;
       }
+    }
+
+    
+    let activeFactCategory = 'all';
+
+    function setQuickFactCategory(cat, btn) {
+      activeFactCategory = cat;
+      document.querySelectorAll('.facts-filter-chips .chip-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderFactsList();
     }
 
     function setFactsScope(scope) {
@@ -2480,6 +2628,20 @@
         }
       } else {
         factsToDisplay = allActiveFacts;
+      }
+
+      if (activeFactCategory !== 'all') {
+        if (activeFactCategory === 'prime') {
+          factsToDisplay = factsToDisplay.filter(f => Number(f.energy_score || 1.0) >= 0.7);
+        } else if (activeFactCategory === 'reeldm') {
+          factsToDisplay = factsToDisplay.filter(f => (f.content || '').toLowerCase().includes('reeldm') || (f.id || '').toLowerCase().includes('reeldm'));
+        } else if (activeFactCategory === 'friday') {
+          factsToDisplay = factsToDisplay.filter(f => (f.content || '').toLowerCase().includes('friday'));
+        } else if (activeFactCategory === 'ec2') {
+          factsToDisplay = factsToDisplay.filter(f => (f.content || '').toLowerCase().includes('ec2') || (f.content || '').toLowerCase().includes('aws') || (f.content || '').includes('13.200.195.74'));
+        } else if (activeFactCategory === 'security') {
+          factsToDisplay = factsToDisplay.filter(f => (f.content || '').toLowerCase().includes('security') || (f.content || '').toLowerCase().includes('dependabot') || (f.content || '').toLowerCase().includes('protect'));
+        }
       }
 
       if (filterText) {
@@ -2632,27 +2794,34 @@
     // --- Direct HUD Open Handlers ---
     document.getElementById('btn-open-facts').addEventListener('click', () => {
       Sound.playClick();
-      currentFactsScope = selectedNode ? 'node' : 'all';
-      if (!document.getElementById('inspector-drawer').classList.contains('open')) {
-        openGlobalDrawer('facts');
-      } else {
-        switchDrawerTab('facts');
-      }
+      currentFactsScope = 'all'; // Always default to all system facts from top button
+      setFactsScope('all');
+      openGlobalDrawer('facts');
     });
 
     document.getElementById('btn-open-vector').addEventListener('click', () => {
       Sound.playClick();
-      if (!document.getElementById('inspector-drawer').classList.contains('open')) {
-        openGlobalDrawer('vector');
-      } else {
-        switchDrawerTab('vector');
+      openGlobalDrawer('vector');
+      const vInput = document.getElementById('vector-search-input');
+      if (vInput && !vInput.value.trim()) {
+        queryVectorQuick('ReelDM Production Architecture');
       }
     });
 
     function openGlobalDrawer(defaultTab = 'facts') {
       const drawer = document.getElementById('inspector-drawer');
-      document.getElementById('drawer-title').innerText = selectedNode ? (selectedNode.name || selectedNode.id).replace(/_/g, ' ') : "Friday's Brain Cortex";
-      document.getElementById('drawer-tag').innerText = selectedNode ? (selectedNode.group || 'NEURAL SYNAPSE').toUpperCase() : "CENTRAL KNOWLEDGE LEDGER";
+      if (defaultTab === 'facts') {
+        document.getElementById('drawer-title').innerText = "Central Memory & Facts Vault";
+        document.getElementById('drawer-tag').innerText = "GROUND TRUTH FACTS (AUTO-SUPERSEDE)";
+        document.getElementById('btn-scope-all').classList.add('active');
+        document.getElementById('btn-scope-node').classList.remove('active');
+      } else if (defaultTab === 'vector') {
+        document.getElementById('drawer-title').innerText = "ChromaDB Neural Memory";
+        document.getElementById('drawer-tag').innerText = "EPISODIC SEMANTIC VECTOR SPACE";
+      } else {
+        document.getElementById('drawer-title').innerText = selectedNode ? (selectedNode.name || selectedNode.id).replace(/_/g, ' ') : "Friday's Brain Cortex";
+        document.getElementById('drawer-tag').innerText = selectedNode ? (selectedNode.group || 'NEURAL SYNAPSE').toUpperCase() : "CENTRAL KNOWLEDGE LEDGER";
+      }
 
       const energy = selectedNode ? (selectedNode.energy_score || 1.0) : 1.0;
       document.getElementById('drawer-energy-score').innerText = energy.toFixed(2);
