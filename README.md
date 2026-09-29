@@ -31,8 +31,8 @@ Persists architecture decisions, schemas, and constraints across sessions via th
   <tr>
     <td align="center"><a href="#the-problem-session-amnesia"><b>The Problem</b></a></td>
     <td align="center"><a href="#architecture-multi-layer-cognitive-substrate"><b>Architecture</b></a></td>
-    <td align="center"><a href="#dual-cortex-architecture-why-the-subconscious-mind-has-its-own-api"><b>Dual-Cortex</b></a></td>
-    <td align="center"><a href="#cognitive-core-20-biological-memory-architecture"><b>Cognitive Core 2.0</b></a></td>
+    <td align="center"><a href="#dual-engine-architecture-decoupled-background-processing"><b>Dual-Engine</b></a></td>
+    <td align="center"><a href="#memory-lifecycle-management-decay-consolidation--calibration"><b>Memory Lifecycle</b></a></td>
     <td align="center"><a href="#quickstart"><b>Quickstart</b></a></td>
     <td align="center"><a href="#python-sdk-friday-memory"><b>Python SDK</b></a></td>
     <td align="center"><a href="#client-setup-mcp"><b>MCP Setup</b></a></td>
@@ -45,7 +45,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 <img src="https://raw.githubusercontent.com/friday-memory/friday/main/docs/assets/holosphere_4_galactic_cortex.png" alt="Friday Neural Studio — Interactive Knowledge Graph" width="100%" style="border-radius: 8px; border: 1px solid #1e293b;" />
 
 <br>
-<sub><i>Friday Neural Studio (Holosphere 4.0) — Real-time WebGL synthetic cortex visualizer rendering galactic lobe constellations, dynamic synaptic energy heatmaps, and autonomous dream cycle consolidation.</i></sub>
+<sub><i>Friday Neural Studio — Real-time 3D WebGL knowledge graph visualizer rendering service topologies, dynamic access heatmaps, and automated memory consolidation.</i></sub>
 
 <br><br>
 
@@ -145,54 +145,54 @@ Friday runs as a self-hosted background service providing a structured, four-tie
 
 ---
 
-## Dual-Cortex Architecture: Why the Subconscious Mind Has Its Own API
+## Dual-Engine Architecture: Decoupled Background Processing
 
-A foundational question developers ask when exploring Friday is:
-> *"Why does Friday maintain an internal background LLM (like Groq, DeepSeek, or local Ollama) on the server, completely separate from the frontier model I use in my terminal or Cursor?"*
+A foundational architectural decision in Friday is:
+> *"Why does Friday maintain a background worker LLM (such as Groq, DeepSeek, or local Ollama) on the server, completely separate from the frontier model running in Cursor, Claude Code, or Antigravity?"*
 
-The answer lies in biological cognitive partitioning. Just as the human brain divides labor between the **Conscious Mind** (deliberate action, focus, reasoning) and the **Subconscious Mind** (sensory processing, memory consolidation, autonomic reflexes), Friday enforces a **Dual-Cortex Cognitive Architecture**:
+Interactive coding agents require low latency, while knowledge graph maintenance requires continuous data extraction and synthesis. Friday enforces a **Dual-Engine Architecture** that cleanly decouples frontline developer workflows from background data pipelines:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                        THE DUAL-CORTEX COGNITIVE MODEL                                 │
+│                        THE DUAL-ENGINE ARCHITECTURE MODEL                                 │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                        │
-│   CONSCIOUS MIND (The Frontline Architect)    SUBCONSCIOUS MIND (The Autonomic Cortex) │
+│   INTERACTIVE AGENT (Frontline Client)       BACKGROUND WORKER (Async Engine)      │
 │   ┌─────────────────────────────────────┐     ┌─────────────────────────────────────┐  │
 │   │ Client: Cursor / Claude / Antigravity│     │ Engine: Self-Hosted Friday Server   │  │
 │   │ Model: Frontier (Claude 3.5 / GPT-4o)│     │ Model: Fast Worker (Groq / Ollama)  │  │
-│   │ Role: Complex code generation       │     │ Role: Real-time graph extraction    │  │
-│   │ Context: Lean, task-specific prompt │     │ Role: Conflict detection & decay    │  │
+│   │ Role: Complex code generation       │     │ Role: Async graph extraction        │  │
+│   │ Context: Lean, task-specific prompt │     │ Role: Conflict pruning & decay      │  │
 │   │ State: Ephemeral session lifetime   │     │ State: 24/7 background persistent   │  │
 │   └──────────────────┬──────────────────┘     └──────────────────▲──────────────────┘  │
 │                      │                                           │                     │
 │                      │ 1. MCP Tools (memory_search, add_memory)  │ 2. Microsecond      │
 │                      ▼                                           │    Async Parsing    │
 │   ┌──────────────────────────────────────────────────────────────┴──────────────────┐  │
-│   │                        FRIDAY PERSISTENT COGNITIVE SUBSTRATE                    │  │
+│   │                        FRIDAY PERSISTENT MEMORY ARCHITECTURE                    │  │
 │   │                                                                                 │  │
 │   │   Layer 1: Facts Ledger (Deterministic S3-style Hash Table)                     │  │
 │   │   Layer 2: Episodic Memory (Mem0 Conversational Thread History)                 │  │
 │   │   Layer 3: Vector Embeddings (ChromaDB Semantic Chunks)                         │  │
 │   │   Layer 4: Property Knowledge Graph (Neo4j Directed Topology)                   │  │
-│   │   Cognitive Dynamics: Synaptic Decay (E(t)) & Nightly Dream Cycle (03:00 UTC)   │  │
+│   │   Memory Lifecycle: Dynamic Decay (E(t)) & Nightly Dream Cycle (03:00 UTC)    │  │
 │   └─────────────────────────────────────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Why Decoupling the Subconscious API is Non-Negotiable:
+### Why Decoupling Background Processing is Essential:
 
 #### 1. ⚡ Zero-Latency IDE Execution (Non-Blocking Decoupling)
 When you type in Cursor or Claude Code and an agent records a major decision via `add_memory`, the Conscious model cannot pause for 4–6 seconds while an LLM parses semantic entities, identifies foreign keys, and runs Cypher mutations.
 - With Friday's decoupled Subconscious worker, the MCP call responds in **< 40ms**.
 - The Subconscious engine (e.g. Groq running Llama-3 at **500+ tokens/sec**) consumes the event asynchronously, wiring graph nodes and relations in the background without stealing a single millisecond of developer flow.
 
-#### 2. 💰 95%+ Economic Token Arbitrage
+#### 2. 💰 95%+ Token Cost Optimization
 Frontier reasoning models (Claude 3.5 Sonnet, GPT-4o) cost **$3.00 to $15.00 per million tokens**. Using these expensive models for routine structural maintenance—such as extracting triples (`Entity A` $\longrightarrow$ `RELATION` $\longrightarrow$ `Entity B`), verifying fact hashes, or applying synaptic decay—wastes massive token budgets.
 - Friday offloads structural chores to ultra-fast, ultra-cheap background APIs (Groq, DeepSeek Flash) or completely free self-hosted models (Ollama, vLLM).
 - Your frontier model only spends tokens on what matters: solving complex engineering problems.
 
-#### 3. 🌙 The Subconscious Never Sleeps (Autonomous 24/7 Consolidation)
+#### 3. 🌙 Autonomous Background Consolidation (The Dream Cycle)
 Your coding session ends when you close your IDE or put your laptop to sleep. But memory evolution cannot stop when the laptop closes:
 - Friday's Subconscious engine lives on your cloud or local server 24/7.
 - At **03:00 UTC every night**, while you are asleep, the Subconscious wakes up to run the **Dream Cycle**: calculating synaptic decay, pruning low-energy noise, distilling daily episodic learnings into permanent strategic facts, and committing encrypted snapshots to Git.
@@ -204,13 +204,13 @@ Dumping a monolithic 500-node graph or 100 historical decisions directly into yo
 
 ---
 
-## Cognitive Core 2.0 (Biological Memory Architecture)
+## Memory Lifecycle Management: Decay, Consolidation & Calibration
 
-Friday incorporates biologically-inspired memory mechanics to ensure AI agents maintain pristine context without bloat, stale instruction interference, or communication misalignment:
+Friday implements active memory lifecycle management to ensure AI agents retain critical constraints without context bloat or stale instruction interference:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                          FRIDAY COGNITIVE DYNAMICS ENGINE                              │
+│                          FRIDAY MEMORY LIFECYCLE ENGINE                                │
 ├────────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                        │
 │  🔥 Dynamic Memory Heat & Decay           🌙 The Dream Cycle (Nightly 03:00 UTC)      │
@@ -221,11 +221,11 @@ Friday incorporates biologically-inspired memory mechanics to ensure AI agents m
 │  │ • Soft Archive if E < 0.25        │    │ 4. Autonomous Backup to Git            │   │
 │  └───────────────────────────────────┘    └────────────────────────────────────────┘   │
 │                                                                                        │
-│  🤍 Empathy & Cognitive State Tracking                                                 │
+│  🤍 Adaptive Context & Persona Calibration                                             │
 │  ┌──────────────────────────────────────────────────────────────────────────────────┐  │
-│  │ Multi-Dimensional User Calibration                                               │  │
-│  │ • Interaction Modes: tactical_sprint | deep_architecture | casual_brainstorm      │  │
-│  │ • Real-time Stress & Urgency Detection (0.0 to 1.0)                              │  │
+│  │ Multi-Dimensional Response Calibration                                           │  │
+│  │ • Interaction Modes: tactical_sprint | deep_architecture | casual_brainstorm     │  │
+│  │ • Task Context & Urgency Detection (0.0 to 1.0)                                  │  │
 │  │ • Dynamic Response Calibration: Brevity (high/med/low) & Tone Tuning             │  │
 │  └──────────────────────────────────────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────────────────────────────────────┘
@@ -243,10 +243,10 @@ Every night at 03:00 UTC (or on-demand via `client.run_dream_cycle()`), Friday e
 - **Neo4j Crystallization**: Links high-confidence insights into the property graph with `CRYSTALLIZED_INTO` edges.
 - **Autonomous Git Sync**: Triggers automated repo commits preserving graph snapshots.
 
-### 3. 🤍 Empathy & Cognitive State Tracking
+### 3. 🤍 Adaptive Context & Persona Calibration
 Friday monitors the developer interaction context (urgent bug-fix sprint, late-night architecture exploration, or casual brainstorming). The engine dynamically adjusts agent response characteristics:
 - **Brevity Calibration**: `high` (zero fluff, code-first) vs. `detailed` (system-wide breakdown).
-- **Tone Calibration**: `sharp_tactical` (Kerry Condon MCU wit) vs. `structured_analytical`.
+- **Tone Calibration**: `technical_concise` (code-first, direct) vs. `architectural_detailed` (system-wide breakdown).
 - Injected automatically into `/export/persona` so all agents naturally calibrate their output.
 
 ---
@@ -331,7 +331,7 @@ The script verifies Docker availability, allocates required ports (8000, 7474, 7
    {
      "status": "healthy",
      "service": "friday-cognitive-substrate",
-     "version": "1.3.0",
+     "version": "1.4.2",
      "layers": {
        "L1_core": "healthy",
        "L2_mem0": "healthy",
@@ -636,14 +636,14 @@ Extracted Graph Nodes & Edges:
   (:API {name: "Stripe"}) -[:DISPATCHES_TO]-> (:Endpoint {path: "/api/webhooks/stripe"})
 ```
 
-### 2. Neural Studio (Holosphere 4.0 — 3D Synthetic Cortex Visualizer)
-A browser-based 3D WebGL neural visualizer powered by Three.js for real-time memory exploration and cognitive telemetry:
-- **Galactic Lobe Constellations**: Eliminates node clumping by distributing 1,000+ entities across 8 deterministic anatomical star systems (Prefrontal, Cognitive Core, Visual Cortex, Temporal AI, Parietal, Brainstem, Exocortex, and Architecture Bridges).
-- **Dynamic Synaptic Heatmap**: Visualizes memory retention energy in real time with interactive filtering (`All`, `Hot ≥ 0.7`, `Decayed < 0.4`). Active pathways radiate vibrant neon bioluminescence, while cooling memories transition gracefully to stardust.
-- **1-Click Dream Cycle Engine**: Dispatches autonomous neural consolidation directly from the HUD with a real-time consolidation shockwave animation, synthesizing episodic insights and crystallizing Neo4j edges.
-- **Live Cognitive State HUD**: Telemetry pill streaming active mode (`Tactical Sprint ⚡`), urgency, and stress metrics updated dynamically every 30 seconds.
-- **Holographic Node Inspector**: Inspects synaptic retention meters, executes instant memory potentiation (`⚡ Reinforce +0.25`), provides clickable connection jumps, and smooth camera flight warp.
-- **Live CRUD & Topology Capture**: Create, rename, or link entities interactively, and export high-resolution screenshots for system documentation.
+### 2. Neural Studio (Interactive 3D Graph Visualizer)
+A browser-based 3D WebGL visualizer powered by Three.js for real-time knowledge graph exploration and system telemetry:
+- **Domain-Clustered Layout**: Groups entities by architectural domain (API, Services, Storage, Auth, Infrastructure) to prevent visual tangling across 1,000+ nodes and clarify service boundaries.
+- **Dynamic Access Heatmap**: Color-codes nodes by recall frequency and recency, with interactive filters for active directives (`Hot ≥ 0.7`) and aging/deprecated context (`Decayed < 0.4`).
+- **1-Click Memory Consolidation**: Dispatches background memory consolidation directly from the UI, synthesizing episodic conversations and crystallizing verified Neo4j relationships.
+- **Live Status HUD**: Real-time indicator displaying active operational mode (Sprint, Deep Architecture, Brainstorm) and system health.
+- **Interactive Node Inspector**: Inspect metadata, reinforce priority weights (`+0.25`), trace bidirectional relationship chains, and smoothly focus the 3D camera on target nodes.
+- **Live CRUD & Topology Export**: Create, rename, or link entities interactively, and export high-resolution canvas snapshots for system documentation.
 
 ### 3. Versioned Facts Ledger
 Deterministic project constants are recorded with immutable version history. Outdated statements are superseded rather than overwritten, preserving an audit trail:
@@ -670,7 +670,7 @@ friday/
 ├── pipelines/               # Background entity extraction, Dream Cycle & fact pipelines
 ├── orchestrator/            # Multi-layer retrieval router & cognitive state engine
 ├── mcp/                     # Model Context Protocol stdio server
-├── studio/                  # Three.js Neural Studio visualizer (Holosphere 4.0)
+├── studio/                  # Three.js Neural Studio 3D visualizer
 ├── benchmarks/              # DeepEval evaluation suite
 ├── tests/                   # Pytest test suite (100% green)
 ├── docker-compose.yml       # Production container definition
