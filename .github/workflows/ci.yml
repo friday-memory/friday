@@ -32,3 +32,20 @@ jobs:
 
       - name: Code Style & Quality Check
         run: ruff check .
+
+  serverless:
+    name: Serverless dual-backend qualification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install isolated serverless dependencies
+        run: |
+          python -m pip install 'cmake<4'
+          python -m pip install -r requirements-serverless.txt pytest==8.3.3 pytest-asyncio==0.24.0 ruff
+      - name: Test both native storage engines and API authentication
+        run: python -m pytest tests/test_storage.py -q
+      - name: Lint
+        run: ruff check .
