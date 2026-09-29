@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "friday-memory"
-version = "1.4.1"
+version = "1.4.2"
 description = "Official Python SDK and self-hosted persistent cognitive memory layer for AI coding agents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -22,9 +22,6 @@ keywords = [
     "knowledge-graph",
     "neo4j",
     "persistent-memory",
-    "serverless",
-    "turso",
-    "libsql",
     "sdk"
 ]
 classifiers = [
@@ -65,6 +62,14 @@ dev = [
 Homepage = "https://github.com/friday-memory/friday"
 Repository = "https://github.com/friday-memory/friday.git"
 Issues = "https://github.com/friday-memory/friday/issues"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/friday",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["friday"]
