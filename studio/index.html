@@ -64,22 +64,23 @@
     /* Top Navigation HUD (Streamlined, Calm & Zero Overflow) */
     .top-hud {
       position: absolute;
-      top: 14px;
-      left: 18px;
-      right: 18px;
+      top: 12px;
+      left: 16px;
+      right: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       pointer-events: none;
       z-index: 20;
     }
     .hud-left {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       pointer-events: auto;
-      flex-shrink: 0;
+      flex-shrink: 1;
+      min-width: 0;
     }
     .hud-center {
       display: flex;
@@ -87,14 +88,27 @@
       justify-content: center;
       pointer-events: auto;
       flex: 1;
-      max-width: 440px;
+      min-width: 140px;
+      max-width: 320px;
+      margin: 0 4px;
     }
     .hud-right {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       pointer-events: auto;
       flex-shrink: 0;
+    }
+
+    @media (max-width: 1440px) {
+      .state-divider, #state-urgency { display: none !important; }
+      .brand-stats .ping-badge { display: none !important; }
+      .search-box { width: 100% !important; max-width: 240px !important; }
+    }
+    @media (max-width: 1280px) {
+      .state-pill { display: none !important; }
+      .brand-stats { display: none !important; }
+      .api-pill span:not(.api-dot) { display: none !important; }
     }
     .memory-btn {
       background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(99, 102, 241, 0.2)) !important;
@@ -449,7 +463,7 @@
       top: 20px;
       right: 20px;
       bottom: 20px;
-      width: 520px;
+      width: 480px;
       max-width: calc(100vw - 32px);
       background: rgba(8, 12, 22, 0.96);
       border: 1px solid rgba(56, 189, 248, 0.35);
@@ -459,12 +473,16 @@
       display: flex;
       flex-direction: column;
       z-index: 40;
-      transform: translateX(450px);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(calc(100% + 40px));
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
       box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 32px rgba(56, 189, 248, 0.2);
     }
     .inspector-drawer.open {
       transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
     }
     .drawer-header {
       padding: 18px 20px;
