@@ -1,10 +1,8 @@
 """Tests for the Friday Universal Agent Rule Adapter Engine & CLI."""
 
-import io
-import sys
-from pathlib import Path
 import pytest
 
+from friday.cli import main
 from friday.rules import (
     AgentTarget,
     generate_all_rules,
@@ -13,7 +11,6 @@ from friday.rules import (
     register_custom_agent,
     render_rule,
 )
-from friday.cli import main
 
 
 def test_get_supported_agents():
