@@ -16,7 +16,8 @@ Fixes #(issue)
 ## Architecture Impact
 
 - [ ] Updates MCP tool schema (`mcp/server.py`)
-- [ ] Modifies database layer (SQLite / Neo4j / ChromaDB)
+- [ ] Modifies core gateway endpoints (`gateway/main.py`)
+- [ ] Modifies Python SDK client or rules engine (`friday/`)
 - [ ] Modifies Neural Studio visualizer (`studio/`)
 - [ ] None (internal logic / tests only)
 
@@ -25,19 +26,19 @@ Fixes #(issue)
 Explain how the changes were verified:
 
 ```bash
-# Example test run
-make test
-make lint
+# Verify test suite and code hygiene
+pytest tests/ -q
+ruff check .
+ruff format --check .
 ```
 
-- [ ] Unit tests added / updated and passing green
-- [ ] Smoke tested locally with FastAPI TestClient
-- [ ] Verified live against Docker Compose stack (if applicable)
-- [ ] No regression in token extraction or graph ingestion
+- [ ] Unit tests added / updated and passing green (100%)
+- [ ] Tested locally with FastAPI TestClient or MockTransport
+- [ ] No regression in token extraction, graph ingestion, or fact resolution
 
-## Checklist
+## Security & Hygiene Checklist (Mandatory)
 
-- [ ] Code follows project style guidelines (`ruff check .`)
-- [ ] All public methods and endpoints have clear docstrings
-- [ ] Relevant documentation updated (README, API reference, or docs)
-- [ ] Commit message follows Conventional Commits format
+- [ ] **Data Hygiene**: Verified ZERO private testing hostnames, internal IPs, API keys, or staging credentials in commits.
+- [ ] Code follows project style guidelines (`ruff check .` and `ruff format --check .`).
+- [ ] All public methods and endpoints have clear docstrings.
+- [ ] Commit message follows Conventional Commits format.
