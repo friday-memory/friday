@@ -16,7 +16,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 <p align="center">
   <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat&color=334155&label=Stars" alt="GitHub Stars"/></a>
-  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.4.3-334155?style=flat" alt="Release"/></a>
+  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.4.4-334155?style=flat" alt="Release"/></a>
   <a href="https://pypi.org/project/friday-memory/"><img src="https://img.shields.io/pypi/v/friday-memory?style=flat&color=334155&label=PyPI" alt="PyPI Package"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-334155?style=flat" alt="MIT License"/></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-334155?style=flat" alt="Python 3.11+"/></a>
@@ -36,6 +36,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
     <td align="center"><a href="#quickstart"><b>Quickstart</b></a></td>
     <td align="center"><a href="#python-sdk-friday-memory"><b>Python SDK</b></a></td>
     <td align="center"><a href="#client-setup-mcp"><b>MCP Setup</b></a></td>
+    <td align="center"><a href="#universal-agent-directive-engine-multi-agent-rules"><b>Agent Rules</b></a></td>
     <td align="center"><a href="#api-reference"><b>API Reference</b></a></td>
   </tr>
 </table>
@@ -331,7 +332,7 @@ The script verifies Docker availability, allocates required ports (8000, 7474, 7
    {
      "status": "healthy",
      "service": "friday-cognitive-substrate",
-     "version": "1.4.3",
+     "version": "1.4.4",
      "layers": {
        "L1_core": "healthy",
        "L2_mem0": "healthy",
@@ -622,6 +623,55 @@ curl -s "http://localhost:8000/export/persona?target=cursor" \
 
 ---
 
+## Universal Agent Directive Engine (Multi-Agent Rules)
+
+Different AI coding assistants rely on different workspace instruction formats. Friday includes a built-in CLI engine that generates standardized, bidirectional memory directives for any editor or autonomous agent runner:
+
+| Target Environment | Generated File | Default Location |
+| :--- | :--- | :--- |
+| **Universal Agent Standard** | `AGENTS.md` | Repository root |
+| **Claude Code** | `CLAUDE.md` | Repository root |
+| **Cursor IDE** | `.cursorrules` | Repository root |
+| **Google Gemini & Antigravity** | `GEMINI.md` | Repository root |
+| **GitHub Copilot** | `copilot-instructions.md` | `.github/` |
+| **Windsurf & Cascade** | `.windsurfrules` | Repository root |
+| **Continue.dev** | `rules.md` | `.continue/` |
+| **Aider** | `CONVENTIONS.md` | Repository root |
+
+### 1. List Supported Targets
+```bash
+friday rules list
+```
+
+### 2. Generate Rules for Your Toolchain
+Generate an optimized rule file for a specific agent:
+```bash
+friday rules generate --target claude
+friday rules generate --target cursor
+friday rules generate --target gemini
+```
+
+Or generate standardized rule files for all supported tools at once:
+```bash
+friday rules generate --all
+```
+
+### 3. Extensible Custom Agent Adapters
+For proprietary agents, internal corporate tooling, or newly released frameworks, register and output custom adapted rule files:
+```bash
+friday rules custom \
+  --key myagent \
+  --name "Internal SRE Agent" \
+  --file ".myagent/rules.md"
+```
+
+Each generated rule file enforces the **Two-Way Zero-Amnesia Protocol**:
+- **Pre-Task Read Gate**: Automatically queries `friday:get_context` and `friday:memory_search` before formulating implementation plans.
+- **Post-Task Write Gate**: Automatically persists architectural decisions, schemas, and bug fixes via `friday:add_fact` and `friday:add_memory`.
+
+
+---
+
 ## Features
 
 ### 1. Automated Knowledge Graph Extraction
@@ -664,7 +714,7 @@ POST /facts -> {"content": "Migrated database to Aurora PostgreSQL on port 5432"
 
 ```
 friday/
-├── friday/                  # Official Python SDK (client, types, LangChain retriever)
+├── friday/                  # Official Python SDK & CLI (client, rules engine, types)
 ├── gateway/                 # FastAPI REST application & routing (Neo4j + ChromaDB + Mem0)
 ├── layers/                  # Pluggable cognitive adapters (ChromaDB, Neo4j, Decay)
 ├── pipelines/               # Background entity extraction, Dream Cycle & fact pipelines

@@ -11,6 +11,14 @@ from .exceptions import (
     FridayError,
     FridayNotFoundError,
 )
+from .rules import (
+    AgentTarget,
+    generate_all_rules,
+    generate_rule_file,
+    get_supported_agents,
+    register_custom_agent,
+    render_rule,
+)
 from .types import (
     CognitiveState,
     DreamReport,
@@ -22,7 +30,7 @@ from .types import (
     SearchResult,
 )
 
-__version__ = "1.3.0"
+__version__ = "1.4.4"
 
 __all__ = [
     "Friday",
@@ -40,5 +48,11 @@ __all__ = [
     "CognitiveState",
     "DreamReport",
     "MemoryDecayReport",
+    "AgentTarget",
+    "get_supported_agents",
+    "register_custom_agent",
+    "render_rule",
+    "generate_rule_file",
+    "generate_all_rules",
     "__version__",
 ]

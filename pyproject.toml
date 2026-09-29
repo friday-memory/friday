@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "friday-memory"
-version = "1.4.3"
+version = "1.4.4"
 description = "Official Python SDK and self-hosted persistent cognitive memory layer for AI coding agents"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -57,6 +57,9 @@ dev = [
     "pytest-asyncio>=0.23.0",
     "ruff>=0.3.0",
 ]
+
+[project.scripts]
+friday = "friday.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/friday-memory/friday"

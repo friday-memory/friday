@@ -20,7 +20,7 @@ from friday.integrations.langchain import FridayRetriever
 
 def test_sdk_version_and_exports():
     """Verify package version and public exports."""
-    assert __version__ == "1.3.0"
+    assert __version__ == "1.4.4"
     assert Friday is not None
     assert AsyncFriday is not None
     assert FridayAuthenticationError is not None
