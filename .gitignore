@@ -31,3 +31,8 @@ integrations/*.md
 neo4j_data/
 neo4j_logs/
 core/cognitive_state.json
+
+# Isolated migration development and private databases
+.venv-*/
+*.db
+*.db-*
