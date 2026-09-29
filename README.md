@@ -814,3 +814,10 @@ Review [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines, commit co
 ## License
 
 Friday is licensed under the [MIT License](LICENSE).
+
+### Parallel serverless candidate
+
+An opt-in SQLite/libSQL gateway, private export/import tools, and Cloud Run/Scheduler
+preview scripts are documented in [the migration runbook](docs/serverless-migration.md).
+This candidate requires explicit project namespaces and authenticated reads. It does
+not change the default Compose installation or authorize a client cutover.

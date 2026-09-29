@@ -24,6 +24,7 @@ import asyncio
 import json
 import logging
 import os
+import subprocess
 import sys
 from typing import Any
 
@@ -52,6 +53,19 @@ def _error(code: int, message: str, req_id: Any = None) -> None:
         err["id"] = req_id
     sys.stdout.write(json.dumps(err) + "\n")
     sys.stdout.flush()
+
+
+def request_headers() -> dict:
+    """Refresh IAM identity when explicitly enabled; never print credentials."""
+    headers = dict(HEADERS)
+    if os.getenv("FRIDAY_GCP_IAM") == "true":
+        token = subprocess.check_output(
+            [os.getenv("FRIDAY_GCLOUD", "gcloud"), "auth", "print-identity-token"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+        headers["X-Serverless-Authorization"] = "Bearer " + token
+    return headers
 
 
 # ── Tool Definitions ───────────────────────────────────────────────────────────
@@ -163,12 +177,22 @@ TOOLS = [
 ]
 
 
+# Every tool carries a project namespace. Existing callers retain default.
+for tool in TOOLS:
+    tool["inputSchema"]["properties"]["project"] = {
+        "type": "string",
+        "minLength": 1,
+        "default": "default",
+        "description": "Project namespace; legacy unscoped exports use __legacy_unscoped__.",
+    }
+
+
 # ── Tool Implementations ────────────────────────────────────────────────────────
 async def add_memory(args: dict) -> dict:
     async with httpx.AsyncClient(timeout=30) as client:
         r = await client.post(
             f"{FRIDAY_URL}/add",
-            headers=HEADERS,
+            headers=request_headers(),
             json={
                 "content": args["content"],
                 "project": args.get("project", "default"),
@@ -186,7 +210,7 @@ async def add_fact(args: dict) -> dict:
     if args.get("supersedes"):
         payload["supersedes"] = args["supersedes"]
     async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.post(f"{FRIDAY_URL}/facts", headers=HEADERS, json=payload)
+        r = await client.post(f"{FRIDAY_URL}/facts", headers=request_headers(), json=payload)
         r.raise_for_status()
         return r.json()
 
@@ -196,7 +220,11 @@ async def get_blast_radius(args: dict) -> dict:
     if args.get("project"):
         params["project"] = args["project"]
     async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.get(f"{FRIDAY_URL}/graph/blast-radius", headers=HEADERS, params=params)
+        r = await client.get(
+            f"{FRIDAY_URL}/graph/blast-radius",
+            headers=request_headers(),
+            params=params,
+        )
         r.raise_for_status()
         return r.json()
 
@@ -205,11 +233,11 @@ async def memory_search(args: dict) -> dict:
     async with httpx.AsyncClient(timeout=30) as client:
         r = await client.post(
             f"{FRIDAY_URL}/search",
-            headers=HEADERS,
+            headers=request_headers(),
             json={
                 "query": args["query"],
                 "top_k": args.get("top_k", 5),
-                "project": args.get("project", ""),
+                "project": args.get("project") or "default",
             },
         )
         r.raise_for_status()
@@ -217,16 +245,18 @@ async def memory_search(args: dict) -> dict:
 
 
 async def get_context(args: dict) -> dict:
-    params = {}
-    if args.get("project"):
-        params["project"] = args["project"]
+    """Read authenticated project context; preserve compatibility with legacy API."""
     async with httpx.AsyncClient(timeout=30) as client:
-        facts_r = await client.get(f"{FRIDAY_URL}/facts", params=params)
-        facts = facts_r.json().get("facts", []) if facts_r.is_success else []
-        return {
-            "facts": facts,
-            "instruction": "Use these facts as absolute truth when responding. Search memory for project-specific context.",
-        }
+        params = {"project": args.get("project") or "default"}
+        response = await client.get(
+            f"{FRIDAY_URL}/context", headers=request_headers(), params=params
+        )
+        if response.status_code == 404:
+            response = await client.get(
+                f"{FRIDAY_URL}/facts", headers=request_headers(), params=params
+            )
+        response.raise_for_status()
+        return response.json()
 
 
 TOOL_HANDLERS = {
