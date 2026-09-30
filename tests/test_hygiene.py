@@ -1,6 +1,5 @@
 """Tests for Memory and Fact Hygiene Parity (delete_memory, update_memory, revoke_fact, delete_fact)."""
 
-from typing import Any, Dict
 from unittest.mock import patch
 
 import httpx
@@ -12,7 +11,6 @@ from friday.client import AsyncFriday, Friday
 from gateway.main import app
 from gateway.serverless import create_app
 from storage.local import LocalStorage
-
 
 # ── 1. Gateway Main: Facts Revocation & Deletion ───────────────────────────────
 
