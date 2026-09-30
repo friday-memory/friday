@@ -16,7 +16,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 <p align="center">
   <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat&color=334155&label=Stars" alt="GitHub Stars"/></a>
-  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.5.0-334155?style=flat" alt="Release"/></a>
+  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.5.1-334155?style=flat" alt="Release"/></a>
   <a href="https://pypi.org/project/friday-memory/"><img src="https://img.shields.io/pypi/v/friday-memory?style=flat&color=334155&label=PyPI" alt="PyPI Package"/></a>
   <a href="https://mcpservers.org/servers/friday-memory/friday"><img src="https://mcpservers.org/badge.svg" alt="Listed on mcpservers.org"/></a>
   <a href="https://glama.ai/mcp/servers/friday-memory/friday"><img src="https://glama.ai/mcp/servers/friday-memory/friday/badges/score.svg" alt="Glama Score"/></a>
@@ -95,11 +95,14 @@ Friday runs as a self-hosted background service providing a structured, four-tie
 │               AI CODING CLIENTS (Cursor / Claude Code / Antigravity / VS Code)         │
 └───────────────────────────────────────────┬────────────────────────────────────────────┘
                                             │
-                                4 MCP Tools (stdio / HTTP)
+                                7 MCP Tools (stdio / HTTP)
                                 ├── add_memory       (persist decisions & rationale)
                                 ├── add_fact         (versioned immutable truths)
                                 ├── memory_search    (targeted semantic recall)
-                                └── get_context      (compiled multi-layer prompt)
+                                ├── get_context      (compiled multi-layer prompt)
+                                ├── get_blast_radius (graph dependency traversal)
+                                ├── delete_memory    (evict obsolete episodic memories)
+                                └── revoke_fact      (prune conflicting/invalid truths)
                                             │
                                             ▼
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -599,6 +602,8 @@ Connected agents automatically access four core MCP primitives:
 | `get_blast_radius`| Computes multi-hop transitive dependency blast radius for a service or entity. | Prior to refactoring schemas or modifying critical APIs. |
 | `add_memory` | Records implementation details, rationale, and tradeoffs; triggers background graph extraction. | Post-implementation or bug resolution. |
 | `add_fact` | Commits versioned ground truths with automatic key conflict resolution and project isolation. | Architectural declarations or configuration changes. |
+| `delete_memory` | Evicts obsolete or invalid episodic memory entries by ID. | Memory hygiene and state cleanup. |
+| `revoke_fact` | Revokes and supersedes conflicting, obsolete, or invalid ground truths. | Architectural migrations or rule deprecations. |
 
 ---
 

@@ -77,6 +77,14 @@ class Decay(BaseModel):
     archive_threshold: float = Field(0.25, ge=0, le=2)
 
 
+class RevokeFact(BaseModel):
+    """Revoke a fact inside a project."""
+
+    project: str = Field("default", min_length=1)
+    fact_id: str = Field(min_length=1)
+    reason: str = ""
+
+
 class Mutation(BaseModel):
     """Project-bound memory mutation."""
 
@@ -138,8 +146,25 @@ def create_app(store=None, api_key=None):
         """Retrieve only the requested project's facts."""
         items = db.list("facts", project)
         if not include_superseded:
-            items = [f for f in items if not f.get("superseded") and f.get("status") != "decayed"]
+            items = [f for f in items if not f.get("superseded") and f.get("status") not in ("decayed", "revoked")]
         return {"total": len(items), "facts": items}
+
+    @app.post("/facts/revoke")
+    def revoke_fact(payload: RevokeFact):
+        """Revoke a fact within its project."""
+        res = db.revoke_fact(payload.project, payload.fact_id, payload.reason)
+        if res.get("status") == "not_found":
+            raise HTTPException(404, f"Fact with id '{payload.fact_id}' not found")
+        return res
+
+    @app.delete("/facts/{fact_id}")
+    def delete_fact(fact_id: str, project: str = Query(..., min_length=1), hard: bool = False):
+        """Delete or revoke a fact within its project."""
+        res = db.delete_fact(project, fact_id, hard=hard)
+        if res.get("status") == "not_found":
+            raise HTTPException(404, f"Fact with id '{fact_id}' not found")
+        return res
+
 
     @app.post("/add")
     def add(payload: Content):

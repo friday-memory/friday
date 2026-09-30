@@ -165,6 +165,62 @@ class Friday:
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error retrieving facts: {e}") from e
 
+    def delete_memory(self, memory_id: str, project: str = "default") -> Dict[str, Any]:
+        """Delete an episodic memory entry by ID."""
+        try:
+            r = self.client.post("/delete", json={"memory_id": memory_id, "project": project})
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error deleting memory: {e}") from e
+
+    def update_memory(
+        self, memory_id: str, content: str, source: Optional[str] = None, project: str = "default"
+    ) -> Dict[str, Any]:
+        """Update an episodic memory entry."""
+        try:
+            payload: Dict[str, Any] = {
+                "memory_id": memory_id,
+                "project": project,
+                "content": content,
+            }
+            if source:
+                payload["source"] = source
+            r = self.client.post("/update", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error updating memory: {e}") from e
+
+    def revoke_fact(
+        self, fact_id: str, reason: str = "", project: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Revoke a fact from the active ledger."""
+        try:
+            payload: Dict[str, Any] = {"fact_id": fact_id, "reason": reason}
+            if project:
+                payload["project"] = project
+            r = self.client.post("/facts/revoke", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error revoking fact: {e}") from e
+
+    def delete_fact(
+        self, fact_id: str, hard: bool = False, project: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Delete or permanently remove a fact from the ledger."""
+        try:
+            params: Dict[str, Any] = {"hard": hard}
+            if project:
+                params["project"] = project
+            r = self.client.delete(f"/facts/{fact_id}", params=params)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error deleting fact: {e}") from e
+
+
     def get_blast_radius(
         self, entity: str, depth: int = 2, project: Optional[str] = None
     ) -> BlastRadiusResult:
@@ -390,6 +446,62 @@ class AsyncFriday:
             return data.get("facts", [])
         except (httpx.ConnectError, httpx.TimeoutException) as e:
             raise FridayConnectionError(f"Network error retrieving facts: {e}") from e
+
+    async def delete_memory(self, memory_id: str, project: str = "default") -> Dict[str, Any]:
+        """Delete an episodic memory entry by ID."""
+        try:
+            r = await self.client.post("/delete", json={"memory_id": memory_id, "project": project})
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error deleting memory: {e}") from e
+
+    async def update_memory(
+        self, memory_id: str, content: str, source: Optional[str] = None, project: str = "default"
+    ) -> Dict[str, Any]:
+        """Update an episodic memory entry."""
+        try:
+            payload: Dict[str, Any] = {
+                "memory_id": memory_id,
+                "project": project,
+                "content": content,
+            }
+            if source:
+                payload["source"] = source
+            r = await self.client.post("/update", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error updating memory: {e}") from e
+
+    async def revoke_fact(
+        self, fact_id: str, reason: str = "", project: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Revoke a fact from the active ledger."""
+        try:
+            payload: Dict[str, Any] = {"fact_id": fact_id, "reason": reason}
+            if project:
+                payload["project"] = project
+            r = await self.client.post("/facts/revoke", json=payload)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error revoking fact: {e}") from e
+
+    async def delete_fact(
+        self, fact_id: str, hard: bool = False, project: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Delete or permanently remove a fact from the ledger."""
+        try:
+            params: Dict[str, Any] = {"hard": hard}
+            if project:
+                params["project"] = project
+            r = await self.client.delete(f"/facts/{fact_id}", params=params)
+            _handle_response_error(r)
+            return r.json()
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            raise FridayConnectionError(f"Network error deleting fact: {e}") from e
+
 
     async def get_blast_radius(
         self, entity: str, depth: int = 2, project: Optional[str] = None

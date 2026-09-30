@@ -6,6 +6,8 @@ Exposes Friday's cognitive memory as 4 tools any AI agent can call:
   - add_fact         : Store a discrete versioned fact
   - memory_search    : Semantic search across memories
   - get_context      : Get full project context (facts + recent memories)
+  - delete_memory    : Delete an episodic memory
+  - revoke_fact      : Revoke an obsolete or invalid fact
 
 Compatible with: Cursor, Antigravity IDE, Claude Desktop, VS Code (Cline/Roo).
 
@@ -174,6 +176,50 @@ TOOLS = [
             "required": ["entity"],
         },
     },
+    {
+        "name": "delete_memory",
+        "description": "Delete an episodic memory entry by its unique memory ID.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "memory_id": {
+                    "type": "string",
+                    "description": "Unique identifier of the memory to delete.",
+                },
+                "project": {
+                    "type": "string",
+                    "description": "Project namespace (e.g. 'reeldm', 'friday', 'default').",
+                    "default": "default",
+                },
+            },
+            "required": ["memory_id"],
+        },
+    },
+    {
+        "name": "revoke_fact",
+        "description": "Revoke an obsolete, conflicting, or incorrect fact from Friday's active facts ledger.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "fact_id": {
+                    "type": "string",
+                    "description": "Unique identifier of the fact to revoke.",
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "Optional audit explanation for why this fact is being revoked.",
+                    "default": "",
+                },
+                "project": {
+                    "type": "string",
+                    "description": "Project namespace filter (e.g. 'reeldm', 'friday', 'global').",
+                    "default": "global",
+                },
+            },
+            "required": ["fact_id"],
+        },
+    },
+
 ]
 
 
@@ -259,12 +305,47 @@ async def get_context(args: dict) -> dict:
         return response.json()
 
 
+async def delete_memory(args: dict) -> dict:
+    payload = {
+        "memory_id": args["memory_id"],
+        "project": args.get("project", "default"),
+    }
+    async with httpx.AsyncClient(timeout=30) as client:
+        r = await client.post(
+            f"{FRIDAY_URL}/delete",
+            headers=request_headers(),
+            json=payload,
+        )
+        r.raise_for_status()
+        return r.json()
+
+
+async def revoke_fact(args: dict) -> dict:
+    payload = {
+        "fact_id": args["fact_id"],
+        "reason": args.get("reason", ""),
+    }
+    if args.get("project"):
+        payload["project"] = args["project"]
+    async with httpx.AsyncClient(timeout=30) as client:
+        r = await client.post(
+            f"{FRIDAY_URL}/facts/revoke",
+            headers=request_headers(),
+            json=payload,
+        )
+        r.raise_for_status()
+        return r.json()
+
+
+
 TOOL_HANDLERS = {
     "add_memory": add_memory,
     "add_fact": add_fact,
     "memory_search": memory_search,
     "get_context": get_context,
     "get_blast_radius": get_blast_radius,
+    "delete_memory": delete_memory,
+    "revoke_fact": revoke_fact,
 }
 
 

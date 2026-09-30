@@ -327,3 +327,32 @@ class LocalStorage:
                 "id": memory_id,
                 "new_id": old.get("superseded_by"),
             }
+
+
+    def revoke_fact(self, project: str, fact_id: str, reason: str = "") -> dict:
+        """Revoke a fact by marking it superseded and revoked."""
+        now = datetime.now(timezone.utc).isoformat()
+        with self.transaction(True) as c:
+            old = self._get(c, "facts", project, fact_id)
+            if old is None:
+                return {"status": "not_found", "fact_id": fact_id}
+            old["superseded"] = True
+            old["status"] = "revoked"
+            old["revoked_at"] = now
+            old["revoked_reason"] = reason or "Explicit revocation"
+            self._put(c, Record("facts", project, fact_id, old))
+            return {"status": "revoked", "fact_id": fact_id, "project": project}
+
+    def delete_fact(self, project: str, fact_id: str, hard: bool = False) -> dict:
+        """Permanently delete or revoke a fact from storage."""
+        if not hard:
+            return self.revoke_fact(project, fact_id, reason="Deleted via API")
+        with self.transaction(True) as c:
+            old = self._get(c, "facts", project, fact_id)
+            if old is None:
+                return {"status": "not_found", "fact_id": fact_id}
+            c.execute(
+                "DELETE FROM records WHERE kind='facts' AND project=? AND id=?",
+                (project, fact_id),
+            )
+            return {"status": "deleted", "fact_id": fact_id, "project": project, "hard": True}

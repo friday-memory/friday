@@ -114,6 +114,18 @@ class MemoryPayload(BaseModel):
     project: str = Field("default", description="Project namespace.")
 
 
+class RevokeFactPayload(BaseModel):
+    fact_id: str = Field(..., description="ID of the fact to revoke.")
+    reason: Optional[str] = Field("", description="Reason for revoking the fact.")
+    project: Optional[str] = Field(None, description="Optional project namespace filter.")
+
+
+class MemoryMutationPayload(BaseModel):
+    project: str = Field("default", description="Project namespace.")
+    memory_id: str = Field(..., description="Target memory ID.")
+    content: Optional[str] = Field(None, description="Updated memory content if updating.")
+    source: Optional[str] = Field(None, description="Source origin: agent | user | system")
+
 class FactPayload(BaseModel):
     content: str = Field(..., description="A discrete, versioned fact.")
     project: str = Field(
@@ -263,6 +275,66 @@ async def add_memory(
     return results
 
 
+@app.post("/delete")
+async def delete_memory_endpoint(payload: MemoryMutationPayload, _key=Depends(verify_key)):
+    """Delete a memory from Mem0 / episodic storage (Parity with serverless /delete)."""
+    mem0 = get_mem0_client()
+    status = "deleted"
+    error = None
+    if mem0:
+        try:
+            mem0.delete(payload.memory_id)
+        except Exception as e:
+            logger.warning(f"Mem0 deletion error for {payload.memory_id}: {e}")
+            error = str(e)
+            status = "mem0_error"
+    return {
+        "status": status,
+        "id": payload.memory_id,
+        "memory_id": payload.memory_id,
+        "project": payload.project,
+        **({"error": error} if error else {}),
+    }
+
+
+@app.delete("/memory/{memory_id}")
+async def delete_memory_by_id(
+    memory_id: str,
+    project: str = "default",
+    _key=Depends(verify_key),
+):
+    """Delete a memory by ID."""
+    return await delete_memory_endpoint(
+        MemoryMutationPayload(memory_id=memory_id, project=project),
+        _key=_key,
+    )
+
+
+@app.post("/update")
+async def update_memory_endpoint(payload: MemoryMutationPayload, _key=Depends(verify_key)):
+    """Update a memory in Mem0 / episodic storage (Parity with serverless /update)."""
+    if not payload.content:
+        raise HTTPException(400, "Field 'content' is required for update.")
+    mem0 = get_mem0_client()
+    status = "updated"
+    error = None
+    if mem0:
+        try:
+            mem0.update(payload.memory_id, data=payload.content)
+        except Exception as e:
+            logger.warning(f"Mem0 update error for {payload.memory_id}: {e}")
+            error = str(e)
+            status = "mem0_error"
+    return {
+        "status": status,
+        "id": payload.memory_id,
+        "memory_id": payload.memory_id,
+        "project": payload.project,
+        **({"error": error} if error else {}),
+    }
+
+
+
 @app.post("/facts")
 async def add_fact(payload: FactPayload, _key=Depends(verify_key)):
     """Add a discrete, versioned fact to the ledger with conflict resolution and auto-supersede."""
@@ -350,7 +422,7 @@ async def get_facts(
         facts = [
             f
             for f in facts
-            if not f.get("superseded", False) and f.get("status", "active") != "decayed"
+            if not f.get("superseded", False) and f.get("status", "active") not in ("decayed", "revoked")
         ]
     if project:
         proj_norm = project.strip().lower()
@@ -359,6 +431,88 @@ async def get_facts(
         facts = [f for f in facts if f.get("energy_score", 1.0) >= min_energy]
     facts.sort(key=lambda x: x.get("energy_score", 1.0), reverse=True)
     return {"total": len(facts), "facts": facts}
+
+
+@app.post("/facts/revoke")
+async def revoke_fact_endpoint(payload: RevokeFactPayload, _key=Depends(verify_key)):
+    """Revoke an active fact from the ledger, marking it revoked and superseded."""
+    data = _load_facts()
+    target_id = payload.fact_id.strip()
+    now = datetime.now(timezone.utc).isoformat()
+    project = payload.project.strip().lower() if payload.project else None
+
+    target = None
+    for f in data.get("facts", []):
+        if f.get("id") == target_id:
+            if project and f.get("project", "global").lower() not in (project, "global"):
+                continue
+            target = f
+            break
+
+    if not target:
+        raise HTTPException(404, f"Fact with id '{target_id}' not found.")
+
+    target["superseded"] = True
+    target["status"] = "revoked"
+    target["revoked_at"] = now
+    target["revoked_reason"] = payload.reason or "Explicit revocation"
+    _save_facts(data)
+
+    return {
+        "status": "revoked",
+        "fact_id": target_id,
+        "project": target.get("project", "global"),
+        "reason": target["revoked_reason"],
+    }
+
+
+@app.delete("/facts/{fact_id}")
+async def delete_fact_endpoint(
+    fact_id: str,
+    hard: bool = False,
+    project: Optional[str] = None,
+    _key=Depends(verify_key),
+):
+    """Delete or revoke a fact from the ledger."""
+    data = _load_facts()
+    now = datetime.now(timezone.utc).isoformat()
+    proj_norm = project.strip().lower() if project else None
+
+    facts = data.get("facts", [])
+    idx = -1
+    for i, f in enumerate(facts):
+        if f.get("id") == fact_id:
+            if proj_norm and f.get("project", "global").lower() not in (proj_norm, "global"):
+                continue
+            idx = i
+            break
+
+    if idx == -1:
+        raise HTTPException(404, f"Fact with id '{fact_id}' not found.")
+
+    if hard:
+        removed = facts.pop(idx)
+        _save_facts(data)
+        return {
+            "status": "deleted",
+            "fact_id": fact_id,
+            "hard": True,
+            "project": removed.get("project", "global"),
+        }
+    else:
+        target = facts[idx]
+        target["superseded"] = True
+        target["status"] = "revoked"
+        target["revoked_at"] = now
+        target["revoked_reason"] = "Deleted via API"
+        _save_facts(data)
+        return {
+            "status": "revoked",
+            "fact_id": fact_id,
+            "hard": False,
+            "project": target.get("project", "global"),
+        }
+
 
 
 @app.post("/search")
