@@ -18,6 +18,8 @@ Persists architecture decisions, schemas, and constraints across sessions via th
   <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat&color=334155&label=Stars" alt="GitHub Stars"/></a>
   <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.5.0-334155?style=flat" alt="Release"/></a>
   <a href="https://pypi.org/project/friday-memory/"><img src="https://img.shields.io/pypi/v/friday-memory?style=flat&color=334155&label=PyPI" alt="PyPI Package"/></a>
+  <a href="https://mcpservers.org/servers/friday-memory/friday"><img src="https://mcpservers.org/badge.svg" alt="Listed on mcpservers.org"/></a>
+  <a href="https://glama.ai/mcp/servers/friday-memory/friday"><img src="https://glama.ai/mcp/servers/friday-memory/friday/badges/score.svg" alt="Glama Score"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-334155?style=flat" alt="MIT License"/></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/python-3.11+-334155?style=flat" alt="Python 3.11+"/></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/protocol-MCP_2024--11--05-334155?style=flat" alt="MCP Protocol"/></a>
