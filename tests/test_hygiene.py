@@ -165,6 +165,134 @@ def test_gateway_memory_delete_and_update_with_auth():
         assert updated_calls == [("mem_99", "Updated architectural choice")]
 
 
+def test_gateway_memory_cross_project_isolation_and_search_scoping():
+    """Verify that memories cannot be read, updated, or deleted across project boundaries (v1.5.2 fix)."""
+    client = TestClient(app)
+    headers = {"X-Friday-Key": "test_key"}
+
+    memories_store = {
+        "mem_prod": {
+            "id": "mem_prod",
+            "content": "ACME_PROD_SECRET=hunter2",
+            "metadata": {"source": "agent", "project": "acme-prod"},
+        },
+        "mem_oss": {
+            "id": "mem_oss",
+            "content": "OSS tool note",
+            "metadata": {"source": "agent", "project": "unrelated-oss"},
+        },
+        "mem_legacy": {
+            "id": "mem_legacy",
+            "content": "Legacy note",
+            "metadata": {"source": "agent"},
+        },
+    }
+
+    class ScopedMem0Mock:
+        def get(self, mid):
+            return memories_store.get(mid)
+
+        def delete(self, mid):
+            if mid in memories_store:
+                del memories_store[mid]
+                return True
+            return False
+
+        def update(self, mid, data=None):
+            if mid in memories_store:
+                memories_store[mid]["content"] = data
+                return True
+            return False
+
+        def search(self, query, user_id=None, limit=5, filters=None):
+            res = []
+            project_filter = None
+            if filters and "AND" in filters:
+                for item in filters["AND"]:
+                    if "metadata" in item and "project" in item["metadata"]:
+                        project_filter = item["metadata"]["project"]
+            for m in memories_store.values():
+                if project_filter:
+                    if (m.get("metadata") or {}).get("project") == project_filter:
+                        res.append(m)
+                else:
+                    res.append(m)
+            return res[:limit]
+
+    with patch("gateway.main.get_mem0_client", return_value=ScopedMem0Mock()):
+        # 1. Search scoping: unrelated-oss search should not return acme-prod secret
+        r_search = client.post(
+            "/search",
+            json={"query": "secret", "project": "unrelated-oss"},
+            headers=headers,
+        )
+        assert r_search.status_code == 200
+        search_results = r_search.json().get("results", [])
+        assert not any(r["id"] == "mem_prod" for r in search_results)
+        assert any(r["id"] == "mem_oss" for r in search_results)
+
+        # 2. Unscoped search: should default to 'default' and not leak other projects
+        r_unscoped = client.post("/search", json={"query": "secret"}, headers=headers)
+        assert r_unscoped.status_code == 200
+        unscoped_results = r_unscoped.json().get("results", [])
+        assert not any(r["id"] in ("mem_prod", "mem_oss") for r in unscoped_results)
+
+        # 3. Cross-project delete: unrelated project cannot delete acme-prod
+        r_del_cross = client.post(
+            "/delete",
+            json={"memory_id": "mem_prod", "project": "unrelated-oss"},
+            headers=headers,
+        )
+        assert r_del_cross.status_code == 403
+        assert "Cross-project mutation denied" in r_del_cross.json()["detail"]
+        assert "mem_prod" in memories_store
+
+        # 4. Default / unscoped delete cannot delete acme-prod
+        r_del_default = client.post(
+            "/delete",
+            json={"memory_id": "mem_prod", "project": "default"},
+            headers=headers,
+        )
+        assert r_del_default.status_code == 403
+        assert "mem_prod" in memories_store
+
+        # 5. Cross-project update: cannot mutate another project's memory
+        r_up_cross = client.post(
+            "/update",
+            json={"memory_id": "mem_prod", "content": "tampered", "project": "unrelated-oss"},
+            headers=headers,
+        )
+        assert r_up_cross.status_code == 403
+        assert memories_store["mem_prod"]["content"] == "ACME_PROD_SECRET=hunter2"
+
+        # 6. Legitimate owner update
+        r_up_ok = client.post(
+            "/update",
+            json={"memory_id": "mem_prod", "content": "updated_secret", "project": "acme-prod"},
+            headers=headers,
+        )
+        assert r_up_ok.status_code == 200
+        assert memories_store["mem_prod"]["content"] == "updated_secret"
+
+        # 7. Legitimate owner delete
+        r_del_ok = client.post(
+            "/delete",
+            json={"memory_id": "mem_prod", "project": "acme-prod"},
+            headers=headers,
+        )
+        assert r_del_ok.status_code == 200
+        assert "mem_prod" not in memories_store
+
+        # 8. Legacy unscoped memory can be cleaned up
+        r_del_legacy = client.post(
+            "/delete",
+            json={"memory_id": "mem_legacy", "project": "any-project"},
+            headers=headers,
+        )
+        assert r_del_legacy.status_code == 200
+        assert "mem_legacy" not in memories_store
+
+
 # ── 3. Serverless Candidate Hygiene Parity ─────────────────────────────────────
 
 def test_serverless_fact_revoke_and_delete(tmp_path):

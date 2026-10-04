@@ -235,6 +235,46 @@ async def health():
     }
 
 
+def _verify_memory_project(mem0_client, memory_id: str, claimed_project: str) -> None:
+    """Raise HTTP 403 if the memory belongs to a different project than claimed_project.
+
+    Security fix: prevents cross-project delete/update (v1.5.2).
+    """
+    if not hasattr(mem0_client, "get"):
+        return
+    try:
+        record = mem0_client.get(memory_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.warning(f"Could not retrieve memory {memory_id} to verify project: {e}")
+        return
+
+    if record is None:
+        return
+    if isinstance(record, list):
+        record = record[0] if record else None
+    if record is None:
+        return
+
+    stored_raw = (record.get("metadata") or {}).get("project")
+    # If unlabelled or explicitly marked legacy, allow modification for backward compatibility
+    if not stored_raw or stored_raw == "__legacy_unscoped__":
+        return
+
+    stored_project = str(stored_raw).strip().lower()
+    claimed = (claimed_project or "default").strip().lower()
+
+    if stored_project != claimed:
+        raise HTTPException(
+            status_code=403,
+            detail=(
+                f"Memory '{memory_id}' belongs to project '{stored_raw}', "
+                f"not '{claimed_project}'. Cross-project mutation denied."
+            ),
+        )
+
+
 @app.post("/add")
 async def add_memory(
     payload: MemoryPayload, background_tasks: BackgroundTasks, _key=Depends(verify_key)
@@ -283,7 +323,11 @@ async def delete_memory_endpoint(payload: MemoryMutationPayload, _key=Depends(ve
     error = None
     if mem0:
         try:
+            # Security: verify ownership before mutating (v1.5.2 fix)
+            _verify_memory_project(mem0, payload.memory_id, payload.project)
             mem0.delete(payload.memory_id)
+        except HTTPException:
+            raise
         except Exception as e:
             logger.warning(f"Mem0 deletion error for {payload.memory_id}: {e}")
             error = str(e)
@@ -320,7 +364,11 @@ async def update_memory_endpoint(payload: MemoryMutationPayload, _key=Depends(ve
     error = None
     if mem0:
         try:
+            # Security: verify ownership before mutating (v1.5.2 fix)
+            _verify_memory_project(mem0, payload.memory_id, payload.project)
             mem0.update(payload.memory_id, data=payload.content)
+        except HTTPException:
+            raise
         except Exception as e:
             logger.warning(f"Mem0 update error for {payload.memory_id}: {e}")
             error = str(e)
@@ -522,7 +570,21 @@ async def search_memory(payload: SearchPayload, _key=Depends(verify_key)):
     if not mem0:
         raise HTTPException(503, "Mem0 not configured. Check MEM0_API_KEY.")
     try:
-        results = mem0.search(payload.query, user_id="friday_user", limit=payload.top_k)
+        # Security: scope search to the caller's project (v1.5.2 fix)
+        project_filter = payload.project.strip() if payload.project else "default"
+        search_kwargs: dict = {
+            "user_id": "friday_user",
+            "limit": payload.top_k,
+            "filters": {"AND": [{"metadata": {"project": project_filter}}]},
+        }
+        results = mem0.search(payload.query, **search_kwargs)
+        # Defensive post-filter — belt-and-suspenders in case backend ignores filter
+        results = [
+            r
+            for r in (results or [])
+            if ((r.get("metadata") or {}).get("project") or "__legacy_unscoped__").strip().lower()
+            in (project_filter.lower(), "__legacy_unscoped__")
+        ]
         return {"query": payload.query, "results": results}
     except Exception as e:
         raise HTTPException(500, str(e))
@@ -548,10 +610,13 @@ async def ingest_blueprint(
     # Also store in Mem0 as memory
     mem0 = get_mem0_client()
     mem0_id = None
+    bp_project = payload.get("project", "default")
     if mem0:
         try:
             r = mem0.add(
-                text[:2000], user_id="friday_user", metadata={"source": source, "file": filename}
+                text[:2000],
+                user_id="friday_user",
+                metadata={"source": source, "file": filename, "project": bp_project},
             )
             mem0_id = r[0].get("id") if r else None
         except Exception:

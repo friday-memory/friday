@@ -16,7 +16,7 @@ Persists architecture decisions, schemas, and constraints across sessions via th
 
 <p align="center">
   <a href="https://github.com/friday-memory/friday/stargazers"><img src="https://img.shields.io/github/stars/friday-memory/friday?style=flat&color=334155&label=Stars" alt="GitHub Stars"/></a>
-  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.5.1-334155?style=flat" alt="Release"/></a>
+  <a href="https://github.com/friday-memory/friday/releases"><img src="https://img.shields.io/badge/release-v1.5.2-334155?style=flat" alt="Release"/></a>
   <a href="https://pypi.org/project/friday-memory/"><img src="https://img.shields.io/pypi/v/friday-memory?style=flat&color=334155&label=PyPI" alt="PyPI Package"/></a>
   <a href="https://mcpservers.org/servers/friday-memory/friday"><img src="https://mcpservers.org/badge.svg" alt="Listed on mcpservers.org"/></a>
   <a href="https://glama.ai/mcp/servers/friday-memory/friday"><img src="https://glama.ai/mcp/servers/friday-memory/friday/badges/score.svg" alt="Glama Score"/></a>
